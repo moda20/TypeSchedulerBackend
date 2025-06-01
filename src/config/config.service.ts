@@ -57,6 +57,13 @@ export const ObjectifyFlattenedProperties = (
   return parsedCnfs;
 };
 
+const verifyMasterKey = () => {
+  const key = config.get("encryption.masterKey");
+  if (!key) {
+    throw new Error("Master key (env MASTER_ENCRYPTION_KEY) is not set");
+  }
+};
+
 export const getConvictSchemaProperties = ({
   encryptedValues = true,
   onlyMirroredValues = true,
@@ -128,6 +135,7 @@ export const getConfigWithDBEncryptionStatus = async () => {
 
 export const syncConfigWithDB = async () => {
   logger.debug("syncing config with db");
+  verifyMasterKey();
   const configList = getConvictSchemaProperties();
   const configFromDB = (await getAllConfigs()).reduce(
     (p, c) => {
