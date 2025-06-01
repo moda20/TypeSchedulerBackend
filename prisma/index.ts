@@ -15,7 +15,7 @@ const createPrismaClient = () => {
   prisma = new PrismaClient({
     datasourceUrl: schedulerDatasourceUrl,
   });
-  const BaseDatasourceUrl = `mysql://${config.get("BASE_DB.username")}:${config.get("BASE_DB.password")}@${config.get("BASE_DB.host")}:${config.get("BASE_DB.port")}/${config.get("BASE_DB.databaseName")}`;
+  const BaseDatasourceUrl = `mysql://${config.get("baseDB.username")}:${config.get("baseDB.password")}@${config.get("baseDB.host")}:${config.get("baseDB.port")}/${config.get("baseDB.databaseName")}`;
   basePrisma = new BasePrismaClient({
     datasourceUrl: BaseDatasourceUrl,
   });
@@ -81,7 +81,7 @@ const runMigrations = () => {
  */
 const runBaseMigrations = () => {
   try {
-    const dbUrl = `mysql://${config.get("BASE_DB.username")}:${config.get("BASE_DB.password")}@${config.get("BASE_DB.host")}:${config.get("BASE_DB.port")}/${config.get("BASE_DB.databaseName")}`;
+    const dbUrl = `mysql://${config.get("baseDB.username")}:${config.get("baseDB.password")}@${config.get("baseDB.host")}:${config.get("baseDB.port")}/${config.get("baseDB.databaseName")}`;
     let statusOutput;
     try {
       statusOutput = execSync(
@@ -123,6 +123,18 @@ const runBaseMigrations = () => {
     console.log("error", error);
     logger.error("Error applying migrations:", error);
   }
+};
+
+const tableExists = async (tableName: string, prisma: PrismaClient) => {
+  const result: any = await prisma.$queryRaw`
+      SELECT COUNT(*) as count
+      FROM information_schema.tables
+      WHERE table_schema = DATABASE() AND table_name = ${tableName}
+  `;
+  return result[0].count > 0;
+};
+export const configTableExists = async () => {
+  return tableExists("appConfig", prisma);
 };
 
 // @ts-ignore

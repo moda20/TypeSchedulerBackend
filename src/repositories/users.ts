@@ -58,7 +58,7 @@ export const registerUser = async (user: NewUserConfig) => {
 export const getEncryptedPassword = (password: string) => {
   return Bun.password.hash(password, {
     algorithm: "bcrypt",
-    cost: config.get("BASE_DB.passwordSaltRounds"),
+    cost: config.get("baseDB.passwordSaltRounds"),
   });
 };
 

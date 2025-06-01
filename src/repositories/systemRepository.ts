@@ -36,12 +36,12 @@ export const getSchedulerDatabaseInfo = async () => {
 
 export const getBaseDatabaseInfo = async () => {
   const dbSize: [{ size_mb: number }] = await getSchedulerDatabaseSize(
-    config.get("BASE_DB.databaseName"),
+    config.get("baseDB.databaseName"),
     basePrisma,
   );
   return {
-    host: `${config.get("BASE_DB.host")}:${config.get("BASE_DB.port")}`,
-    databaseName: config.get("BASE_DB.databaseName"),
+    host: `${config.get("baseDB.host")}:${config.get("baseDB.port")}`,
+    databaseName: config.get("baseDB.databaseName"),
     dbSize: dbSize[0]?.size_mb,
   };
 };
@@ -100,10 +100,10 @@ export const backupSchedulerDB = async () => {
 
 export const backupBaseDB = async () => {
   return mysqldumpDbDump({
-    host: config.get("BASE_DB.host"),
-    user: config.get("BASE_DB.username"),
-    password: config.get("BASE_DB.password"),
-    database: config.get("BASE_DB.databaseName"),
-    port: config.get("BASE_DB.port"),
+    host: config.get("baseDB.host"),
+    user: config.get("baseDB.username"),
+    password: config.get("baseDB.password"),
+    database: config.get("baseDB.databaseName"),
+    port: config.get("baseDB.port"),
   });
 };
