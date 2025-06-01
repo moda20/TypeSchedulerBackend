@@ -126,6 +126,25 @@ exports.Prisma.UserScalarFieldEnum = {
   password: 'password'
 };
 
+exports.Prisma.AppConfigScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  value: 'value',
+  is_encrypted: 'is_encrypted',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
+exports.Prisma.AppConfigAuditScalarFieldEnum = {
+  id: 'id',
+  configId: 'configId',
+  oldValue: 'oldValue',
+  newValue: 'newValue',
+  changedUserId: 'changedUserId',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -137,9 +156,26 @@ exports.Prisma.userOrderByRelevanceFieldEnum = {
   password: 'password'
 };
 
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
+exports.Prisma.appConfigOrderByRelevanceFieldEnum = {
+  key: 'key',
+  value: 'value'
+};
+
+exports.Prisma.appConfigAuditOrderByRelevanceFieldEnum = {
+  oldValue: 'oldValue',
+  newValue: 'newValue'
+};
+
 
 exports.Prisma.ModelName = {
-  user: 'user'
+  user: 'user',
+  appConfig: 'appConfig',
+  appConfigAudit: 'appConfigAudit'
 };
 
 /**

@@ -1,3 +1,4 @@
+import { walk } from "@utils/convictUtils";
 import convict from "convict";
 import { ipaddress } from "convict-format-with-validator";
 
@@ -18,6 +19,7 @@ const config = convict({
   swaggerServer: {
     doc: "Whether to enable swagger server or not.",
     default: true,
+    format: Boolean,
     env: "ENABLE_SWAGGER_SERVER",
   },
   server: {
@@ -131,7 +133,7 @@ const config = convict({
       env: "SCHEDULER_DB_NAME",
     },
   },
-  BASE_DB: {
+  baseDB: {
     host: {
       doc: "The base database host.",
       format: "ipaddress",
@@ -182,6 +184,7 @@ const config = convict({
       format: String,
       default: "token",
       env: "GOTIFY_TOKEN",
+      sensitive: true,
     },
     appToken: {
       doc: "The gotify app token.",
@@ -189,6 +192,7 @@ const config = convict({
       default: null,
       env: "GOTIFY_APP_TOKEN",
       nullable: true,
+      sensitive: true,
     },
     appErrorChannelToken: {
       doc: "The gotify app error channel token.",
@@ -196,6 +200,7 @@ const config = convict({
       default: null,
       env: "GOTIFY_ERROR_APP_TOKEN",
       nullable: true,
+      sensitive: true,
     },
   },
   grafana: {
@@ -212,6 +217,7 @@ const config = convict({
       default: null,
       env: "GRAFANA_LOKI_USERNAME",
       nullable: true,
+      sensitive: true,
     },
     password: {
       doc: "The grafana loki password.",
@@ -219,6 +225,7 @@ const config = convict({
       default: null,
       env: "GRAFANA_LOKI_PASSWORD",
       nullable: true,
+      sensitive: true,
     },
   },
   browserless: {
@@ -235,6 +242,7 @@ const config = convict({
       default: "token",
       env: "BROWSERLESS_TOKEN",
       nullable: true,
+      sensitive: true,
     },
     timeout: {
       doc: "The browserless Timeout",
@@ -244,6 +252,33 @@ const config = convict({
       nullable: false,
     },
   },
+  encryption: {
+    masterKey: {
+      doc: "The master key used to encrypt and decrypt config values, it's expected to be in base64",
+      format: String,
+      default: "",
+      env: "MASTER_ENCRYPTION_KEY",
+      sensitive: true,
+      db_mirror: false,
+    },
+  },
 });
 
-export default config;
+type extendedConvict = typeof config & {
+  removeKey: (key: string) => void;
+  _instance: any;
+};
+
+const extendedConfig = config as extendedConvict;
+
+extendedConfig.removeKey = function (key: string) {
+  const keySplit = key.split(".");
+  const targetKey = keySplit.pop();
+  const targetPath = keySplit.join(".");
+  if (targetKey) {
+    const targetObject = walk(this._instance, targetPath, false);
+    delete targetObject[targetKey];
+  }
+};
+
+export default extendedConfig;

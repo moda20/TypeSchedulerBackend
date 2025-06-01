@@ -1,8 +1,11 @@
+import config from "@config/config";
+import { syncConfigWithDB } from "@config/config.service";
 import type { PrismaClient } from "@generated/prisma";
 import { PrismaClient as BasePrismaClient } from "@generated/prisma_base";
 import logger from "@utils/loggers";
 
 import {
+  configTableExists,
   createPrismaClient,
   runBaseMigrations,
   runMigrations,
@@ -15,12 +18,19 @@ let basePrisma: BasePrismaClient;
 
 export const initialize = async () => {
   [prisma, basePrisma] = await createPrismaClient();
+  const configExists = await configTableExists();
+  if (configExists) {
+    await syncConfigWithDB();
+  }
   logger.info("Migrating the database");
   runMigrations();
   runBaseMigrations();
+  if (!configExists) {
+    await syncConfigWithDB();
+  }
+  logger.info("Config synced with DB");
   const managerResults = await start();
   logger.info("Schedule manager initialized");
-
   return { managerResults };
 };
 

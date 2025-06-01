@@ -1,6 +1,7 @@
 import { outputFilesController } from "@api/files/outputFiles.controller";
 import { JobsController } from "@api/jobs/jobs.controller";
 import { proxiesController } from "@api/proxies/proxies.controller";
+import { configController } from "@api/system/config.controller";
 import { systemController } from "@api/system/system.controller";
 import { websocketController } from "@api/websocket/mainSocket.controller";
 import { isAuthenticated } from "@auth/guards/authenticated.guard";
@@ -30,6 +31,7 @@ export const apiRoutes = createElysia()
           errors: isAuth.errors,
         };
       }
+      set.headers["x-user-id"] = isAuth.data.id;
     },
   });
 
@@ -51,3 +53,4 @@ apiRoutes.use(systemController);
 apiRoutes.use(outputFilesController);
 apiRoutes.use(proxiesController);
 apiRoutes.use(websocketController);
+apiRoutes.use(configController);

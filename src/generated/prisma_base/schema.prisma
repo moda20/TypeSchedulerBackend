@@ -17,4 +17,29 @@ model user {
   updated_at DateTime @default(now()) @db.DateTime(0)
   username   String   @db.VarChar(255)
   password   String   @db.VarChar(255)
+
+  configChanges appConfigAudit[]
+}
+
+model appConfig {
+  id           Int      @id @unique(map: "id") @default(autoincrement())
+  key          String   @unique @db.VarChar(255)
+  value        String?  @db.LongText
+  is_encrypted Boolean  @default(false)
+  created_at   DateTime @default(now()) @db.DateTime(0)
+  updated_at   DateTime @default(now()) @db.DateTime(0)
+
+  appConfigAudit appConfigAudit[]
+}
+
+model appConfigAudit {
+  id            Int        @id @unique(map: "id") @default(autoincrement())
+  config        appConfig? @relation(fields: [configId], references: [id], onDelete: SetNull)
+  configId      Int?
+  oldValue      String?    @db.LongText
+  newValue      String?    @db.LongText
+  changedBy     user       @relation(fields: [changedUserId], references: [id], map: "config_changed_by_user")
+  changedUserId Int
+  created_at    DateTime   @default(now()) @db.DateTime(0)
+  updated_at    DateTime   @default(now()) @db.DateTime(0)
 }
