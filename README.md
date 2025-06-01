@@ -43,6 +43,7 @@ the initial configuration is done via the **.env** file. The following variables
 | NODE_ENV                     | The environment to use                                                               | development       |
 | ENABLE_SWAGGER_SERVER        | Whether to enable the swagger server or not                                          | true              |
 | APP_NAME                     | The Application name (will be used around the app)                                   | scheduler_backend |
+| MASTER_ENCRYPTION_KEY*       | The master encryption key, should be set as a base64 encoded secret key              |                   |
 | DB_HOST                      | The database host                                                                    | localhost         |
 | DB_PORT                      | The database port                                                                    | 3306              |
 | DB_USERNAME                  | The database username                                                                | root              |
@@ -74,19 +75,20 @@ the initial configuration is done via the **.env** file. The following variables
 | CACHE_FILES_ROOT_PATH        | The directory inside the output folder that houses cache files                       | caches            |
 | OUTPUT_FILES_ROOT_PATH       | The directory inside the output folder that houses exported files                    | exported          |
 
-
-
 ## Development
 
-The Scheduler_backend is built using [Bun](https://bun.sh/) for the runtime and [Elysia](https://elysiajs.com/) for the server/API framework.
-The following are the most pertinent packages used in tandem with the above : 
+The Scheduler_backend is built using [Bun](https://bun.sh/) for the runtime and [Elysia](https://elysiajs.com/) for the
+server/API framework.
+The following are the most pertinent packages used in tandem with the above :
 
-- [Prisma](https://www.prisma.io/) for the ORM and migrations
+*- [Prisma](https://www.prisma.io/) for the ORM and migr*ations
 - [Pino](https://github.com/pinojs/pino) for logging
 - [Scheduler Manager](https://github.com/moda20/node-schedule-manager) for the CRON based scheduling
 
 ### Running backend locally
+
 To run the backend app locally :
+
 - Have bun installed : installation instructions [Bun.sh](https://bun.sh/docs/installation)
 - Clone the repo : `git clone https://github.com/moda20/scheduler_backend.git`
 - Install the dependencies : `bun install`
@@ -94,9 +96,6 @@ To run the backend app locally :
 - to build the app run : `bun build`
 
 A .env file is necessary for the app to run, the .env.example file is provided as a template and check the table above
-
-
-
 
 ## 📝 License
 
