@@ -263,5 +263,5 @@ export interface JobStats {
 
 export interface JobOptions {
   utils?: typeof JobConsumerUtils;
-  config?: typeof config;
+  config?: { [key: string]: any };
 }
