@@ -68,7 +68,7 @@ export class JobConsumer extends Consumer {
     try {
       this.options = {
         utils: jobConsumerUtils,
-        config: config,
+        config: config.getProperties(),
       };
       return await this.run(job, jobLog);
     } catch (err) {
