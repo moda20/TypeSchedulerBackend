@@ -277,6 +277,38 @@ export const jobActionExecution = async (
   }
 };
 
+export const getJobRuns = async ({
+  jobId,
+  limit,
+  offset,
+}: {
+  jobId: string;
+  limit?: number;
+  offset?: number;
+}) => {
+  const [jobRuns, count] = await Promise.all([
+    prisma.schedule_job_log.findMany({
+      where: {
+        job_id: Number(jobId),
+      },
+      take: limit,
+      skip: offset,
+      orderBy: {
+        start_time: "desc",
+      },
+    }),
+    prisma.schedule_job_log.count({
+      where: {
+        job_id: Number(jobId),
+      },
+    }),
+  ]);
+  return {
+    data: jobRuns,
+    total: count,
+  };
+};
+
 export const getAvailableConsumers = async () => {
   const targetPath = join("src/jobs", config.get("jobs.targetFolderForJobs"));
   return findFiles(

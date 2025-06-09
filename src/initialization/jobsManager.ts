@@ -124,10 +124,10 @@ export const saveJobLogs = (id: string, name: string) => {
     ScheduleJobLogEventBus.removeAllListeners(logId);
     ScheduleJobLogEventBus.removeAllListeners(errorId);
     ScheduleJobLogEventBus.on(logId, (data: any) => {
-      JobLogger(id.toString(), name).info(data);
+      JobLogger(id.toString(), name).info({ logId: data.logId }, data.data);
     });
     ScheduleJobLogEventBus.on(errorId, (data: any) => {
-      JobLogger(id.toString(), name).info(data);
+      JobLogger(id.toString(), name).info({ logId: data.logId }, data.data);
       const targetConsumer = ScheduleJobManager.runningJob.find(
         (j) =>
           (j.job.getUniqueSingularId() ?? j.job.getId())?.toString() === id,

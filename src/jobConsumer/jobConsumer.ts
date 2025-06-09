@@ -57,6 +57,21 @@ export class JobConsumer extends Consumer {
       });
   }
 
+  logEvent(data: any, serializer?: (data: any) => any) {
+    const serializedData = serializer
+      ? serializer(data)
+      : this.serializeLogs(data);
+    if (this.jobLog?.logEventBus) {
+      this.jobLog.logEventBus.emit(
+        "jobLog:" + (this.job?.getUniqueSingularId() ?? this.job?.getId()),
+        {
+          logId: this.jobLog?.getId(),
+          data: serializedData,
+        },
+      );
+    }
+  }
+
   run(job: JobDTO, jobLog: JobLogDTO) {
     return super.run(job, jobLog);
   }
