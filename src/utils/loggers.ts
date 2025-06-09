@@ -12,6 +12,7 @@ const JobLokiTransportTemplate = {
       password: config.get("grafana.password") || "",
     },
     formattingTemplate: "${log.timeParsed} | ${log.levelParsed} | ${log.msg}",
+    propsToLabels: ["logId"],
   },
 };
 
@@ -41,7 +42,7 @@ const JobLogger = (id: string, name: string) => {
     },
     config.get("env") === "development" && {
       target: "pino-pretty",
-      options: { destination: 1, colorize: true, ignore: "pid,hostname" },
+      options: { destination: 1, colorize: true, ignore: "pid,hostname,logId" },
     },
   ].filter((e) => !!e);
   const jobTransport = pino.transport({

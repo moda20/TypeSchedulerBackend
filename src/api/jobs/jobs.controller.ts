@@ -5,6 +5,7 @@ import {
   getAllJobs,
   getAvailableConsumers,
   getJobMetrics,
+  getJobRuns,
   getJobStats,
   getLokiLogs,
   getRunningJobs,
@@ -119,4 +120,17 @@ export const JobsController = createElysia({ prefix: "/jobs" })
   )
   .get("/getRunningJobs", () => {
     return getRunningJobs();
-  });
+  })
+  .get(
+    "/getJobRuns",
+    ({ query }) => {
+      return getJobRuns(query);
+    },
+    {
+      query: t.Object({
+        jobId: t.String(),
+        limit: t.Optional(t.Union([t.Number(), t.String()])),
+        offset: t.Optional(t.Union([t.Number(), t.String()])),
+      }),
+    },
+  );
