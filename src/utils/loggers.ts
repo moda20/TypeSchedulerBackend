@@ -64,6 +64,31 @@ const JobLogger = (id: string, name: string) => {
   loggers[id] = pino(jobTransport);
   return loggers[id];
 };
+const deleteJobLogger = (id: string) => {
+  try {
+    const targetLogger = loggers[id];
+    if (targetLogger) {
+      const symbols = Object.getOwnPropertySymbols(targetLogger);
+      const targetSymbol = symbols.find(
+        (e) => e.toString() === "Symbol(pino.stream)",
+      )!;
+      // @ts-ignore
+      const targetThreadStream: any = targetLogger[targetSymbol];
+      const KimplSymbol = Object.getOwnPropertySymbols(targetThreadStream).find(
+        (e) => e.toString() === "Symbol(kImpl)",
+      )!;
+      targetThreadStream[KimplSymbol].dataBuf = null;
+      delete targetThreadStream[KimplSymbol].data;
+      delete targetThreadStream?.worker?._events;
+      targetThreadStream?.removeAllListeners();
+      targetThreadStream?.end();
+      generalLogger.trace(`logger for ${id} deleted`);
+      delete loggers[id];
+    }
+  } catch (err) {
+    generalLogger.error(err);
+  }
+};
 
 const generalTransport = pino.transport({
   targets: <TransportTargetOptions[]>[
@@ -75,12 +100,20 @@ const generalTransport = pino.transport({
     config.get("server.logToConsole") && {
       target: "pino-pretty",
       level: "error",
-      options: { destination: 1, colorize: true, ignore: "pid,hostname" },
+      options: {
+        destination: 1,
+        colorize: true,
+        ignore: "pid,hostname",
+      },
     },
     config.get("server.logToConsole") && {
       target: "pino-pretty",
       level: "info",
-      options: { destination: 1, colorize: true, ignore: "pid,hostname" },
+      options: {
+        destination: 1,
+        colorize: true,
+        ignore: "pid,hostname",
+      },
     },
     {
       target: "pino/file",
@@ -98,4 +131,4 @@ generalTransport.on("error", (err: any) => {
 const generalLogger = pino(generalTransport);
 
 export default generalLogger;
-export { JobLogger };
+export { deleteJobLogger, JobLogger, loggers };

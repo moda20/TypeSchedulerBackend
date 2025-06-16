@@ -1,7 +1,7 @@
 import { JobConsumer } from "@jobConsumer/jobConsumer";
 import { JobDTO, jobStatus } from "@typesDef/models/job";
 import currentRunsManager from "@utils/CurrentRunsManager";
-import logger, { JobLogger } from "@utils/loggers";
+import logger, { deleteJobLogger, JobLogger } from "@utils/loggers";
 import schedulerManager from "schedule-manager";
 const { ScheduleJobEventBus, ScheduleJobLogEventBus, ScheduleJobManager } =
   schedulerManager;
@@ -88,8 +88,10 @@ export const registerSingularJobStartAndEndActions = (job: JobDTO) => {
   }
   currentRunsManager.startJob(job);
   ScheduleJobEventBus.once(`completed:${eventTargetId}`, (endedJob: JobDTO) => {
+    logger.trace(`Singular job completed ${job.getUniqueSingularId()!}`);
     currentRunsManager.endJob(endedJob);
     delete currentRunsManager.initialized[eventTargetId];
+    deleteJobLogger(job.getUniqueSingularId()!);
   });
   currentRunsManager.initialized[eventTargetId] = true;
 };

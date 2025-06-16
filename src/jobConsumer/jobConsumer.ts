@@ -72,11 +72,18 @@ export class JobConsumer extends Consumer {
     }
   }
 
-  run(job: JobDTO, jobLog: JobLogDTO) {
-    return super.run(job, jobLog);
+  jobInputParse(job: JobDTO, jobLog: JobLogDTO) {
+    if (job.param && typeof job.param === "string") {
+      job.param = JSON.parse(job.param);
+    }
+    return {
+      job,
+      jobLog,
+    };
   }
 
-  async preRun(job: JobDTO, jobLog: JobLogDTO) {
+  async preRun(j: JobDTO, jl: JobLogDTO) {
+    const { job, jobLog } = this.jobInputParse(j, jl);
     this.job = job;
     this.jobLog = jobLog;
     await this.injectProxies();
