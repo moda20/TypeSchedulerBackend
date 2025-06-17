@@ -139,17 +139,23 @@ export const updateJobConfig = async (
 ) => {
   const { job } = await ScheduleJobManager.getJobById(Number(id));
   if (job) {
+    const cronSettingChanged = newConfig?.cronSetting !== job?.getCronSetting();
     job.setCronSetting(newConfig?.cronSetting ?? job?.getCronSetting());
     job.setName(newConfig?.name ?? job?.getName());
     job.setParam(newConfig?.param ?? job?.getParam());
     job.setConsumer(newConfig?.consumer ?? job?.getConsumer());
-    return await ScheduleJobManager.updateJob(Number(id), job);
+    return await ScheduleJobManager.updateJob(Number(id), job).then(() => {
+      if (cronSettingChanged) {
+        refreshJobRegistration(Number(id));
+      }
+      return { success: true };
+    });
   }
 };
 
 export const refreshJobRegistration = async (id: number | number[]) => {
   const targetJobIds = Array.isArray(id) ? id : [id];
-  await Promise.all(
+  return await Promise.all(
     targetJobIds.map((id) => {
       return Promise.resolve(ScheduleJobManager.stopJobById(id))
         .then((jobStopped) => {
@@ -242,9 +248,11 @@ export const jobActionExecution = async (
         });
       });
     }
-    case jobActions.EXECUTE: {
+    case jobActions.EXECUTE:
+    case jobActions.EXECUTE_WITH_PARAMS: {
       return ScheduleJobManager.jobRegistration(id, {
         singular: true,
+        extraParams: config?.param && JSON.parse(config.param),
       }).then((registrationData) => {
         if (!registrationData.success) {
           throw new Error("Error when registering job", {

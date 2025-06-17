@@ -61,10 +61,10 @@ export const JobsController = createElysia({ prefix: "/jobs" })
         action: t.String(),
         config: t.Optional(
           t.Object({
-            name: t.String(),
+            name: t.Optional(t.String()),
             param: t.Optional(Nullable(t.String())),
-            consumer: t.String(),
-            cronSetting: t.String(),
+            consumer: t.Optional(t.String()),
+            cronSetting: t.Optional(t.String()),
           }),
         ),
       }),
