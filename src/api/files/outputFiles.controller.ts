@@ -16,8 +16,10 @@ import { file } from "bun";
 import qs from "qs";
 
 export const outputFilesController = createElysia({ prefix: "/files" })
-  .onBeforeHandle(({ set }) => {
-    set.headers["content-type"] = "application/json; charset=utf-8";
+  .onBeforeHandle(({ set, path }) => {
+    if (!path?.toLowerCase().includes("download")) {
+      set.headers["content-type"] = "application/json; charset=utf-8";
+    }
   })
   .onTransform((ctx) => {
     // @ts-ignore
