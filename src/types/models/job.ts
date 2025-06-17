@@ -244,6 +244,7 @@ export enum jobActions {
   EXECUTE = "EXECUTE",
   UPDATE = "UPDATE",
   REFRESH = "REFRESH",
+  EXECUTE_WITH_PARAMS = "EXECUTE_WITH_PARAMS",
 }
 
 export enum jobStatus {

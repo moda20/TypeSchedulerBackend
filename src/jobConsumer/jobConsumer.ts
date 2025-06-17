@@ -75,6 +75,12 @@ export class JobConsumer extends Consumer {
   jobInputParse(job: JobDTO, jobLog: JobLogDTO) {
     if (job.param && typeof job.param === "string") {
       job.param = JSON.parse(job.param);
+      if (job.extraParams) {
+        job.param = {
+          ...job.param,
+          ...job.extraParams,
+        };
+      }
     }
     return {
       job,
