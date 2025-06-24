@@ -79,37 +79,52 @@ export const getJobCacheFiles = async ({
   limit?: number;
   offset?: number;
 }) => {
-  return prisma.schedule_job
-    .findFirst({
-      where: {
-        job_id: Number(jobId),
-      },
-      include: {
-        job_logs: {
-          take: limit,
-          skip: offset,
-          orderBy: {
-            start_time: "desc",
-          },
-          where: {
-            cache_files: {
-              some: {},
+  const [data, count] = await Promise.all([
+    prisma.schedule_job
+      .findFirst({
+        where: {
+          job_id: Number(jobId),
+        },
+        include: {
+          job_logs: {
+            take: limit,
+            skip: offset,
+            orderBy: {
+              start_time: "desc",
             },
-          },
-          include: {
-            cache_files: {
-              orderBy: {
-                created_at: "desc",
+            where: {
+              cache_files: {
+                some: {},
+              },
+            },
+            include: {
+              cache_files: {
+                orderBy: {
+                  created_at: "desc",
+                },
               },
             },
           },
         },
+      })
+      .then((job) => {
+        if (!job) return [];
+        return job?.job_logs.flat();
+      }),
+    prisma.schedule_job_log.findMany({
+      where: {
+        job_id: Number(jobId),
+        cache_files: {
+          some: {},
+        },
       },
-    })
-    .then((job) => {
-      if (!job) return [];
-      return job?.job_logs.flat();
-    });
+    }),
+  ]);
+
+  return {
+    data: data,
+    total: count.length,
+  };
 };
 
 export const getCacheFilePath = async ({
