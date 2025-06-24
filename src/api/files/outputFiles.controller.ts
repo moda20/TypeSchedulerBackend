@@ -56,28 +56,34 @@ export const outputFilesController = createElysia({ prefix: "/files" })
   .get(
     "/downloadCacheFile",
     async ({ query }) => {
-      const { id, fileName } = query;
+      const { id, fileName, nativeType } = query;
       const filePath = await getCacheFilePath({ id: Number(id), fileName });
-      return file(filePath);
+      return file(filePath, {
+        type: !nativeType && "application/binary",
+      });
     },
     {
       query: t.Object({
         id: t.Union([t.Number(), t.String()]),
         fileName: t.String(),
+        nativeType: t.Optional(t.Boolean()),
       }),
     },
   )
   .get(
     "/downloadOutputFile",
     async ({ query }) => {
-      const { id, fileName } = query;
+      const { id, fileName, nativeType } = query;
       const filePath = await getOutputFilePath({ id: Number(id), fileName });
-      return file(filePath);
+      return file(filePath, {
+        type: !nativeType && "application/binary",
+      });
     },
     {
       query: t.Object({
         id: t.Union([t.Number(), t.String()]),
         fileName: t.String(),
+        nativeType: t.Optional(t.Boolean()),
       }),
     },
   )

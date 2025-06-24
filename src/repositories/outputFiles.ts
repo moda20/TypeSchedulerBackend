@@ -71,44 +71,58 @@ export const getJobOutputFiles = async ({
   limit?: number;
   offset?: number;
 }) => {
-  return prisma.schedule_job
-    .findFirst({
-      where: {
-        job_id: Number(jobId),
-        job_logs: {
-          some: {
-            output_files: {
-              some: {},
-            },
-          },
-        },
-      },
-      include: {
-        job_logs: {
-          take: limit,
-          skip: offset,
-          orderBy: {
-            start_time: "desc",
-          },
-          where: {
-            output_files: {
-              some: {},
-            },
-          },
-          include: {
-            output_files: {
-              orderBy: {
-                created_at: "desc",
+  const [data, count] = await Promise.all([
+    prisma.schedule_job
+      .findFirst({
+        where: {
+          job_id: Number(jobId),
+          job_logs: {
+            some: {
+              output_files: {
+                some: {},
               },
             },
           },
         },
+        include: {
+          job_logs: {
+            take: limit,
+            skip: offset,
+            orderBy: {
+              start_time: "desc",
+            },
+            where: {
+              output_files: {
+                some: {},
+              },
+            },
+            include: {
+              output_files: {
+                orderBy: {
+                  created_at: "desc",
+                },
+              },
+            },
+          },
+        },
+      })
+      .then((job) => {
+        if (!job) return [];
+        return job?.job_logs.flat();
+      }),
+    prisma.schedule_job_log.findMany({
+      where: {
+        job_id: Number(jobId),
+        output_files: {
+          some: {},
+        },
       },
-    })
-    .then((job) => {
-      if (!job) return [];
-      return job?.job_logs.flat();
-    });
+    }),
+  ]);
+  return {
+    data: data,
+    total: count.length,
+  };
 };
 
 export const deleteOutputFile = async ({
