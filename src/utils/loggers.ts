@@ -33,16 +33,17 @@ const JobLogger = (uniqueId: string, name: string) => {
   const transportsList = [
     config.get("files.exportJobLogsToFiles") &&
       new transports.DailyRotateFile(options("info")),
-    new transports.Console({
-      ...options("info"),
-      format: format.combine(
-        format.timestamp(),
-        format.printf(
-          (info) =>
-            `[${dayjs(info.timestamp as string).format("HH:mm:ss.SSS")}] ${chalk.green(info.level.padEnd(4).toUpperCase())}: ${chalk.hex("#008080")(info.message)}`,
+    config.get("server.logToConsole") &&
+      new transports.Console({
+        ...options("info"),
+        format: format.combine(
+          format.timestamp(),
+          format.printf(
+            (info) =>
+              `[${dayjs(info.timestamp as string).format("HH:mm:ss.SSS")}] ${chalk.green(info.level.padEnd(4).toUpperCase())}: ${chalk.hex("#008080")(info.message)}`,
+          ),
         ),
-      ),
-    }),
+      }),
     config.get("grafana.lokiUrl") &&
       new LokiTransport({
         host: config.get("grafana.lokiUrl") || "",
