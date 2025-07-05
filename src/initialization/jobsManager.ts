@@ -1,7 +1,7 @@
 import { JobConsumer } from "@jobConsumer/jobConsumer";
 import { JobDTO, jobStatus } from "@typesDef/models/job";
 import currentRunsManager from "@utils/CurrentRunsManager";
-import logger, { deleteJobLogger, JobLogger } from "@utils/loggers";
+import logger, { JobLogger } from "@utils/loggers";
 import schedulerManager from "schedule-manager";
 const { ScheduleJobEventBus, ScheduleJobLogEventBus, ScheduleJobManager } =
   schedulerManager;
@@ -91,7 +91,7 @@ export const registerSingularJobStartAndEndActions = (job: JobDTO) => {
     logger.trace(`Singular job completed ${job.getUniqueSingularId()!}`);
     currentRunsManager.endJob(endedJob);
     delete currentRunsManager.initialized[eventTargetId];
-    deleteJobLogger(job.getUniqueSingularId()!);
+    // TODO figure out if deleting the logger manually is useful
   });
   currentRunsManager.initialized[eventTargetId] = true;
 };
@@ -126,10 +126,10 @@ export const saveJobLogs = (id: string, name: string) => {
     ScheduleJobLogEventBus.removeAllListeners(logId);
     ScheduleJobLogEventBus.removeAllListeners(errorId);
     ScheduleJobLogEventBus.on(logId, (data: any) => {
-      JobLogger(id.toString(), name).info({ logId: data.logId }, data.data);
+      JobLogger(id.toString(), name).info(data.data, { logId: data.logId });
     });
     ScheduleJobLogEventBus.on(errorId, (data: any) => {
-      JobLogger(id.toString(), name).info({ logId: data.logId }, data.data);
+      JobLogger(id.toString(), name).info(data.data, { logId: data.logId });
       const targetConsumer = ScheduleJobManager.runningJob.find(
         (j) =>
           (j.job.getUniqueSingularId() ?? j.job.getId())?.toString() === id,

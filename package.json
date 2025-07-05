@@ -24,6 +24,7 @@
     "@prisma/migrate": "^6.5.0",
     "@supercharge/promise-pool": "^3.2.0",
     "axios": "^1.8.4",
+    "chalk": "^5.4.1",
     "colors": "^1.4.0",
     "convict": "^6.2.4",
     "convict-format-with-validator": "^6.2.0",
@@ -40,7 +41,10 @@
     "pino-roll": "^3.0.0",
     "prisma": "^6.5.0",
     "qs": "^6.14.0",
-    "schedule-manager": "github:moda20/node-schedule-manager#Feature/typescript_rewrite"
+    "schedule-manager": "github:moda20/node-schedule-manager#Feature/typescript_rewrite",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0",
+    "winston-loki": "github:moda20/winston-loki#development"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
