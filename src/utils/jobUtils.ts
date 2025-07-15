@@ -2,11 +2,14 @@ import { t, TSchema } from "elysia";
 
 import config from "@config/config";
 import { getCacheFile, saveCacheFile } from "@repositories/cacheFiles";
+import { getNotificationService } from "@repositories/notificationServices";
 import { saveNewFile } from "@repositories/outputFiles";
+import { JobDTO, JobLogDTO } from "@typesDef/models/job";
 import logger from "@utils/loggers";
 import cronParser from "cron-parser";
 import { readdirSync, statSync } from "fs-extra";
-import path, { parse } from "path";
+import path, { join, parse } from "path";
+import { IScheduleJobLog } from "schedule-manager";
 export const Nullable = <T extends TSchema>(T: T) => {
   // type Nullable<T> = T | null
   return t.Union([T, t.Null()]);
@@ -202,4 +205,41 @@ export const findFiles = (
     }
   }
   return result;
+};
+
+export const injectNotificationServices = async (
+  job: JobDTO,
+  jobLogDTO: JobLogDTO | IScheduleJobLog,
+  services: number[],
+  logger: (msg: any) => void = console.log,
+) => {
+  try {
+    const initiatedServices = await Promise.all(
+      services.map(async (serviceId) => {
+        const service = await getNotificationService(serviceId);
+        if (service) {
+          const targetFile = (
+            await import(join(import.meta.dir, "../..", service.entryPoint))
+          ).default;
+
+          const targetService = targetFile.init(job, jobLogDTO, service);
+          return {
+            name: service.name,
+            service: targetService,
+          };
+        }
+      }),
+    );
+    return initiatedServices.reduce(
+      (p, c: any) => {
+        p[c.name] = c.service;
+        return p;
+      },
+      {} as { [key: string]: any },
+    );
+  } catch (err: any) {
+    logger("error initiating notification services");
+    logger(err.toString());
+    throw err;
+  }
 };

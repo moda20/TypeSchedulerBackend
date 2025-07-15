@@ -1,6 +1,7 @@
 import config from "@config/config";
 import * as BrowserlessService from "@external/browserless";
-import { GotifyService } from "@notifications/gotify";
+import GotifyService from "@notifications/gotify";
+import { getNotificationService } from "@repositories/notificationServices";
 import { JobDTO, JobLogDTO, JobOptions } from "@typesDef/models/job";
 import defaultAxiosInstance from "@utils/httpRequestConfig";
 import * as jobConsumerUtils from "@utils/jobConsumerUtils";
@@ -8,10 +9,14 @@ import {
   exportCacheFiles,
   exportResultsToFile,
   getFromCache,
+  injectNotificationServices,
 } from "@utils/jobUtils";
 import { injectProxy } from "@utils/proxyUtils";
 import type { AxiosInstance } from "axios";
-import scheduleManager from "schedule-manager";
+import scheduleManager, {
+  IScheduleJob,
+  IScheduleJobLog,
+} from "schedule-manager";
 const { JobConsumer: Consumer } = scheduleManager;
 
 export class JobConsumer extends Consumer {
@@ -19,6 +24,8 @@ export class JobConsumer extends Consumer {
   public options?: JobOptions;
   notification: GotifyService;
   public browserless: typeof BrowserlessService;
+  onEnd?: (job: IScheduleJob, jobLog: IScheduleJobLog) => Promise<void>;
+  notificationServices: { [key: string]: any } = {};
   constructor() {
     super();
     this.axios = defaultAxiosInstance.create();
@@ -38,6 +45,14 @@ export class JobConsumer extends Consumer {
     return exportCacheFiles(...args);
   }
 
+  private async initializeNotificationService(job: JobDTO, jobLog: JobLogDTO) {
+    this.notification.init(
+      job,
+      jobLog,
+      (await getNotificationService(0, this.notification.name))!,
+    );
+  }
+
   async injectProxies() {
     return injectProxy({
       jobId: Number(this.job?.id),
@@ -55,6 +70,17 @@ export class JobConsumer extends Consumer {
         this.logEvent("error injecting proxies");
         this.logEvent(err);
       });
+  }
+  async injectNotificationServices(services: number[]) {
+    this.notificationServices = await injectNotificationServices(
+      this.job!,
+      this.jobLog!,
+      services,
+      (v: any) => this.logEvent(v),
+    );
+    this.logEvent(
+      `using ${Object.keys(this.notificationServices).length} notification services`,
+    );
   }
 
   logEvent(data: any, serializer?: (data: any) => any) {
@@ -93,11 +119,16 @@ export class JobConsumer extends Consumer {
     this.job = job;
     this.jobLog = jobLog;
     await this.injectProxies();
+    // initializing the notification service to work with the new structure of services
+    await this.initializeNotificationService(job, jobLog);
     try {
       this.options = {
         utils: jobConsumerUtils,
         config: config.getProperties(),
       };
+      await this.injectNotificationServices(
+        job?.param?.notificationServices || [],
+      );
       return await this.run(job, jobLog);
     } catch (err) {
       this.logEvent(`job ${job.name} crashed with an error ${err?.toString()}`);
@@ -105,5 +136,12 @@ export class JobConsumer extends Consumer {
       this.error(err as Error);
       return await this.complete(jobLog, null, err?.toString());
     }
+  }
+
+  async complete(jobLog: IScheduleJobLog, result: any, error?: string) {
+    if (this.onEnd) {
+      await this.onEnd(this.job!, jobLog);
+    }
+    return super.complete(jobLog, result, error);
   }
 }

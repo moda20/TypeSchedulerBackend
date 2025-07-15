@@ -43,3 +43,26 @@ model appConfigAudit {
   created_at    DateTime   @default(now()) @db.DateTime(0)
   updated_at    DateTime   @default(now()) @db.DateTime(0)
 }
+
+model notificationServices {
+  id            Int            @id @unique(map: "id") @default(autoincrement())
+  name          String         @unique @db.VarChar(255)
+  description   String         @db.VarChar(255)
+  entryPoint    String         @db.VarChar(255)
+  image         String?        @db.VarChar(255)
+  created_at    DateTime       @default(now()) @db.DateTime(0)
+  updated_at    DateTime       @default(now()) @db.DateTime(0)
+  notifications notification[]
+}
+
+model notification {
+  id         Int                   @id @unique(map: "id") @default(autoincrement())
+  message    String?               @db.LongText
+  data       Json?                 @db.Json
+  service    notificationServices? @relation(fields: [service_id], references: [id], map: "notification_service")
+  service_id Int?
+  job_log_id String?               @db.VarChar(255)
+  is_sent    Boolean               @default(false)
+  created_at DateTime              @default(now()) @db.DateTime(0)
+  updated_at DateTime              @default(now()) @db.DateTime(0)
+}

@@ -2,6 +2,7 @@ import { Elysia } from "elysia";
 import { helmet } from "elysia-helmet";
 import cookie from "@elysiajs/cookie";
 import { cors } from "@elysiajs/cors";
+import { staticPlugin } from "@elysiajs/static";
 import { swagger } from "@elysiajs/swagger";
 
 import { apiRoutes } from "@api/index";
@@ -51,6 +52,13 @@ if (config.get("swaggerServer")) {
 api.use(auth);
 api.use(apiRoutes);
 api.get("/", () => "Server is working");
+
+api.use(
+  staticPlugin({
+    prefix: "public",
+    assets: "public",
+  }),
+);
 
 initialize()
   .then(() => {
