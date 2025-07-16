@@ -23,6 +23,19 @@ class TestJob extends JobConsumer {
       newFile: true,
     });
     this.logEvent("Testing Final Log");
+    // testing the default gotify service
+    this.notification.sendJobFinishNotification(
+      job.id!.toString(),
+      job.name,
+      "test results",
+    );
+    // testing he gotify service that is injected via notification services
+    if (this.notificationServices["gotify"]) {
+      this.notificationServices["gotify"].sendMessage(
+        "test results from injected services",
+      );
+    }
+
     return this.complete(jobLog, "");
   }
 }

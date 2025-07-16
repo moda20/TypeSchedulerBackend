@@ -1,5 +1,6 @@
 import { outputFilesController } from "@api/files/outputFiles.controller";
 import { JobsController } from "@api/jobs/jobs.controller";
+import { notificationsController } from "@api/notifications/notifications.controller";
 import { proxiesController } from "@api/proxies/proxies.controller";
 import { configController } from "@api/system/config.controller";
 import { systemController } from "@api/system/system.controller";
@@ -54,3 +55,4 @@ apiRoutes.use(outputFilesController);
 apiRoutes.use(proxiesController);
 apiRoutes.use(websocketController);
 apiRoutes.use(configController);
+apiRoutes.use(notificationsController);

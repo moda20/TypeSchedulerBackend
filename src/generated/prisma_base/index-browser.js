@@ -145,9 +145,35 @@ exports.Prisma.AppConfigAuditScalarFieldEnum = {
   updated_at: 'updated_at'
 };
 
+exports.Prisma.NotificationServicesScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  entryPoint: 'entryPoint',
+  image: 'image',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
+exports.Prisma.NotificationScalarFieldEnum = {
+  id: 'id',
+  message: 'message',
+  data: 'data',
+  service_id: 'service_id',
+  job_log_id: 'job_log_id',
+  is_sent: 'is_sent',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.userOrderByRelevanceFieldEnum = {
@@ -171,11 +197,36 @@ exports.Prisma.appConfigAuditOrderByRelevanceFieldEnum = {
   newValue: 'newValue'
 };
 
+exports.Prisma.notificationServicesOrderByRelevanceFieldEnum = {
+  name: 'name',
+  description: 'description',
+  entryPoint: 'entryPoint',
+  image: 'image'
+};
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+};
+
+exports.Prisma.notificationOrderByRelevanceFieldEnum = {
+  message: 'message',
+  job_log_id: 'job_log_id'
+};
+
 
 exports.Prisma.ModelName = {
   user: 'user',
   appConfig: 'appConfig',
-  appConfigAudit: 'appConfigAudit'
+  appConfigAudit: 'appConfigAudit',
+  notificationServices: 'notificationServices',
+  notification: 'notification'
 };
 
 /**

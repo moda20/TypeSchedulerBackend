@@ -1,14 +1,16 @@
+import { notificationServices } from "@generated/prisma_base";
+import { JobDTO, JobLogDTO } from "@typesDef/models/job";
+import { IScheduleJobLog } from "schedule-manager";
+
 export interface Notifications {
-  sendJobFinishNotification(
-    jobId: string,
-    jobName: string,
-    results: string,
-    options?: { title: string; message: string; priority: number },
-  ): Promise<any>;
-  sendJobCrashNotification(
-    jobId: string,
-    jobName: string,
-    error?: string,
-    options?: { title: string; message: string; priority: number },
-  ): Promise<any>;
+  init?(
+    job: JobDTO,
+    jobLogDTO: JobLogDTO | IScheduleJobLog,
+    serviceDbObject: notificationServices,
+  ): Notifications;
+  name?: string;
+  description?: string;
+  serviceDbId?: number;
+
+  sendMessage(message: string, title?: string): Promise<any>;
 }

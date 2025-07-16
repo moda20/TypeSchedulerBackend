@@ -31,11 +31,13 @@ export const getAllJobs = async ({
   name,
   status,
   sort,
+  jobIds,
 }: {
   limit: number;
   offset: number;
   name: string;
   status: string[];
+  jobIds?: number[];
   sort: { id: string; desc: string }[];
 }) => {
   const allJobs = await prisma.schedule_job.findMany({
@@ -56,6 +58,9 @@ export const getAllJobs = async ({
       ],
       status: {
         in: status,
+      },
+      job_id: {
+        in: jobIds,
       },
     },
     orderBy: sort
@@ -158,13 +163,10 @@ export const refreshJobRegistration = async (id: number | number[]) => {
   return await Promise.all(
     targetJobIds.map((id) => {
       return Promise.resolve(ScheduleJobManager.stopJobById(id))
-        .then((jobStopped) => {
-          console.log("stopping job", jobStopped);
-          console.log("stopping job");
+        .then(() => {
           return unsubscribeFromAllLogs(id);
         })
         .then((f) => {
-          console.log(f);
           return ScheduleJobManager.getJobById(id);
         })
         .then((jobDetails) => {

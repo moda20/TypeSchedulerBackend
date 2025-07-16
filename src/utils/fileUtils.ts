@@ -1,0 +1,48 @@
+import { promises } from "fs";
+import { join, parse } from "path";
+
+export const saveToPublicFolder = async ({
+  filename,
+  data,
+}: {
+  filename: string;
+  data: any;
+}) => {
+  const fullPath = join(__dirname, "../..", "public", filename);
+  const targetPath = join("public", filename);
+  return promises.writeFile(fullPath, data).then(() => targetPath);
+};
+
+export const savePublicImage = ({
+  filename,
+  data,
+  unique,
+}: {
+  filename: string;
+  data: any;
+  unique?: boolean;
+}) => {
+  let sanitizedFileName = filename.replace(/\s/g, "");
+  if (unique) {
+    const parsedFileName = parse(sanitizedFileName);
+    sanitizedFileName = `${parsedFileName.name}_${Date.now()}${parsedFileName.ext}`;
+  }
+  return saveToPublicFolder({
+    filename: join("/images", sanitizedFileName),
+    data,
+  });
+};
+export const deletePublicImage = async ({ filename }: { filename: string }) => {
+  const targetFileName = filename.split("/").pop();
+  if (targetFileName) {
+    const targetPath = join(
+      __dirname,
+      "../..",
+      "public/images",
+      targetFileName,
+    );
+    return promises.rm(targetPath);
+  }
+
+  return Promise.reject("no file found");
+};
