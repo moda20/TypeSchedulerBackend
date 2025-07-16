@@ -30,9 +30,12 @@ class TestJob extends JobConsumer {
       "test results",
     );
     // testing he gotify service that is injected via notification services
-    this.notificationServices["gotify"].sendMessage(
-      "test results from injected services",
-    );
+    if (this.notificationServices["gotify"]) {
+      this.notificationServices["gotify"].sendMessage(
+        "test results from injected services",
+      );
+    }
+
     return this.complete(jobLog, "");
   }
 }
