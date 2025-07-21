@@ -17,6 +17,7 @@ The installation process is best done via a docker container, here is a compose 
       - ./:/usr/src/app/src/jobs:ro
       - ./logs:/usr/src/app/src/logs/
       - ./outputs:/usr/src/app/src/outputs/
+      - ./plugins:/usr/src/app/src/external/userPlugins
     ports:
       - "8080:8080"
 ```
