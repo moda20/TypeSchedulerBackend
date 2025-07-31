@@ -2,6 +2,11 @@
 
 This is the repo for the Scheduler backend. This acts as a task manager and authentication server.
 
+### Wiki
+
+[The general wiki](scheduler-docs-9p4lb6fmr-moda20s-projects.vercel.app) is out now, and is a good place to start if you want to have a general idea about the project.
+This repo is only focused on the backend component
+
 ## 📦 Installation
 
 The installation process is best done via a docker container, here is a compose example
