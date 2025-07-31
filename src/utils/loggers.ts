@@ -38,10 +38,13 @@ const JobLogger = (uniqueId: string, name: string) => {
         ...options("info"),
         format: format.combine(
           format.timestamp(),
-          format.printf(
-            (info) =>
-              `[${dayjs(info.timestamp as string).format("HH:mm:ss.SSS")}] ${chalk.green(info.level.padEnd(4).toUpperCase())}: ${chalk.hex("#008080")(info.message)}`,
-          ),
+          format.printf((info) => {
+            const targetMessage =
+              typeof info.message === "object"
+                ? JSON.stringify(info.message, null, 4)
+                : info.message;
+            return `[${dayjs(info.timestamp as string).format("HH:mm:ss.SSS")}] ${chalk.green(info.level.padEnd(4).toUpperCase())}: ${chalk.hex("#008080")(targetMessage)}`;
+          }),
         ),
       }),
     config.get("grafana.lokiUrl") &&

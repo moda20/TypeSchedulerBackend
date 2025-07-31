@@ -83,6 +83,21 @@ export class JobConsumer extends Consumer {
     );
   }
 
+  serializeLogs(
+    logsData: any,
+    initialLevel?: number,
+    currentLevel?: number,
+  ): any {
+    const superSerializer = super.serializeLogs(
+      logsData,
+      initialLevel,
+      currentLevel,
+    );
+    return typeof superSerializer === "object"
+      ? JSON.stringify(superSerializer, null, 4)
+      : superSerializer;
+  }
+
   logEvent(data: any, serializer?: (data: any) => any) {
     const serializedData = serializer
       ? serializer(data)
