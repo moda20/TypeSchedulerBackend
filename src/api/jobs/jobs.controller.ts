@@ -4,6 +4,7 @@ import config from "@config/config";
 import {
   getAllJobs,
   getAvailableConsumers,
+  getFilteredJobs,
   getJobMetrics,
   getJobRuns,
   getJobStats,
@@ -12,7 +13,7 @@ import {
   isJobRunning,
   jobActionExecution,
 } from "@repositories/jobs";
-import { createElysia } from "@utils/createElysia";
+import { createElysia, FilterableType } from "@utils/createElysia";
 import currentRunsManager from "@utils/CurrentRunsManager";
 import { Nullable, toJSON } from "@utils/jobUtils";
 import qs from "qs";
@@ -45,6 +46,26 @@ export const JobsController = createElysia({ prefix: "/jobs" })
         status: t.Optional(t.Array(t.String())),
         sorting: t.Optional(
           t.Array(t.Object({ id: t.String(), desc: t.String() })),
+        ),
+      }),
+    },
+  )
+  .post(
+    "/filterJobs",
+    ({ body }) => {
+      return getFilteredJobs(body);
+    },
+    {
+      body: t.Object({
+        name: t.Optional(FilterableType),
+        consumer: t.Optional(FilterableType),
+        cronSetting: t.Optional(FilterableType),
+        averageTime: t.Optional(FilterableType),
+        latestRun: t.Optional(FilterableType),
+        status: t.Optional(t.Array(t.String())),
+        isRunning: t.Optional(t.Boolean()),
+        sorting: t.Optional(
+          t.Array(t.Object({ id: t.String(), desc: t.Boolean() })),
         ),
       }),
     },

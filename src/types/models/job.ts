@@ -223,9 +223,20 @@ export class JobDTOClass implements JobDTO {
   }
 }
 
-export const jobAttributeMap = <Record<string, string>>{
+export const jobFilteringAttributeMap = <Record<string, string>>{
   id: "job_id",
   name: "job_name",
+  averageTime: "average_time",
+};
+
+export const jobModelAttributeMap = <Record<string, string>>{
+  id: "job_id",
+  name: "job_name",
+  param: "job_param",
+  cronSetting: "job_cron_setting",
+  consumer: "consumer",
+  exclusive: "exclusive",
+  status: "status",
   averageTime: "average_time",
 };
 

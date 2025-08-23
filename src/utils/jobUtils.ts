@@ -4,6 +4,7 @@ import config from "@config/config";
 import { getCacheFile, saveCacheFile } from "@repositories/cacheFiles";
 import { getNotificationService } from "@repositories/notificationServices";
 import { saveNewFile } from "@repositories/outputFiles";
+import { TypedFilter } from "@typesDef/api/jobs";
 import { JobDTO, JobLogDTO } from "@typesDef/models/job";
 import logger from "@utils/loggers";
 import cronParser from "cron-parser";
@@ -241,5 +242,32 @@ export const injectNotificationServices = async (
     logger("error initiating notification services");
     logger(err.toString());
     throw err;
+  }
+};
+
+export const parseTypedValueToPrismaValue = (
+  attribute: string,
+  typedValue: TypedFilter | any,
+  isADateValue = false,
+) => {
+  if (typeof typedValue !== "object") return typedValue;
+  switch (typedValue.type) {
+    case "exact":
+      return {
+        [attribute]: {
+          equals: typedValue.value,
+        },
+      };
+    case "regex":
+      return typedValue;
+    case "between":
+      return {
+        [attribute]: {
+          gte: isADateValue ? new Date(typedValue.value1) : typedValue.value1,
+          lte: isADateValue ? new Date(typedValue.value2) : typedValue.value2,
+        },
+      };
+    default:
+      return null;
   }
 };
