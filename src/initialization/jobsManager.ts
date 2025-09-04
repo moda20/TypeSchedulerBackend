@@ -87,13 +87,24 @@ export const registerSingularJobStartAndEndActions = (job: JobDTO) => {
     return; // Already initialized;
   }
   currentRunsManager.startJob(job);
-  ScheduleJobEventBus.once(`completed:${eventTargetId}`, (endedJob: JobDTO) => {
+  onJobFinished<JobDTO>(eventTargetId).then((endedJob: JobDTO) => {
     logger.trace(`Singular job completed ${job.getUniqueSingularId()!}`);
     currentRunsManager.endJob(endedJob);
     delete currentRunsManager.initialized[eventTargetId];
     // TODO figure out if deleting the logger manually is useful
   });
   currentRunsManager.initialized[eventTargetId] = true;
+};
+
+export const onJobFinished = <T>(eventTargetId: string) => {
+  return new Promise<T>((res) => {
+    ScheduleJobEventBus.once(
+      `completed:${eventTargetId}`,
+      (endedJob: JobDTO) => {
+        res(endedJob as T);
+      },
+    );
+  });
 };
 
 export const unsubscribeFromAllLogs = (id: number) => {

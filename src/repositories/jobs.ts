@@ -3,12 +3,17 @@ import { prisma } from "@initialization/index";
 import {
   deleteJobStartAndEndActions,
   fullStartAJob,
+  onJobFinished,
   registerJobStartAndEndActions,
   registerSingularJobStartAndEndActions,
   saveJobLogs,
   unsubscribeFromAllLogs,
 } from "@initialization/jobsManager";
-import { advancedFilters, getAllJobsInputs } from "@typesDef/api/jobs";
+import {
+  advancedFilters,
+  getAllJobsInputs,
+  queuedJobsExecutionConfig,
+} from "@typesDef/api/jobs";
 import {
   jobActions,
   JobDTOClass,
@@ -26,6 +31,7 @@ import {
   parseTypedValueToPrismaValue,
 } from "@utils/jobUtils";
 import logger from "@utils/loggers";
+import { JobQueue } from "@utils/queueUtils";
 import dayjs from "dayjs";
 import { join } from "path";
 import manager from "schedule-manager";
@@ -339,6 +345,33 @@ export const jobActionExecution = async (
       return refreshJobRegistration(id);
     }
   }
+};
+
+export const queueJobExecution = async (
+  execConfig: queuedJobsExecutionConfig,
+) => {
+  const newQueue = new JobQueue(execConfig);
+  const jobList = await getAllJobs({
+    limit: 999999,
+    offset: 0,
+    jobIds: execConfig.targetJobs,
+    sort: [{ id: execConfig.executionOrderAttribute ?? "id", desc: "false" }],
+    name: "",
+    status: ["STOPPED", "STARTED"],
+  });
+  const taskList = jobList.map((e) => {
+    return () =>
+      jobActionExecution(jobActions.EXECUTE, Number(e.id), {}).then(
+        (registrationData: any) => {
+          const eventTargetId = `${e.getName()}_${registrationData.uniqueSingularId!}`;
+          return onJobFinished(eventTargetId);
+        },
+      );
+  });
+  logger.info(`will enqueue ${taskList.length} jobs`);
+  newQueue.splitToBatches(taskList);
+  await newQueue.enqueueNextBatch();
+  return newQueue;
 };
 
 export const getJobRuns = async ({

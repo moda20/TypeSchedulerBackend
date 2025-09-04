@@ -31,6 +31,7 @@ export interface JobDTO extends IScheduleJob {
   getUniqueSingularId(): string | undefined;
   getCreatedAt(): Date | undefined;
   getLatestRun(): any | null;
+  getSingularRunId?(): string;
 
   setId(id: number): void;
   setName(name: string): void;
@@ -84,6 +85,7 @@ export class JobDTOClass implements JobDTO {
   isCurrentlyRunning?: boolean;
   initialized: boolean;
   jobLogs?: any[];
+  extraParams: { [p: string]: any } | undefined;
 
   constructor(job: schedule_job) {
     this.id = job.job_id;
@@ -155,6 +157,12 @@ export class JobDTOClass implements JobDTO {
     return this.initialized;
   }
 
+  getSingularRunId(): string {
+    return this.uniqueSingularId
+      ? `${this.name}_${this.uniqueSingularId}`
+      : this.name;
+  }
+
   setId(id: string | number | undefined): void {
     this.id = id ? Number(id) : undefined;
   }
@@ -220,6 +228,14 @@ export class JobDTOClass implements JobDTO {
       job_id: this.id,
       latest_run: this.latestRun,
     };
+  }
+
+  getExtraParams(): { [p: string]: any } | undefined {
+    return this.extraParams;
+  }
+
+  setExtraParams(extraParams: { [p: string]: any }): void {
+    this.extraParams = extraParams;
   }
 }
 

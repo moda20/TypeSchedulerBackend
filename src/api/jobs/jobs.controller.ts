@@ -12,6 +12,7 @@ import {
   getRunningJobs,
   isJobRunning,
   jobActionExecution,
+  queueJobExecution,
 } from "@repositories/jobs";
 import { createElysia, FilterableType } from "@utils/createElysia";
 import currentRunsManager from "@utils/CurrentRunsManager";
@@ -67,6 +68,21 @@ export const JobsController = createElysia({ prefix: "/jobs" })
         sorting: t.Optional(
           t.Array(t.Object({ id: t.String(), desc: t.Boolean() })),
         ),
+      }),
+    },
+  )
+  .post(
+    "/queueJobs",
+    ({ body }) => {
+      return queueJobExecution(body);
+    },
+    {
+      body: t.Object({
+        batchCount: t.Number(),
+        batchDelay: t.Number(),
+        executionOrderAttribute: t.Optional(t.String()),
+        targetJobs: t.Optional(t.Array(t.Number())),
+        waitBetweenBatches: t.Optional(t.Boolean()),
       }),
     },
   )

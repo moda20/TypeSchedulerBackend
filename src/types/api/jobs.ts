@@ -29,3 +29,16 @@ export interface getAllJobsInputs {
   latestRun?: any;
   advancedFilters?: advancedFilters;
 }
+
+export interface queuedJobsExecutionConfig {
+  batchCount: number;
+  batchDelay: number;
+  waitBetweenBatches: boolean;
+  executionOrderAttribute?: string;
+  targetJobs: number[];
+}
+
+export type Task<T> = () => Promise<T>;
+export interface queuedTasksExecutionConfig extends queuedJobsExecutionConfig {
+  targetTasks?: Task<any>[];
+}
