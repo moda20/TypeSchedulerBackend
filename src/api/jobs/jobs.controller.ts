@@ -93,7 +93,7 @@ export const JobsController = createElysia({ prefix: "/jobs" })
       if (jobIdList) {
         return Promise.allSettled(
           jobIdList.map((id: string | number) => {
-            return jobActionExecution(action, Number(id ?? ""), { config });
+            return jobActionExecution(action, Number(id ?? ""), {});
           }),
         );
       }
