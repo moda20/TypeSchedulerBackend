@@ -4,6 +4,7 @@ import config from "@config/config";
 import {
   getAllJobs,
   getAvailableConsumers,
+  getFilteredJobs,
   getJobMetrics,
   getJobRuns,
   getJobStats,
@@ -11,8 +12,9 @@ import {
   getRunningJobs,
   isJobRunning,
   jobActionExecution,
+  queueJobExecution,
 } from "@repositories/jobs";
-import { createElysia } from "@utils/createElysia";
+import { createElysia, FilterableType } from "@utils/createElysia";
 import currentRunsManager from "@utils/CurrentRunsManager";
 import { Nullable, toJSON } from "@utils/jobUtils";
 import qs from "qs";
@@ -50,14 +52,57 @@ export const JobsController = createElysia({ prefix: "/jobs" })
     },
   )
   .post(
+    "/filterJobs",
+    ({ body }) => {
+      return getFilteredJobs(body);
+    },
+    {
+      body: t.Object({
+        name: t.Optional(FilterableType),
+        consumer: t.Optional(FilterableType),
+        cronSetting: t.Optional(FilterableType),
+        averageTime: t.Optional(FilterableType),
+        latestRun: t.Optional(FilterableType),
+        status: t.Optional(t.Array(t.String())),
+        isRunning: t.Optional(t.Boolean()),
+        sorting: t.Optional(
+          t.Array(t.Object({ id: t.String(), desc: t.Boolean() })),
+        ),
+      }),
+    },
+  )
+  .post(
+    "/queueJobs",
+    ({ body }) => {
+      return queueJobExecution(body);
+    },
+    {
+      body: t.Object({
+        batchCount: t.Number(),
+        batchDelay: t.Number(),
+        executionOrderAttribute: t.Optional(t.String()),
+        targetJobs: t.Optional(t.Array(t.Number())),
+        waitBetweenBatches: t.Optional(t.Boolean()),
+      }),
+    },
+  )
+  .post(
     "/executeAction",
     ({ body }) => {
-      const { jobId, action, config } = body;
+      const { jobId, action, config, jobIdList } = body;
+      if (jobIdList) {
+        return Promise.allSettled(
+          jobIdList.map((id: string | number) => {
+            return jobActionExecution(action, Number(id ?? ""), {});
+          }),
+        );
+      }
       return jobActionExecution(action, Number(jobId ?? ""), { config });
     },
     {
       body: t.Object({
         jobId: t.Optional(t.Union([t.String(), t.Number()])),
+        jobIdList: t.Optional(t.Array(t.Union([t.String(), t.Number()]))),
         action: t.String(),
         config: t.Optional(
           t.Object({

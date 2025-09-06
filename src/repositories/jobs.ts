@@ -3,43 +3,96 @@ import { prisma } from "@initialization/index";
 import {
   deleteJobStartAndEndActions,
   fullStartAJob,
+  onJobFinished,
   registerJobStartAndEndActions,
   registerSingularJobStartAndEndActions,
   saveJobLogs,
   unsubscribeFromAllLogs,
 } from "@initialization/jobsManager";
 import {
+  advancedFilters,
+  getAllJobsInputs,
+  queuedJobsExecutionConfig,
+} from "@typesDef/api/jobs";
+import {
   jobActions,
-  jobAttributeMap,
   JobDTOClass,
+  jobFilteringAttributeMap,
+  jobModelAttributeMap,
   JobStats,
   jobStatus,
   jobUpdateConfig,
 } from "@typesDef/models/job";
 import currentRunsManager from "@utils/CurrentRunsManager";
 import { lokiHttpService } from "@utils/httpRequestConfig";
-import { findFiles, getNextJobExecution } from "@utils/jobUtils";
+import {
+  findFiles,
+  getNextJobExecution,
+  parseTypedValueToPrismaValue,
+} from "@utils/jobUtils";
 import logger from "@utils/loggers";
+import { JobQueue } from "@utils/queueUtils";
 import dayjs from "dayjs";
 import { join } from "path";
 import manager from "schedule-manager";
 const { ScheduleJobManager } = manager;
 
+export const getFilteredJobs = async (filters: advancedFilters) => {
+  const regexTypes = (
+    Object.keys(filters) as Array<keyof advancedFilters>
+  ).filter((e: keyof advancedFilters) => (filters[e] as any)?.type === "regex");
+
+  const jobIds = regexTypes.length
+    ? await prisma.$queryRawUnsafe<{ job_id: number }[]>(
+        `SELECT job_id from schedule_job WHERE ${regexTypes.map((e) => `${jobModelAttributeMap[e]} REGEXP '${(filters[e] as any)?.value}'`).join(" AND ")} `,
+      )
+    : undefined;
+  const nonRegexFilters: advancedFilters = Object.fromEntries(
+    (Object.keys(filters) as Array<keyof advancedFilters>)
+      .filter(
+        (e: keyof advancedFilters) =>
+          !["sorting", "status", "latestRun"].includes(e) &&
+          typeof filters[e] === "object" &&
+          (filters[e] as any)?.type !== "regex",
+      )
+      .map((e) => [e, filters[e]]),
+  );
+
+  return getAllJobs({
+    limit: 999999,
+    offset: 0,
+    jobIds: jobIds?.map((e) => e.job_id),
+    advancedFilters: nonRegexFilters,
+    latestRun: filters.latestRun,
+    status: filters.status || ["STARTED", "STOPPED"],
+    name: "",
+    sort: filters.sorting || [],
+  });
+};
 export const getAllJobs = async ({
   limit,
   offset,
   name,
   status,
+  latestRun,
   sort,
   jobIds,
-}: {
-  limit: number;
-  offset: number;
-  name: string;
-  status: string[];
-  jobIds?: number[];
-  sort: { id: string; desc: string }[];
-}) => {
+  advancedFilters,
+}: getAllJobsInputs) => {
+  const parsedAdvancedFilters =
+    (advancedFilters &&
+      Object.fromEntries(
+        Object.keys(advancedFilters).map((e) => [
+          jobModelAttributeMap[e],
+          parseTypedValueToPrismaValue(
+            jobModelAttributeMap[e],
+            advancedFilters[e as keyof advancedFilters],
+          )[jobModelAttributeMap[e]],
+        ]),
+      )) ??
+    [];
+  logger.debug(`advancedFilters: ${JSON.stringify(advancedFilters, null, 4)}`);
+  logger.debug(`inputJobIds ${jobIds}`);
   const allJobs = await prisma.schedule_job.findMany({
     take: limit,
     skip: offset,
@@ -57,16 +110,23 @@ export const getAllJobs = async ({
         },
       ],
       status: {
-        in: status,
+        in: status || advancedFilters?.status,
       },
       job_id: {
         in: jobIds,
       },
+      job_logs: {
+        every: {
+          ...parseTypedValueToPrismaValue("start_time", latestRun, true),
+        },
+        ...(latestRun ? { some: {} } : {}),
+      },
+      ...parsedAdvancedFilters,
     },
     orderBy: sort
-      ?.filter((e) => jobAttributeMap[e.id])
+      ?.filter((e) => jobFilteringAttributeMap[e.id])
       .map((e) => ({
-        [jobAttributeMap[e.id]]: e.desc === "true" ? "desc" : "asc",
+        [jobFilteringAttributeMap[e.id]]: e.desc === "true" ? "desc" : "asc",
       })),
     include: {
       job_logs: {
@@ -107,7 +167,7 @@ export const getAllJobs = async ({
   if (parsedSort?.isCurrentlyRunning) {
     mappedJobs.sort((a, b) => {
       return (
-        (parsedSort?.isCurrentlyRunning === "false" ? -1 : 1) *
+        (parsedSort?.isCurrentlyRunning === "false" ? 1 : -1) *
         (Number(a.isCurrentlyRunning) - Number(b.isCurrentlyRunning))
       );
     });
@@ -285,6 +345,33 @@ export const jobActionExecution = async (
       return refreshJobRegistration(id);
     }
   }
+};
+
+export const queueJobExecution = async (
+  execConfig: queuedJobsExecutionConfig,
+) => {
+  const newQueue = new JobQueue(execConfig);
+  const jobList = await getAllJobs({
+    limit: 999999,
+    offset: 0,
+    jobIds: execConfig.targetJobs,
+    sort: [{ id: execConfig.executionOrderAttribute ?? "id", desc: "false" }],
+    name: "",
+    status: ["STOPPED", "STARTED"],
+  });
+  const taskList = jobList.map((e) => {
+    return () =>
+      jobActionExecution(jobActions.EXECUTE, Number(e.id), {}).then(
+        (registrationData: any) => {
+          const eventTargetId = `${e.getName()}_${registrationData.uniqueSingularId!}`;
+          return onJobFinished(eventTargetId);
+        },
+      );
+  });
+  logger.info(`will enqueue ${taskList.length} jobs`);
+  newQueue.splitToBatches(taskList);
+  await newQueue.enqueueNextBatch();
+  return newQueue;
 };
 
 export const getJobRuns = async ({

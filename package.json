@@ -36,6 +36,7 @@
     "execSync": "^1.0.2",
     "fs-extra": "^11.3.0",
     "mysqldump": "^3.2.0",
+    "p-queue": "^8.1.0",
     "pino": "^9.6.0",
     "pino-loki": "github:moda20/pino-loki#dev",
     "pino-pretty": "^13.0.0",

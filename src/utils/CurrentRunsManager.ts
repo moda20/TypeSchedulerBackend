@@ -1,8 +1,10 @@
 import mainSocketService from "@api/websocket/mainSocket.service";
 import { JobDTO } from "@typesDef/models/job";
+import { JobQueue } from "@utils/queueUtils";
 export default {
   runningJobs: <Record<string, Record<string, JobDTO>>>{},
   initialized: <Record<string, boolean>>{},
+  queues: Array<JobQueue>(),
   startJob(job: JobDTO) {
     if (this.runningJobs[job.getName()]) {
       this.runningJobs[job.getName()][
