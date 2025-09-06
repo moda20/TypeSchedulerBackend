@@ -89,12 +89,20 @@ export const JobsController = createElysia({ prefix: "/jobs" })
   .post(
     "/executeAction",
     ({ body }) => {
-      const { jobId, action, config } = body;
+      const { jobId, action, config, jobIdList } = body;
+      if (jobIdList) {
+        return Promise.allSettled(
+          jobIdList.map((id: string | number) => {
+            return jobActionExecution(action, Number(id ?? ""), { config });
+          }),
+        );
+      }
       return jobActionExecution(action, Number(jobId ?? ""), { config });
     },
     {
       body: t.Object({
         jobId: t.Optional(t.Union([t.String(), t.Number()])),
+        jobIdList: t.Optional(t.Array(t.Union([t.String(), t.Number()]))),
         action: t.String(),
         config: t.Optional(
           t.Object({
