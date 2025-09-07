@@ -11,6 +11,7 @@ import cronParser from "cron-parser";
 import { readdirSync, statSync } from "fs-extra";
 import path, { join, parse } from "path";
 import { IScheduleJobLog } from "schedule-manager";
+import dayjs from "@utils/dayJs";
 export const Nullable = <T extends TSchema>(T: T) => {
   // type Nullable<T> = T | null
   return t.Union([T, t.Null()]);
@@ -260,13 +261,20 @@ export const parseTypedValueToPrismaValue = (
       };
     case "regex":
       return typedValue;
-    case "between":
+    case "between": {
+      const upperValue = isADateValue
+        ? typedValue.value2
+          ? new Date(typedValue.value2)
+          : dayjs(typedValue.value1).add(1, "day").toDate()
+        : typedValue.value2;
       return {
         [attribute]: {
           gte: isADateValue ? new Date(typedValue.value1) : typedValue.value1,
-          lte: isADateValue ? new Date(typedValue.value2) : typedValue.value2,
+          lte: upperValue,
         },
       };
+    }
+
     default:
       return null;
   }
