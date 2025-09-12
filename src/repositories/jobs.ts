@@ -347,6 +347,72 @@ export const jobActionExecution = async (
   }
 };
 
+export const exportJobsToJSON = async ({
+  jobIds,
+  advancedFilters,
+}: {
+  jobIds?: number[];
+  advancedFilters?: advancedFilters;
+}) => {
+  let jobsList: JobDTOClass[] = [];
+  if (advancedFilters) {
+    jobsList = await getFilteredJobs(advancedFilters);
+  } else {
+    jobsList = await getAllJobs({
+      limit: 999999,
+      offset: 0,
+      jobIds: jobIds,
+      status: ["STARTED", "STOPPED"],
+      name: "",
+      sort: [],
+    });
+  }
+  return jobsList.map((job) => {
+    return {
+      consumer: job.getConsumer(),
+      job_name: job.getName(),
+      job_param: job.getParam(),
+      job_cron_setting: job.getCronSetting(),
+      status: job.getStats(),
+    };
+  });
+};
+
+export const importJobsFromJSON = async (jobs: any[] = []) => {
+  const results = await Promise.allSettled(
+    jobs.map((job) => {
+      return ScheduleJobManager.newJob(
+        job.job_name,
+        job.job_cron_setting,
+        job.job_param,
+        job.consumer,
+        true,
+        job.status ?? jobStatus.STOPPED,
+      ).then((d) => {
+        if (d.success && d.job) {
+          registerJobStartAndEndActions(d.job);
+          return `Job ${d.job.name} created successfully`;
+        }
+        throw new Error("Error when creating Job", {
+          cause: {
+            errorOutput: d,
+            job: job,
+          },
+        });
+      });
+    }),
+  );
+  return results.map((res) => {
+    if (res.status === "fulfilled") {
+      return res.value;
+    } else {
+      return {
+        error: res.reason.cause.errorOutput,
+        inputJob: res.reason.cause.job,
+      };
+    }
+  });
+};
 export const queueJobExecution = async (
   execConfig: queuedJobsExecutionConfig,
 ) => {

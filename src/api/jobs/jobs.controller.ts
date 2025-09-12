@@ -2,6 +2,7 @@ import { t } from "elysia";
 
 import config from "@config/config";
 import {
+  exportJobsToJSON,
   getAllJobs,
   getAvailableConsumers,
   getFilteredJobs,
@@ -10,12 +11,19 @@ import {
   getJobStats,
   getLokiLogs,
   getRunningJobs,
+  importJobsFromJSON,
   isJobRunning,
   jobActionExecution,
   queueJobExecution,
 } from "@repositories/jobs";
-import { createElysia, FilterableType } from "@utils/createElysia";
+import {
+  BatchInputJob,
+  createElysia,
+  FilterableType,
+  JobsAdvancedFilters,
+} from "@utils/createElysia";
 import currentRunsManager from "@utils/CurrentRunsManager";
+import dayJs from "@utils/dayJs";
 import { Nullable, toJSON } from "@utils/jobUtils";
 import qs from "qs";
 
@@ -57,18 +65,7 @@ export const JobsController = createElysia({ prefix: "/jobs" })
       return getFilteredJobs(body);
     },
     {
-      body: t.Object({
-        name: t.Optional(FilterableType),
-        consumer: t.Optional(FilterableType),
-        cronSetting: t.Optional(FilterableType),
-        averageTime: t.Optional(FilterableType),
-        latestRun: t.Optional(FilterableType),
-        status: t.Optional(t.Array(t.String())),
-        isRunning: t.Optional(t.Boolean()),
-        sorting: t.Optional(
-          t.Array(t.Object({ id: t.String(), desc: t.Boolean() })),
-        ),
-      }),
+      body: JobsAdvancedFilters,
     },
   )
   .post(
@@ -177,5 +174,30 @@ export const JobsController = createElysia({ prefix: "/jobs" })
         limit: t.Optional(t.Union([t.Number(), t.String()])),
         offset: t.Optional(t.Union([t.Number(), t.String()])),
       }),
+    },
+  )
+  .post(
+    "/exportJobsToJSON",
+    ({ body, set }) => {
+      set.headers["content-disposition"] =
+        `attachment; filename="${dayJs().format("YYYY_MM_DD_HH_mm_ss")}_exported_jobs.json`;
+      return exportJobsToJSON(body);
+    },
+    {
+      body: t.Optional(
+        t.Object({
+          jobIds: t.Optional(t.Array(t.Number())),
+          advancedFilters: t.Optional(JobsAdvancedFilters),
+        }),
+      ),
+    },
+  )
+  .post(
+    "/importJobsFromJSON",
+    ({ body }) => {
+      return importJobsFromJSON(body);
+    },
+    {
+      body: t.Array(BatchInputJob),
     },
   );
