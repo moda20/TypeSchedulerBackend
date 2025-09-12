@@ -17,3 +17,27 @@ export const FilterableType = t.Optional(
     value2: t.Optional(t.Union([t.String(), t.Number()])),
   }),
 );
+
+export const JobsAdvancedFilters = t.Object({
+  name: t.Optional(FilterableType),
+  consumer: t.Optional(FilterableType),
+  cronSetting: t.Optional(FilterableType),
+  averageTime: t.Optional(FilterableType),
+  latestRun: t.Optional(FilterableType),
+  status: t.Optional(t.Array(t.String())),
+  isRunning: t.Optional(t.Boolean()),
+  sorting: t.Optional(t.Array(t.Object({ id: t.String(), desc: t.Boolean() }))),
+});
+
+export const BatchInputJob = t.Object({
+  job_name: t.String(),
+  job_param: t.String(),
+  job_cron_setting: t.String(),
+  consumer: t.String(),
+  status: t.Optional(
+    t.Union([
+      t.Enum({ STOPPED: "STOPPED", STARTED: "STARTED" }),
+      t.Array(t.Enum({ STOPPED: "STOPPED", STARTED: "STARTED" })),
+    ]),
+  ),
+});
