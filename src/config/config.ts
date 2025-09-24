@@ -41,6 +41,12 @@ const config = convict({
       default: true,
       env: "LOG_TO_CONSOLE",
     },
+    logSystemEvents: {
+      doc: "Whether to log all system events, useful for debugging.",
+      format: Boolean,
+      default: true,
+      env: "LOG_SYSTEM_EVENTS",
+    },
   },
   jobs: {
     targetFolderForJobs: {

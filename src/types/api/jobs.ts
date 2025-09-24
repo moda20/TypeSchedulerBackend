@@ -42,3 +42,18 @@ export type Task<T> = () => Promise<T>;
 export interface queuedTasksExecutionConfig extends queuedJobsExecutionConfig {
   targetTasks?: Task<any>[];
 }
+
+export interface JobInitialization {
+  startEventOff?: () => void;
+  endEventOff?: () => void;
+}
+
+export enum LogEventNames {
+  "JobLogEvent" = "JobLogEvent",
+  "JobScheduleEvent" = "JobScheduleEvent",
+}
+export enum jobEventLog {
+  JOB_ENDED = "JOB_ENDED",
+  JOB_STARTED = "JOB_STARTED",
+  JOB_ERROR = "JOB_ERROR",
+}

@@ -1,7 +1,8 @@
 import { JobConsumer } from "@jobConsumer/jobConsumer";
+import { jobEventLog, LogEventNames } from "@typesDef/api/jobs";
 import { JobDTO, jobStatus } from "@typesDef/models/job";
 import currentRunsManager from "@utils/CurrentRunsManager";
-import logger, { JobLogger } from "@utils/loggers";
+import logger, { eventLog, JobLogger } from "@utils/loggers";
 import schedulerManager from "schedule-manager";
 const { ScheduleJobEventBus, ScheduleJobLogEventBus, ScheduleJobManager } =
   schedulerManager;
@@ -63,19 +64,19 @@ export const fullStartAJob = async (job: JobDTO) => {
 
 export const registerJobStartAndEndActions = (job: JobDTO) => {
   logger.info(`Registering jobs ${job.getName()}`);
+  const eventTargetId = job.getName();
   if (currentRunsManager.initialized[job.getName()]) {
     return; // Already initialized;
   }
-  ScheduleJobEventBus.on(
-    "scheduleJob:" + job.getName(),
-    (startedJob: JobDTO) => {
-      currentRunsManager.startJob(startedJob);
-    },
-  );
-  ScheduleJobEventBus.on("completed:" + job.getName(), (endedJob: JobDTO) => {
-    currentRunsManager.endJob(endedJob);
+  onJobStarted<JobDTO>(eventTargetId).then(({ job: startedJob, off }) => {
+    currentRunsManager.startJob(startedJob);
+    currentRunsManager.initialized[eventTargetId].startEventOff = off;
   });
-  currentRunsManager.initialized[job.getName()] = true;
+  onJobFinished<JobDTO>(eventTargetId).then(({ job: endedJob, off }) => {
+    currentRunsManager.endJob(endedJob);
+    currentRunsManager.initialized[eventTargetId].endEventOff = off;
+  });
+  currentRunsManager.initialized[job.getName()] = {};
 };
 
 export const registerSingularJobStartAndEndActions = (job: JobDTO) => {
@@ -86,24 +87,64 @@ export const registerSingularJobStartAndEndActions = (job: JobDTO) => {
   if (currentRunsManager.initialized[eventTargetId]) {
     return; // Already initialized;
   }
+  const evenLogger = eventLog(LogEventNames.JobScheduleEvent);
+  evenLogger.debug(`${jobEventLog.JOB_STARTED}: ${eventTargetId}`, {
+    eventName: `scheduleJob:${eventTargetId}`,
+  });
   currentRunsManager.startJob(job);
-  onJobFinished<JobDTO>(eventTargetId).then((endedJob: JobDTO) => {
+  onJobFinished<JobDTO>(eventTargetId, true).then(({ job: endedJob }) => {
     logger.trace(`Singular job completed ${job.getUniqueSingularId()!}`);
     currentRunsManager.endJob(endedJob);
     delete currentRunsManager.initialized[eventTargetId];
     // TODO figure out if deleting the logger manually is useful
   });
-  currentRunsManager.initialized[eventTargetId] = true;
+  currentRunsManager.initialized[eventTargetId] = {};
 };
 
-export const onJobFinished = <T>(eventTargetId: string) => {
-  return new Promise<T>((res) => {
-    ScheduleJobEventBus.once(
-      `completed:${eventTargetId}`,
-      (endedJob: JobDTO) => {
-        res(endedJob as T);
-      },
-    );
+export const onJobFinished = <T>(
+  eventTargetId: string,
+  once?: boolean,
+): Promise<{ job: T; off: () => void }> => {
+  const fullEventId = `completed:${eventTargetId}`;
+  return new Promise<{ job: T; off: () => void }>((res) => {
+    const execFunction = (endedJob: JobDTO) => {
+      const logger = eventLog(LogEventNames.JobScheduleEvent);
+      logger.debug(`${jobEventLog.JOB_ENDED}: ${eventTargetId}`, {
+        eventName: fullEventId,
+      });
+      res({
+        job: endedJob as T,
+        off: () => {
+          ScheduleJobEventBus.off(fullEventId, execFunction);
+        },
+      });
+    };
+    if (once) {
+      ScheduleJobEventBus.once(fullEventId, execFunction);
+    } else {
+      ScheduleJobEventBus.on(fullEventId, execFunction);
+    }
+  });
+};
+
+export const onJobStarted = <T>(
+  eventTargetId: string,
+): Promise<{ job: T; off: () => void }> => {
+  const fullEventId = `scheduleJob:${eventTargetId}`;
+  return new Promise<{ job: T; off: () => void }>((res) => {
+    const execFunction = (endedJob: JobDTO) => {
+      const logger = eventLog(LogEventNames.JobScheduleEvent);
+      logger.debug(`${jobEventLog.JOB_STARTED}: ${eventTargetId}`, {
+        eventName: fullEventId,
+      });
+      res({
+        job: endedJob as T,
+        off: () => {
+          ScheduleJobEventBus.off(fullEventId, execFunction);
+        },
+      });
+    };
+    ScheduleJobEventBus.on(fullEventId, execFunction);
   });
 };
 
@@ -113,19 +154,10 @@ export const unsubscribeFromAllLogs = (id: number) => {
 };
 
 export const deleteJobStartAndEndActions = (job: JobDTO) => {
-  if (currentRunsManager.initialized[job.getName()]) {
-    ScheduleJobEventBus.off(
-      "scheduleJob:" + job.getName(),
-      (startedJob: JobDTO) => {
-        currentRunsManager.startJob(startedJob);
-      },
-    );
-    ScheduleJobEventBus.off(
-      "completed:" + job.getName(),
-      (endedJob: JobDTO) => {
-        currentRunsManager.endJob(endedJob);
-      },
-    );
+  const jobInitialization = currentRunsManager.initialized[job.getName()];
+  if (jobInitialization) {
+    jobInitialization.startEventOff?.();
+    jobInitialization.endEventOff?.();
     delete currentRunsManager.initialized[job.getName()];
   }
 };
