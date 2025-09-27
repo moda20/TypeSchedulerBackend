@@ -63,7 +63,6 @@ export default {
     );
   },
   subscribeToTopic(userId: string, topics: string[]) {
-    console.log(MiscNotificationTopicsList, topics);
     if (topics.every((e) => MiscNotificationTopicsList.includes(e))) {
       this.topicsSubscriptions[userId] = Array.from(
         new Set([...(this.topicsSubscriptions[userId] ?? []), ...topics]),

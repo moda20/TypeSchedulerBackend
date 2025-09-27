@@ -16,7 +16,10 @@ export class WinstonToSocketTransport extends Transport {
     setImmediate(() => this.emit("logged", info));
 
     try {
-      this.logFn(info);
+      this.logFn({
+        ...info,
+        timestamp: new Date().toISOString(),
+      });
     } catch (err) {
       this.emit("error", err);
     }

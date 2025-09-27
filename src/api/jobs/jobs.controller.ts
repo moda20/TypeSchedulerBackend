@@ -139,7 +139,7 @@ export const JobsController = createElysia({ prefix: "/jobs" })
   .get(
     "/jobLogs/loki",
     async ({ query }) => {
-      const { start, end, query: queryString } = query;
+      const { start, end, query: queryString, mergeStreams } = query;
       if (!config.get("grafana.lokiUrl")) {
         throw new Error("Loki connection is not configured", {
           cause: 400,
@@ -150,13 +150,28 @@ export const JobsController = createElysia({ prefix: "/jobs" })
         Number(start),
         Number(end),
       );
-      return data;
+      if (mergeStreams) {
+        const flattenedStreams = data.data.result.flatMap((stream: any) =>
+          stream.values.map(([ts, line]: [string, string]) => [
+            Number(ts),
+            line,
+            stream.stream,
+          ]),
+        );
+
+        // sort by timestamp
+        flattenedStreams.sort((a, b) => a[0] - b[0]);
+        return flattenedStreams;
+      } else {
+        return data;
+      }
     },
     {
       query: t.Object({
         start: t.Optional(t.Union([t.Number(), t.String()])),
         end: t.Optional(t.Union([t.Number(), t.String()])),
         query: t.String(),
+        mergeStreams: t.Optional(t.Boolean()),
       }),
     },
   )
