@@ -1,5 +1,6 @@
 import { ElysiaWS } from "elysia/dist/ws";
 
+import { getAllPendingJobEvents } from "@repositories/events";
 import {
   EventLogNotification,
   JobNotificationTopics,
@@ -7,6 +8,7 @@ import {
   MiscNotificationTopicsList,
 } from "@typesDef/api/websocket";
 import { JobDTO } from "@typesDef/models/job";
+import currentRunsManager from "@utils/CurrentRunsManager";
 
 export default {
   clients: {} as { [key: string]: ElysiaWS<any> },
@@ -61,6 +63,23 @@ export default {
       },
       MiscNotificationTopics.EventLog,
     );
+  },
+
+  async sendJobStatusEvents(clientId?: string) {
+    const jobEvents = await getAllPendingJobEvents({
+      handled: false,
+    });
+
+    (clientId ? this.clients[clientId].send : this.broadcastMessage)({
+      id: JobNotificationTopics.Status,
+      data: JSON.stringify({
+        runningJobCount: currentRunsManager.getRunningJobCount(),
+        jobEvents: {
+          errorsCount: jobEvents[0]?.events?.errors?.length,
+          warningsCount: jobEvents[0]?.events?.warnings?.length,
+        },
+      }),
+    });
   },
   subscribeToTopic(userId: string, topics: string[]) {
     if (topics.every((e) => MiscNotificationTopicsList.includes(e))) {

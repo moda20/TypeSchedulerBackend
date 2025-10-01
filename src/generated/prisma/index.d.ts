@@ -14,11 +14,6 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 
 /**
- * Model SequelizeMeta
- * 
- */
-export type SequelizeMeta = $Result.DefaultSelection<Prisma.$SequelizeMetaPayload>
-/**
  * Model cache_files
  * This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
  */
@@ -48,6 +43,11 @@ export type schedule_job = $Result.DefaultSelection<Prisma.$schedule_jobPayload>
  * 
  */
 export type schedule_job_log = $Result.DefaultSelection<Prisma.$schedule_job_logPayload>
+/**
+ * Model job_event_log
+ * 
+ */
+export type job_event_log = $Result.DefaultSelection<Prisma.$job_event_logPayload>
 
 /**
  * Enums
@@ -73,8 +73,8 @@ export const proxy_status: typeof $Enums.proxy_status
  * @example
  * ```
  * const prisma = new PrismaClient()
- * // Fetch zero or more SequelizeMetas
- * const sequelizeMetas = await prisma.sequelizeMeta.findMany()
+ * // Fetch zero or more Cache_files
+ * const cache_files = await prisma.cache_files.findMany()
  * ```
  *
  *
@@ -94,8 +94,8 @@ export class PrismaClient<
    * @example
    * ```
    * const prisma = new PrismaClient()
-   * // Fetch zero or more SequelizeMetas
-   * const sequelizeMetas = await prisma.sequelizeMeta.findMany()
+   * // Fetch zero or more Cache_files
+   * const cache_files = await prisma.cache_files.findMany()
    * ```
    *
    *
@@ -192,16 +192,6 @@ export class PrismaClient<
   }>>
 
       /**
-   * `prisma.sequelizeMeta`: Exposes CRUD operations for the **SequelizeMeta** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more SequelizeMetas
-    * const sequelizeMetas = await prisma.sequelizeMeta.findMany()
-    * ```
-    */
-  get sequelizeMeta(): Prisma.SequelizeMetaDelegate<ExtArgs, ClientOptions>;
-
-  /**
    * `prisma.cache_files`: Exposes CRUD operations for the **cache_files** model.
     * Example usage:
     * ```ts
@@ -260,6 +250,16 @@ export class PrismaClient<
     * ```
     */
   get schedule_job_log(): Prisma.schedule_job_logDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.job_event_log`: Exposes CRUD operations for the **job_event_log** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Job_event_logs
+    * const job_event_logs = await prisma.job_event_log.findMany()
+    * ```
+    */
+  get job_event_log(): Prisma.job_event_logDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -700,13 +700,13 @@ export namespace Prisma {
 
 
   export const ModelName: {
-    SequelizeMeta: 'SequelizeMeta',
     cache_files: 'cache_files',
     output_files: 'output_files',
     proxy: 'proxy',
     proxy_job: 'proxy_job',
     schedule_job: 'schedule_job',
-    schedule_job_log: 'schedule_job_log'
+    schedule_job_log: 'schedule_job_log',
+    job_event_log: 'job_event_log'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -725,76 +725,10 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "sequelizeMeta" | "cache_files" | "output_files" | "proxy" | "proxy_job" | "schedule_job" | "schedule_job_log"
+      modelProps: "cache_files" | "output_files" | "proxy" | "proxy_job" | "schedule_job" | "schedule_job_log" | "job_event_log"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
-      SequelizeMeta: {
-        payload: Prisma.$SequelizeMetaPayload<ExtArgs>
-        fields: Prisma.SequelizeMetaFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.SequelizeMetaFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$SequelizeMetaPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.SequelizeMetaFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$SequelizeMetaPayload>
-          }
-          findFirst: {
-            args: Prisma.SequelizeMetaFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$SequelizeMetaPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.SequelizeMetaFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$SequelizeMetaPayload>
-          }
-          findMany: {
-            args: Prisma.SequelizeMetaFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$SequelizeMetaPayload>[]
-          }
-          create: {
-            args: Prisma.SequelizeMetaCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$SequelizeMetaPayload>
-          }
-          createMany: {
-            args: Prisma.SequelizeMetaCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          delete: {
-            args: Prisma.SequelizeMetaDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$SequelizeMetaPayload>
-          }
-          update: {
-            args: Prisma.SequelizeMetaUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$SequelizeMetaPayload>
-          }
-          deleteMany: {
-            args: Prisma.SequelizeMetaDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.SequelizeMetaUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          upsert: {
-            args: Prisma.SequelizeMetaUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$SequelizeMetaPayload>
-          }
-          aggregate: {
-            args: Prisma.SequelizeMetaAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateSequelizeMeta>
-          }
-          groupBy: {
-            args: Prisma.SequelizeMetaGroupByArgs<ExtArgs>
-            result: $Utils.Optional<SequelizeMetaGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.SequelizeMetaCountArgs<ExtArgs>
-            result: $Utils.Optional<SequelizeMetaCountAggregateOutputType> | number
-          }
-        }
-      }
       cache_files: {
         payload: Prisma.$cache_filesPayload<ExtArgs>
         fields: Prisma.cache_filesFieldRefs
@@ -1191,6 +1125,72 @@ export namespace Prisma {
           }
         }
       }
+      job_event_log: {
+        payload: Prisma.$job_event_logPayload<ExtArgs>
+        fields: Prisma.job_event_logFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.job_event_logFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_event_logPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.job_event_logFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_event_logPayload>
+          }
+          findFirst: {
+            args: Prisma.job_event_logFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_event_logPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.job_event_logFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_event_logPayload>
+          }
+          findMany: {
+            args: Prisma.job_event_logFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_event_logPayload>[]
+          }
+          create: {
+            args: Prisma.job_event_logCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_event_logPayload>
+          }
+          createMany: {
+            args: Prisma.job_event_logCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.job_event_logDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_event_logPayload>
+          }
+          update: {
+            args: Prisma.job_event_logUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_event_logPayload>
+          }
+          deleteMany: {
+            args: Prisma.job_event_logDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.job_event_logUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.job_event_logUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$job_event_logPayload>
+          }
+          aggregate: {
+            args: Prisma.Job_event_logAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateJob_event_log>
+          }
+          groupBy: {
+            args: Prisma.job_event_logGroupByArgs<ExtArgs>
+            result: $Utils.Optional<Job_event_logGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.job_event_logCountArgs<ExtArgs>
+            result: $Utils.Optional<Job_event_logCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1275,13 +1275,13 @@ export namespace Prisma {
     omit?: Prisma.GlobalOmitConfig
   }
   export type GlobalOmitConfig = {
-    sequelizeMeta?: SequelizeMetaOmit
     cache_files?: cache_filesOmit
     output_files?: output_filesOmit
     proxy?: proxyOmit
     proxy_job?: proxy_jobOmit
     schedule_job?: schedule_jobOmit
     schedule_job_log?: schedule_job_logOmit
+    job_event_log?: job_event_logOmit
   }
 
   /* Types for Logging */
@@ -1449,11 +1449,13 @@ export namespace Prisma {
   export type Schedule_job_logCountOutputType = {
     cache_files: number
     output_files: number
+    events: number
   }
 
   export type Schedule_job_logCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     cache_files?: boolean | Schedule_job_logCountOutputTypeCountCache_filesArgs
     output_files?: boolean | Schedule_job_logCountOutputTypeCountOutput_filesArgs
+    events?: boolean | Schedule_job_logCountOutputTypeCountEventsArgs
   }
 
   // Custom InputTypes
@@ -1481,848 +1483,17 @@ export namespace Prisma {
     where?: output_filesWhereInput
   }
 
+  /**
+   * Schedule_job_logCountOutputType without action
+   */
+  export type Schedule_job_logCountOutputTypeCountEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: job_event_logWhereInput
+  }
+
 
   /**
    * Models
    */
-
-  /**
-   * Model SequelizeMeta
-   */
-
-  export type AggregateSequelizeMeta = {
-    _count: SequelizeMetaCountAggregateOutputType | null
-    _min: SequelizeMetaMinAggregateOutputType | null
-    _max: SequelizeMetaMaxAggregateOutputType | null
-  }
-
-  export type SequelizeMetaMinAggregateOutputType = {
-    name: string | null
-  }
-
-  export type SequelizeMetaMaxAggregateOutputType = {
-    name: string | null
-  }
-
-  export type SequelizeMetaCountAggregateOutputType = {
-    name: number
-    _all: number
-  }
-
-
-  export type SequelizeMetaMinAggregateInputType = {
-    name?: true
-  }
-
-  export type SequelizeMetaMaxAggregateInputType = {
-    name?: true
-  }
-
-  export type SequelizeMetaCountAggregateInputType = {
-    name?: true
-    _all?: true
-  }
-
-  export type SequelizeMetaAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which SequelizeMeta to aggregate.
-     */
-    where?: SequelizeMetaWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of SequelizeMetas to fetch.
-     */
-    orderBy?: SequelizeMetaOrderByWithRelationInput | SequelizeMetaOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: SequelizeMetaWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` SequelizeMetas from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` SequelizeMetas.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned SequelizeMetas
-    **/
-    _count?: true | SequelizeMetaCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: SequelizeMetaMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: SequelizeMetaMaxAggregateInputType
-  }
-
-  export type GetSequelizeMetaAggregateType<T extends SequelizeMetaAggregateArgs> = {
-        [P in keyof T & keyof AggregateSequelizeMeta]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateSequelizeMeta[P]>
-      : GetScalarType<T[P], AggregateSequelizeMeta[P]>
-  }
-
-
-
-
-  export type SequelizeMetaGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: SequelizeMetaWhereInput
-    orderBy?: SequelizeMetaOrderByWithAggregationInput | SequelizeMetaOrderByWithAggregationInput[]
-    by: SequelizeMetaScalarFieldEnum[] | SequelizeMetaScalarFieldEnum
-    having?: SequelizeMetaScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: SequelizeMetaCountAggregateInputType | true
-    _min?: SequelizeMetaMinAggregateInputType
-    _max?: SequelizeMetaMaxAggregateInputType
-  }
-
-  export type SequelizeMetaGroupByOutputType = {
-    name: string
-    _count: SequelizeMetaCountAggregateOutputType | null
-    _min: SequelizeMetaMinAggregateOutputType | null
-    _max: SequelizeMetaMaxAggregateOutputType | null
-  }
-
-  type GetSequelizeMetaGroupByPayload<T extends SequelizeMetaGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<SequelizeMetaGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof SequelizeMetaGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], SequelizeMetaGroupByOutputType[P]>
-            : GetScalarType<T[P], SequelizeMetaGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type SequelizeMetaSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    name?: boolean
-  }, ExtArgs["result"]["sequelizeMeta"]>
-
-
-
-  export type SequelizeMetaSelectScalar = {
-    name?: boolean
-  }
-
-  export type SequelizeMetaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"name", ExtArgs["result"]["sequelizeMeta"]>
-
-  export type $SequelizeMetaPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "SequelizeMeta"
-    objects: {}
-    scalars: $Extensions.GetPayloadResult<{
-      name: string
-    }, ExtArgs["result"]["sequelizeMeta"]>
-    composites: {}
-  }
-
-  type SequelizeMetaGetPayload<S extends boolean | null | undefined | SequelizeMetaDefaultArgs> = $Result.GetResult<Prisma.$SequelizeMetaPayload, S>
-
-  type SequelizeMetaCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<SequelizeMetaFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: SequelizeMetaCountAggregateInputType | true
-    }
-
-  export interface SequelizeMetaDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SequelizeMeta'], meta: { name: 'SequelizeMeta' } }
-    /**
-     * Find zero or one SequelizeMeta that matches the filter.
-     * @param {SequelizeMetaFindUniqueArgs} args - Arguments to find a SequelizeMeta
-     * @example
-     * // Get one SequelizeMeta
-     * const sequelizeMeta = await prisma.sequelizeMeta.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends SequelizeMetaFindUniqueArgs>(args: SelectSubset<T, SequelizeMetaFindUniqueArgs<ExtArgs>>): Prisma__SequelizeMetaClient<$Result.GetResult<Prisma.$SequelizeMetaPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one SequelizeMeta that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {SequelizeMetaFindUniqueOrThrowArgs} args - Arguments to find a SequelizeMeta
-     * @example
-     * // Get one SequelizeMeta
-     * const sequelizeMeta = await prisma.sequelizeMeta.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends SequelizeMetaFindUniqueOrThrowArgs>(args: SelectSubset<T, SequelizeMetaFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SequelizeMetaClient<$Result.GetResult<Prisma.$SequelizeMetaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first SequelizeMeta that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {SequelizeMetaFindFirstArgs} args - Arguments to find a SequelizeMeta
-     * @example
-     * // Get one SequelizeMeta
-     * const sequelizeMeta = await prisma.sequelizeMeta.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends SequelizeMetaFindFirstArgs>(args?: SelectSubset<T, SequelizeMetaFindFirstArgs<ExtArgs>>): Prisma__SequelizeMetaClient<$Result.GetResult<Prisma.$SequelizeMetaPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first SequelizeMeta that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {SequelizeMetaFindFirstOrThrowArgs} args - Arguments to find a SequelizeMeta
-     * @example
-     * // Get one SequelizeMeta
-     * const sequelizeMeta = await prisma.sequelizeMeta.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends SequelizeMetaFindFirstOrThrowArgs>(args?: SelectSubset<T, SequelizeMetaFindFirstOrThrowArgs<ExtArgs>>): Prisma__SequelizeMetaClient<$Result.GetResult<Prisma.$SequelizeMetaPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more SequelizeMetas that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {SequelizeMetaFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all SequelizeMetas
-     * const sequelizeMetas = await prisma.sequelizeMeta.findMany()
-     * 
-     * // Get first 10 SequelizeMetas
-     * const sequelizeMetas = await prisma.sequelizeMeta.findMany({ take: 10 })
-     * 
-     * // Only select the `name`
-     * const sequelizeMetaWithNameOnly = await prisma.sequelizeMeta.findMany({ select: { name: true } })
-     * 
-     */
-    findMany<T extends SequelizeMetaFindManyArgs>(args?: SelectSubset<T, SequelizeMetaFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SequelizeMetaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a SequelizeMeta.
-     * @param {SequelizeMetaCreateArgs} args - Arguments to create a SequelizeMeta.
-     * @example
-     * // Create one SequelizeMeta
-     * const SequelizeMeta = await prisma.sequelizeMeta.create({
-     *   data: {
-     *     // ... data to create a SequelizeMeta
-     *   }
-     * })
-     * 
-     */
-    create<T extends SequelizeMetaCreateArgs>(args: SelectSubset<T, SequelizeMetaCreateArgs<ExtArgs>>): Prisma__SequelizeMetaClient<$Result.GetResult<Prisma.$SequelizeMetaPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many SequelizeMetas.
-     * @param {SequelizeMetaCreateManyArgs} args - Arguments to create many SequelizeMetas.
-     * @example
-     * // Create many SequelizeMetas
-     * const sequelizeMeta = await prisma.sequelizeMeta.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends SequelizeMetaCreateManyArgs>(args?: SelectSubset<T, SequelizeMetaCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Delete a SequelizeMeta.
-     * @param {SequelizeMetaDeleteArgs} args - Arguments to delete one SequelizeMeta.
-     * @example
-     * // Delete one SequelizeMeta
-     * const SequelizeMeta = await prisma.sequelizeMeta.delete({
-     *   where: {
-     *     // ... filter to delete one SequelizeMeta
-     *   }
-     * })
-     * 
-     */
-    delete<T extends SequelizeMetaDeleteArgs>(args: SelectSubset<T, SequelizeMetaDeleteArgs<ExtArgs>>): Prisma__SequelizeMetaClient<$Result.GetResult<Prisma.$SequelizeMetaPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one SequelizeMeta.
-     * @param {SequelizeMetaUpdateArgs} args - Arguments to update one SequelizeMeta.
-     * @example
-     * // Update one SequelizeMeta
-     * const sequelizeMeta = await prisma.sequelizeMeta.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends SequelizeMetaUpdateArgs>(args: SelectSubset<T, SequelizeMetaUpdateArgs<ExtArgs>>): Prisma__SequelizeMetaClient<$Result.GetResult<Prisma.$SequelizeMetaPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more SequelizeMetas.
-     * @param {SequelizeMetaDeleteManyArgs} args - Arguments to filter SequelizeMetas to delete.
-     * @example
-     * // Delete a few SequelizeMetas
-     * const { count } = await prisma.sequelizeMeta.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends SequelizeMetaDeleteManyArgs>(args?: SelectSubset<T, SequelizeMetaDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more SequelizeMetas.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {SequelizeMetaUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many SequelizeMetas
-     * const sequelizeMeta = await prisma.sequelizeMeta.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends SequelizeMetaUpdateManyArgs>(args: SelectSubset<T, SequelizeMetaUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create or update one SequelizeMeta.
-     * @param {SequelizeMetaUpsertArgs} args - Arguments to update or create a SequelizeMeta.
-     * @example
-     * // Update or create a SequelizeMeta
-     * const sequelizeMeta = await prisma.sequelizeMeta.upsert({
-     *   create: {
-     *     // ... data to create a SequelizeMeta
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the SequelizeMeta we want to update
-     *   }
-     * })
-     */
-    upsert<T extends SequelizeMetaUpsertArgs>(args: SelectSubset<T, SequelizeMetaUpsertArgs<ExtArgs>>): Prisma__SequelizeMetaClient<$Result.GetResult<Prisma.$SequelizeMetaPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of SequelizeMetas.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {SequelizeMetaCountArgs} args - Arguments to filter SequelizeMetas to count.
-     * @example
-     * // Count the number of SequelizeMetas
-     * const count = await prisma.sequelizeMeta.count({
-     *   where: {
-     *     // ... the filter for the SequelizeMetas we want to count
-     *   }
-     * })
-    **/
-    count<T extends SequelizeMetaCountArgs>(
-      args?: Subset<T, SequelizeMetaCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], SequelizeMetaCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a SequelizeMeta.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {SequelizeMetaAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends SequelizeMetaAggregateArgs>(args: Subset<T, SequelizeMetaAggregateArgs>): Prisma.PrismaPromise<GetSequelizeMetaAggregateType<T>>
-
-    /**
-     * Group by SequelizeMeta.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {SequelizeMetaGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends SequelizeMetaGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: SequelizeMetaGroupByArgs['orderBy'] }
-        : { orderBy?: SequelizeMetaGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, SequelizeMetaGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSequelizeMetaGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the SequelizeMeta model
-   */
-  readonly fields: SequelizeMetaFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for SequelizeMeta.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__SequelizeMetaClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the SequelizeMeta model
-   */ 
-  interface SequelizeMetaFieldRefs {
-    readonly name: FieldRef<"SequelizeMeta", 'String'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * SequelizeMeta findUnique
-   */
-  export type SequelizeMetaFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the SequelizeMeta
-     */
-    select?: SequelizeMetaSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the SequelizeMeta
-     */
-    omit?: SequelizeMetaOmit<ExtArgs> | null
-    /**
-     * Filter, which SequelizeMeta to fetch.
-     */
-    where: SequelizeMetaWhereUniqueInput
-  }
-
-  /**
-   * SequelizeMeta findUniqueOrThrow
-   */
-  export type SequelizeMetaFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the SequelizeMeta
-     */
-    select?: SequelizeMetaSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the SequelizeMeta
-     */
-    omit?: SequelizeMetaOmit<ExtArgs> | null
-    /**
-     * Filter, which SequelizeMeta to fetch.
-     */
-    where: SequelizeMetaWhereUniqueInput
-  }
-
-  /**
-   * SequelizeMeta findFirst
-   */
-  export type SequelizeMetaFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the SequelizeMeta
-     */
-    select?: SequelizeMetaSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the SequelizeMeta
-     */
-    omit?: SequelizeMetaOmit<ExtArgs> | null
-    /**
-     * Filter, which SequelizeMeta to fetch.
-     */
-    where?: SequelizeMetaWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of SequelizeMetas to fetch.
-     */
-    orderBy?: SequelizeMetaOrderByWithRelationInput | SequelizeMetaOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for SequelizeMetas.
-     */
-    cursor?: SequelizeMetaWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` SequelizeMetas from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` SequelizeMetas.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of SequelizeMetas.
-     */
-    distinct?: SequelizeMetaScalarFieldEnum | SequelizeMetaScalarFieldEnum[]
-  }
-
-  /**
-   * SequelizeMeta findFirstOrThrow
-   */
-  export type SequelizeMetaFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the SequelizeMeta
-     */
-    select?: SequelizeMetaSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the SequelizeMeta
-     */
-    omit?: SequelizeMetaOmit<ExtArgs> | null
-    /**
-     * Filter, which SequelizeMeta to fetch.
-     */
-    where?: SequelizeMetaWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of SequelizeMetas to fetch.
-     */
-    orderBy?: SequelizeMetaOrderByWithRelationInput | SequelizeMetaOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for SequelizeMetas.
-     */
-    cursor?: SequelizeMetaWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` SequelizeMetas from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` SequelizeMetas.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of SequelizeMetas.
-     */
-    distinct?: SequelizeMetaScalarFieldEnum | SequelizeMetaScalarFieldEnum[]
-  }
-
-  /**
-   * SequelizeMeta findMany
-   */
-  export type SequelizeMetaFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the SequelizeMeta
-     */
-    select?: SequelizeMetaSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the SequelizeMeta
-     */
-    omit?: SequelizeMetaOmit<ExtArgs> | null
-    /**
-     * Filter, which SequelizeMetas to fetch.
-     */
-    where?: SequelizeMetaWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of SequelizeMetas to fetch.
-     */
-    orderBy?: SequelizeMetaOrderByWithRelationInput | SequelizeMetaOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing SequelizeMetas.
-     */
-    cursor?: SequelizeMetaWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` SequelizeMetas from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` SequelizeMetas.
-     */
-    skip?: number
-    distinct?: SequelizeMetaScalarFieldEnum | SequelizeMetaScalarFieldEnum[]
-  }
-
-  /**
-   * SequelizeMeta create
-   */
-  export type SequelizeMetaCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the SequelizeMeta
-     */
-    select?: SequelizeMetaSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the SequelizeMeta
-     */
-    omit?: SequelizeMetaOmit<ExtArgs> | null
-    /**
-     * The data needed to create a SequelizeMeta.
-     */
-    data: XOR<SequelizeMetaCreateInput, SequelizeMetaUncheckedCreateInput>
-  }
-
-  /**
-   * SequelizeMeta createMany
-   */
-  export type SequelizeMetaCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many SequelizeMetas.
-     */
-    data: SequelizeMetaCreateManyInput | SequelizeMetaCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * SequelizeMeta update
-   */
-  export type SequelizeMetaUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the SequelizeMeta
-     */
-    select?: SequelizeMetaSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the SequelizeMeta
-     */
-    omit?: SequelizeMetaOmit<ExtArgs> | null
-    /**
-     * The data needed to update a SequelizeMeta.
-     */
-    data: XOR<SequelizeMetaUpdateInput, SequelizeMetaUncheckedUpdateInput>
-    /**
-     * Choose, which SequelizeMeta to update.
-     */
-    where: SequelizeMetaWhereUniqueInput
-  }
-
-  /**
-   * SequelizeMeta updateMany
-   */
-  export type SequelizeMetaUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update SequelizeMetas.
-     */
-    data: XOR<SequelizeMetaUpdateManyMutationInput, SequelizeMetaUncheckedUpdateManyInput>
-    /**
-     * Filter which SequelizeMetas to update
-     */
-    where?: SequelizeMetaWhereInput
-    /**
-     * Limit how many SequelizeMetas to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * SequelizeMeta upsert
-   */
-  export type SequelizeMetaUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the SequelizeMeta
-     */
-    select?: SequelizeMetaSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the SequelizeMeta
-     */
-    omit?: SequelizeMetaOmit<ExtArgs> | null
-    /**
-     * The filter to search for the SequelizeMeta to update in case it exists.
-     */
-    where: SequelizeMetaWhereUniqueInput
-    /**
-     * In case the SequelizeMeta found by the `where` argument doesn't exist, create a new SequelizeMeta with this data.
-     */
-    create: XOR<SequelizeMetaCreateInput, SequelizeMetaUncheckedCreateInput>
-    /**
-     * In case the SequelizeMeta was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<SequelizeMetaUpdateInput, SequelizeMetaUncheckedUpdateInput>
-  }
-
-  /**
-   * SequelizeMeta delete
-   */
-  export type SequelizeMetaDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the SequelizeMeta
-     */
-    select?: SequelizeMetaSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the SequelizeMeta
-     */
-    omit?: SequelizeMetaOmit<ExtArgs> | null
-    /**
-     * Filter which SequelizeMeta to delete.
-     */
-    where: SequelizeMetaWhereUniqueInput
-  }
-
-  /**
-   * SequelizeMeta deleteMany
-   */
-  export type SequelizeMetaDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which SequelizeMetas to delete
-     */
-    where?: SequelizeMetaWhereInput
-    /**
-     * Limit how many SequelizeMetas to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * SequelizeMeta without action
-   */
-  export type SequelizeMetaDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the SequelizeMeta
-     */
-    select?: SequelizeMetaSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the SequelizeMeta
-     */
-    omit?: SequelizeMetaOmit<ExtArgs> | null
-  }
-
 
   /**
    * Model cache_files
@@ -7688,6 +6859,7 @@ export namespace Prisma {
     schedule_job?: boolean | schedule_jobDefaultArgs<ExtArgs>
     cache_files?: boolean | schedule_job_log$cache_filesArgs<ExtArgs>
     output_files?: boolean | schedule_job_log$output_filesArgs<ExtArgs>
+    events?: boolean | schedule_job_log$eventsArgs<ExtArgs>
     _count?: boolean | Schedule_job_logCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["schedule_job_log"]>
 
@@ -7708,6 +6880,7 @@ export namespace Prisma {
     schedule_job?: boolean | schedule_jobDefaultArgs<ExtArgs>
     cache_files?: boolean | schedule_job_log$cache_filesArgs<ExtArgs>
     output_files?: boolean | schedule_job_log$output_filesArgs<ExtArgs>
+    events?: boolean | schedule_job_log$eventsArgs<ExtArgs>
     _count?: boolean | Schedule_job_logCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -7717,6 +6890,7 @@ export namespace Prisma {
       schedule_job: Prisma.$schedule_jobPayload<ExtArgs>
       cache_files: Prisma.$cache_filesPayload<ExtArgs>[]
       output_files: Prisma.$output_filesPayload<ExtArgs>[]
+      events: Prisma.$job_event_logPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       job_log_id: string
@@ -8069,6 +7243,7 @@ export namespace Prisma {
     schedule_job<T extends schedule_jobDefaultArgs<ExtArgs> = {}>(args?: Subset<T, schedule_jobDefaultArgs<ExtArgs>>): Prisma__schedule_jobClient<$Result.GetResult<Prisma.$schedule_jobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     cache_files<T extends schedule_job_log$cache_filesArgs<ExtArgs> = {}>(args?: Subset<T, schedule_job_log$cache_filesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$cache_filesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     output_files<T extends schedule_job_log$output_filesArgs<ExtArgs> = {}>(args?: Subset<T, schedule_job_log$output_filesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$output_filesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    events<T extends schedule_job_log$eventsArgs<ExtArgs> = {}>(args?: Subset<T, schedule_job_log$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$job_event_logPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8496,6 +7671,30 @@ export namespace Prisma {
   }
 
   /**
+   * schedule_job_log.events
+   */
+  export type schedule_job_log$eventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_event_log
+     */
+    select?: job_event_logSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_event_log
+     */
+    omit?: job_event_logOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_event_logInclude<ExtArgs> | null
+    where?: job_event_logWhereInput
+    orderBy?: job_event_logOrderByWithRelationInput | job_event_logOrderByWithRelationInput[]
+    cursor?: job_event_logWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: Job_event_logScalarFieldEnum | Job_event_logScalarFieldEnum[]
+  }
+
+  /**
    * schedule_job_log without action
    */
   export type schedule_job_logDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -8515,6 +7714,991 @@ export namespace Prisma {
 
 
   /**
+   * Model job_event_log
+   */
+
+  export type AggregateJob_event_log = {
+    _count: Job_event_logCountAggregateOutputType | null
+    _avg: Job_event_logAvgAggregateOutputType | null
+    _sum: Job_event_logSumAggregateOutputType | null
+    _min: Job_event_logMinAggregateOutputType | null
+    _max: Job_event_logMaxAggregateOutputType | null
+  }
+
+  export type Job_event_logAvgAggregateOutputType = {
+    id: number | null
+  }
+
+  export type Job_event_logSumAggregateOutputType = {
+    id: number | null
+  }
+
+  export type Job_event_logMinAggregateOutputType = {
+    id: number | null
+    job_log_id: string | null
+    event: string | null
+    event_message: string | null
+    type: string | null
+    created_at: Date | null
+    handled_on: Date | null
+  }
+
+  export type Job_event_logMaxAggregateOutputType = {
+    id: number | null
+    job_log_id: string | null
+    event: string | null
+    event_message: string | null
+    type: string | null
+    created_at: Date | null
+    handled_on: Date | null
+  }
+
+  export type Job_event_logCountAggregateOutputType = {
+    id: number
+    job_log_id: number
+    event: number
+    event_message: number
+    type: number
+    created_at: number
+    handled_on: number
+    _all: number
+  }
+
+
+  export type Job_event_logAvgAggregateInputType = {
+    id?: true
+  }
+
+  export type Job_event_logSumAggregateInputType = {
+    id?: true
+  }
+
+  export type Job_event_logMinAggregateInputType = {
+    id?: true
+    job_log_id?: true
+    event?: true
+    event_message?: true
+    type?: true
+    created_at?: true
+    handled_on?: true
+  }
+
+  export type Job_event_logMaxAggregateInputType = {
+    id?: true
+    job_log_id?: true
+    event?: true
+    event_message?: true
+    type?: true
+    created_at?: true
+    handled_on?: true
+  }
+
+  export type Job_event_logCountAggregateInputType = {
+    id?: true
+    job_log_id?: true
+    event?: true
+    event_message?: true
+    type?: true
+    created_at?: true
+    handled_on?: true
+    _all?: true
+  }
+
+  export type Job_event_logAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which job_event_log to aggregate.
+     */
+    where?: job_event_logWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of job_event_logs to fetch.
+     */
+    orderBy?: job_event_logOrderByWithRelationInput | job_event_logOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: job_event_logWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` job_event_logs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` job_event_logs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned job_event_logs
+    **/
+    _count?: true | Job_event_logCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: Job_event_logAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: Job_event_logSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: Job_event_logMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: Job_event_logMaxAggregateInputType
+  }
+
+  export type GetJob_event_logAggregateType<T extends Job_event_logAggregateArgs> = {
+        [P in keyof T & keyof AggregateJob_event_log]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateJob_event_log[P]>
+      : GetScalarType<T[P], AggregateJob_event_log[P]>
+  }
+
+
+
+
+  export type job_event_logGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: job_event_logWhereInput
+    orderBy?: job_event_logOrderByWithAggregationInput | job_event_logOrderByWithAggregationInput[]
+    by: Job_event_logScalarFieldEnum[] | Job_event_logScalarFieldEnum
+    having?: job_event_logScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: Job_event_logCountAggregateInputType | true
+    _avg?: Job_event_logAvgAggregateInputType
+    _sum?: Job_event_logSumAggregateInputType
+    _min?: Job_event_logMinAggregateInputType
+    _max?: Job_event_logMaxAggregateInputType
+  }
+
+  export type Job_event_logGroupByOutputType = {
+    id: number
+    job_log_id: string
+    event: string
+    event_message: string
+    type: string
+    created_at: Date
+    handled_on: Date | null
+    _count: Job_event_logCountAggregateOutputType | null
+    _avg: Job_event_logAvgAggregateOutputType | null
+    _sum: Job_event_logSumAggregateOutputType | null
+    _min: Job_event_logMinAggregateOutputType | null
+    _max: Job_event_logMaxAggregateOutputType | null
+  }
+
+  type GetJob_event_logGroupByPayload<T extends job_event_logGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<Job_event_logGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof Job_event_logGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], Job_event_logGroupByOutputType[P]>
+            : GetScalarType<T[P], Job_event_logGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type job_event_logSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    job_log_id?: boolean
+    event?: boolean
+    event_message?: boolean
+    type?: boolean
+    created_at?: boolean
+    handled_on?: boolean
+    schedule_job_log?: boolean | schedule_job_logDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["job_event_log"]>
+
+
+
+  export type job_event_logSelectScalar = {
+    id?: boolean
+    job_log_id?: boolean
+    event?: boolean
+    event_message?: boolean
+    type?: boolean
+    created_at?: boolean
+    handled_on?: boolean
+  }
+
+  export type job_event_logOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "job_log_id" | "event" | "event_message" | "type" | "created_at" | "handled_on", ExtArgs["result"]["job_event_log"]>
+  export type job_event_logInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    schedule_job_log?: boolean | schedule_job_logDefaultArgs<ExtArgs>
+  }
+
+  export type $job_event_logPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "job_event_log"
+    objects: {
+      schedule_job_log: Prisma.$schedule_job_logPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      job_log_id: string
+      event: string
+      event_message: string
+      type: string
+      created_at: Date
+      handled_on: Date | null
+    }, ExtArgs["result"]["job_event_log"]>
+    composites: {}
+  }
+
+  type job_event_logGetPayload<S extends boolean | null | undefined | job_event_logDefaultArgs> = $Result.GetResult<Prisma.$job_event_logPayload, S>
+
+  type job_event_logCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<job_event_logFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: Job_event_logCountAggregateInputType | true
+    }
+
+  export interface job_event_logDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['job_event_log'], meta: { name: 'job_event_log' } }
+    /**
+     * Find zero or one Job_event_log that matches the filter.
+     * @param {job_event_logFindUniqueArgs} args - Arguments to find a Job_event_log
+     * @example
+     * // Get one Job_event_log
+     * const job_event_log = await prisma.job_event_log.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends job_event_logFindUniqueArgs>(args: SelectSubset<T, job_event_logFindUniqueArgs<ExtArgs>>): Prisma__job_event_logClient<$Result.GetResult<Prisma.$job_event_logPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Job_event_log that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {job_event_logFindUniqueOrThrowArgs} args - Arguments to find a Job_event_log
+     * @example
+     * // Get one Job_event_log
+     * const job_event_log = await prisma.job_event_log.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends job_event_logFindUniqueOrThrowArgs>(args: SelectSubset<T, job_event_logFindUniqueOrThrowArgs<ExtArgs>>): Prisma__job_event_logClient<$Result.GetResult<Prisma.$job_event_logPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Job_event_log that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {job_event_logFindFirstArgs} args - Arguments to find a Job_event_log
+     * @example
+     * // Get one Job_event_log
+     * const job_event_log = await prisma.job_event_log.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends job_event_logFindFirstArgs>(args?: SelectSubset<T, job_event_logFindFirstArgs<ExtArgs>>): Prisma__job_event_logClient<$Result.GetResult<Prisma.$job_event_logPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Job_event_log that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {job_event_logFindFirstOrThrowArgs} args - Arguments to find a Job_event_log
+     * @example
+     * // Get one Job_event_log
+     * const job_event_log = await prisma.job_event_log.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends job_event_logFindFirstOrThrowArgs>(args?: SelectSubset<T, job_event_logFindFirstOrThrowArgs<ExtArgs>>): Prisma__job_event_logClient<$Result.GetResult<Prisma.$job_event_logPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Job_event_logs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {job_event_logFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Job_event_logs
+     * const job_event_logs = await prisma.job_event_log.findMany()
+     * 
+     * // Get first 10 Job_event_logs
+     * const job_event_logs = await prisma.job_event_log.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const job_event_logWithIdOnly = await prisma.job_event_log.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends job_event_logFindManyArgs>(args?: SelectSubset<T, job_event_logFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$job_event_logPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Job_event_log.
+     * @param {job_event_logCreateArgs} args - Arguments to create a Job_event_log.
+     * @example
+     * // Create one Job_event_log
+     * const Job_event_log = await prisma.job_event_log.create({
+     *   data: {
+     *     // ... data to create a Job_event_log
+     *   }
+     * })
+     * 
+     */
+    create<T extends job_event_logCreateArgs>(args: SelectSubset<T, job_event_logCreateArgs<ExtArgs>>): Prisma__job_event_logClient<$Result.GetResult<Prisma.$job_event_logPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Job_event_logs.
+     * @param {job_event_logCreateManyArgs} args - Arguments to create many Job_event_logs.
+     * @example
+     * // Create many Job_event_logs
+     * const job_event_log = await prisma.job_event_log.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends job_event_logCreateManyArgs>(args?: SelectSubset<T, job_event_logCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Job_event_log.
+     * @param {job_event_logDeleteArgs} args - Arguments to delete one Job_event_log.
+     * @example
+     * // Delete one Job_event_log
+     * const Job_event_log = await prisma.job_event_log.delete({
+     *   where: {
+     *     // ... filter to delete one Job_event_log
+     *   }
+     * })
+     * 
+     */
+    delete<T extends job_event_logDeleteArgs>(args: SelectSubset<T, job_event_logDeleteArgs<ExtArgs>>): Prisma__job_event_logClient<$Result.GetResult<Prisma.$job_event_logPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Job_event_log.
+     * @param {job_event_logUpdateArgs} args - Arguments to update one Job_event_log.
+     * @example
+     * // Update one Job_event_log
+     * const job_event_log = await prisma.job_event_log.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends job_event_logUpdateArgs>(args: SelectSubset<T, job_event_logUpdateArgs<ExtArgs>>): Prisma__job_event_logClient<$Result.GetResult<Prisma.$job_event_logPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Job_event_logs.
+     * @param {job_event_logDeleteManyArgs} args - Arguments to filter Job_event_logs to delete.
+     * @example
+     * // Delete a few Job_event_logs
+     * const { count } = await prisma.job_event_log.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends job_event_logDeleteManyArgs>(args?: SelectSubset<T, job_event_logDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Job_event_logs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {job_event_logUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Job_event_logs
+     * const job_event_log = await prisma.job_event_log.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends job_event_logUpdateManyArgs>(args: SelectSubset<T, job_event_logUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Job_event_log.
+     * @param {job_event_logUpsertArgs} args - Arguments to update or create a Job_event_log.
+     * @example
+     * // Update or create a Job_event_log
+     * const job_event_log = await prisma.job_event_log.upsert({
+     *   create: {
+     *     // ... data to create a Job_event_log
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Job_event_log we want to update
+     *   }
+     * })
+     */
+    upsert<T extends job_event_logUpsertArgs>(args: SelectSubset<T, job_event_logUpsertArgs<ExtArgs>>): Prisma__job_event_logClient<$Result.GetResult<Prisma.$job_event_logPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Job_event_logs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {job_event_logCountArgs} args - Arguments to filter Job_event_logs to count.
+     * @example
+     * // Count the number of Job_event_logs
+     * const count = await prisma.job_event_log.count({
+     *   where: {
+     *     // ... the filter for the Job_event_logs we want to count
+     *   }
+     * })
+    **/
+    count<T extends job_event_logCountArgs>(
+      args?: Subset<T, job_event_logCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], Job_event_logCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Job_event_log.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {Job_event_logAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends Job_event_logAggregateArgs>(args: Subset<T, Job_event_logAggregateArgs>): Prisma.PrismaPromise<GetJob_event_logAggregateType<T>>
+
+    /**
+     * Group by Job_event_log.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {job_event_logGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends job_event_logGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: job_event_logGroupByArgs['orderBy'] }
+        : { orderBy?: job_event_logGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, job_event_logGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetJob_event_logGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the job_event_log model
+   */
+  readonly fields: job_event_logFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for job_event_log.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__job_event_logClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    schedule_job_log<T extends schedule_job_logDefaultArgs<ExtArgs> = {}>(args?: Subset<T, schedule_job_logDefaultArgs<ExtArgs>>): Prisma__schedule_job_logClient<$Result.GetResult<Prisma.$schedule_job_logPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the job_event_log model
+   */ 
+  interface job_event_logFieldRefs {
+    readonly id: FieldRef<"job_event_log", 'Int'>
+    readonly job_log_id: FieldRef<"job_event_log", 'String'>
+    readonly event: FieldRef<"job_event_log", 'String'>
+    readonly event_message: FieldRef<"job_event_log", 'String'>
+    readonly type: FieldRef<"job_event_log", 'String'>
+    readonly created_at: FieldRef<"job_event_log", 'DateTime'>
+    readonly handled_on: FieldRef<"job_event_log", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * job_event_log findUnique
+   */
+  export type job_event_logFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_event_log
+     */
+    select?: job_event_logSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_event_log
+     */
+    omit?: job_event_logOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_event_logInclude<ExtArgs> | null
+    /**
+     * Filter, which job_event_log to fetch.
+     */
+    where: job_event_logWhereUniqueInput
+  }
+
+  /**
+   * job_event_log findUniqueOrThrow
+   */
+  export type job_event_logFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_event_log
+     */
+    select?: job_event_logSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_event_log
+     */
+    omit?: job_event_logOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_event_logInclude<ExtArgs> | null
+    /**
+     * Filter, which job_event_log to fetch.
+     */
+    where: job_event_logWhereUniqueInput
+  }
+
+  /**
+   * job_event_log findFirst
+   */
+  export type job_event_logFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_event_log
+     */
+    select?: job_event_logSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_event_log
+     */
+    omit?: job_event_logOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_event_logInclude<ExtArgs> | null
+    /**
+     * Filter, which job_event_log to fetch.
+     */
+    where?: job_event_logWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of job_event_logs to fetch.
+     */
+    orderBy?: job_event_logOrderByWithRelationInput | job_event_logOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for job_event_logs.
+     */
+    cursor?: job_event_logWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` job_event_logs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` job_event_logs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of job_event_logs.
+     */
+    distinct?: Job_event_logScalarFieldEnum | Job_event_logScalarFieldEnum[]
+  }
+
+  /**
+   * job_event_log findFirstOrThrow
+   */
+  export type job_event_logFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_event_log
+     */
+    select?: job_event_logSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_event_log
+     */
+    omit?: job_event_logOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_event_logInclude<ExtArgs> | null
+    /**
+     * Filter, which job_event_log to fetch.
+     */
+    where?: job_event_logWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of job_event_logs to fetch.
+     */
+    orderBy?: job_event_logOrderByWithRelationInput | job_event_logOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for job_event_logs.
+     */
+    cursor?: job_event_logWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` job_event_logs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` job_event_logs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of job_event_logs.
+     */
+    distinct?: Job_event_logScalarFieldEnum | Job_event_logScalarFieldEnum[]
+  }
+
+  /**
+   * job_event_log findMany
+   */
+  export type job_event_logFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_event_log
+     */
+    select?: job_event_logSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_event_log
+     */
+    omit?: job_event_logOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_event_logInclude<ExtArgs> | null
+    /**
+     * Filter, which job_event_logs to fetch.
+     */
+    where?: job_event_logWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of job_event_logs to fetch.
+     */
+    orderBy?: job_event_logOrderByWithRelationInput | job_event_logOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing job_event_logs.
+     */
+    cursor?: job_event_logWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` job_event_logs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` job_event_logs.
+     */
+    skip?: number
+    distinct?: Job_event_logScalarFieldEnum | Job_event_logScalarFieldEnum[]
+  }
+
+  /**
+   * job_event_log create
+   */
+  export type job_event_logCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_event_log
+     */
+    select?: job_event_logSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_event_log
+     */
+    omit?: job_event_logOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_event_logInclude<ExtArgs> | null
+    /**
+     * The data needed to create a job_event_log.
+     */
+    data: XOR<job_event_logCreateInput, job_event_logUncheckedCreateInput>
+  }
+
+  /**
+   * job_event_log createMany
+   */
+  export type job_event_logCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many job_event_logs.
+     */
+    data: job_event_logCreateManyInput | job_event_logCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * job_event_log update
+   */
+  export type job_event_logUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_event_log
+     */
+    select?: job_event_logSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_event_log
+     */
+    omit?: job_event_logOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_event_logInclude<ExtArgs> | null
+    /**
+     * The data needed to update a job_event_log.
+     */
+    data: XOR<job_event_logUpdateInput, job_event_logUncheckedUpdateInput>
+    /**
+     * Choose, which job_event_log to update.
+     */
+    where: job_event_logWhereUniqueInput
+  }
+
+  /**
+   * job_event_log updateMany
+   */
+  export type job_event_logUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update job_event_logs.
+     */
+    data: XOR<job_event_logUpdateManyMutationInput, job_event_logUncheckedUpdateManyInput>
+    /**
+     * Filter which job_event_logs to update
+     */
+    where?: job_event_logWhereInput
+    /**
+     * Limit how many job_event_logs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * job_event_log upsert
+   */
+  export type job_event_logUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_event_log
+     */
+    select?: job_event_logSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_event_log
+     */
+    omit?: job_event_logOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_event_logInclude<ExtArgs> | null
+    /**
+     * The filter to search for the job_event_log to update in case it exists.
+     */
+    where: job_event_logWhereUniqueInput
+    /**
+     * In case the job_event_log found by the `where` argument doesn't exist, create a new job_event_log with this data.
+     */
+    create: XOR<job_event_logCreateInput, job_event_logUncheckedCreateInput>
+    /**
+     * In case the job_event_log was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<job_event_logUpdateInput, job_event_logUncheckedUpdateInput>
+  }
+
+  /**
+   * job_event_log delete
+   */
+  export type job_event_logDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_event_log
+     */
+    select?: job_event_logSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_event_log
+     */
+    omit?: job_event_logOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_event_logInclude<ExtArgs> | null
+    /**
+     * Filter which job_event_log to delete.
+     */
+    where: job_event_logWhereUniqueInput
+  }
+
+  /**
+   * job_event_log deleteMany
+   */
+  export type job_event_logDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which job_event_logs to delete
+     */
+    where?: job_event_logWhereInput
+    /**
+     * Limit how many job_event_logs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * job_event_log without action
+   */
+  export type job_event_logDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the job_event_log
+     */
+    select?: job_event_logSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the job_event_log
+     */
+    omit?: job_event_logOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: job_event_logInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -8526,13 +8710,6 @@ export namespace Prisma {
   };
 
   export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
-
-
-  export const SequelizeMetaScalarFieldEnum: {
-    name: 'name'
-  };
-
-  export type SequelizeMetaScalarFieldEnum = (typeof SequelizeMetaScalarFieldEnum)[keyof typeof SequelizeMetaScalarFieldEnum]
 
 
   export const Cache_filesScalarFieldEnum: {
@@ -8623,19 +8800,25 @@ export namespace Prisma {
   export type Schedule_job_logScalarFieldEnum = (typeof Schedule_job_logScalarFieldEnum)[keyof typeof Schedule_job_logScalarFieldEnum]
 
 
+  export const Job_event_logScalarFieldEnum: {
+    id: 'id',
+    job_log_id: 'job_log_id',
+    event: 'event',
+    event_message: 'event_message',
+    type: 'type',
+    created_at: 'created_at',
+    handled_on: 'handled_on'
+  };
+
+  export type Job_event_logScalarFieldEnum = (typeof Job_event_logScalarFieldEnum)[keyof typeof Job_event_logScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
-
-
-  export const SequelizeMetaOrderByRelevanceFieldEnum: {
-    name: 'name'
-  };
-
-  export type SequelizeMetaOrderByRelevanceFieldEnum = (typeof SequelizeMetaOrderByRelevanceFieldEnum)[keyof typeof SequelizeMetaOrderByRelevanceFieldEnum]
 
 
   export const NullsOrder: {
@@ -8701,22 +8884,32 @@ export namespace Prisma {
   export type schedule_job_logOrderByRelevanceFieldEnum = (typeof schedule_job_logOrderByRelevanceFieldEnum)[keyof typeof schedule_job_logOrderByRelevanceFieldEnum]
 
 
+  export const job_event_logOrderByRelevanceFieldEnum: {
+    job_log_id: 'job_log_id',
+    event: 'event',
+    event_message: 'event_message',
+    type: 'type'
+  };
+
+  export type job_event_logOrderByRelevanceFieldEnum = (typeof job_event_logOrderByRelevanceFieldEnum)[keyof typeof job_event_logOrderByRelevanceFieldEnum]
+
+
   /**
    * Field references 
    */
 
 
   /**
-   * Reference to a field of type 'String'
+   * Reference to a field of type 'Int'
    */
-  export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
     
 
 
   /**
-   * Reference to a field of type 'Int'
+   * Reference to a field of type 'String'
    */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+  export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>
     
 
 
@@ -8750,39 +8943,6 @@ export namespace Prisma {
    * Deep Input Types
    */
 
-
-  export type SequelizeMetaWhereInput = {
-    AND?: SequelizeMetaWhereInput | SequelizeMetaWhereInput[]
-    OR?: SequelizeMetaWhereInput[]
-    NOT?: SequelizeMetaWhereInput | SequelizeMetaWhereInput[]
-    name?: StringFilter<"SequelizeMeta"> | string
-  }
-
-  export type SequelizeMetaOrderByWithRelationInput = {
-    name?: SortOrder
-    _relevance?: SequelizeMetaOrderByRelevanceInput
-  }
-
-  export type SequelizeMetaWhereUniqueInput = Prisma.AtLeast<{
-    name?: string
-    AND?: SequelizeMetaWhereInput | SequelizeMetaWhereInput[]
-    OR?: SequelizeMetaWhereInput[]
-    NOT?: SequelizeMetaWhereInput | SequelizeMetaWhereInput[]
-  }, "name" | "name">
-
-  export type SequelizeMetaOrderByWithAggregationInput = {
-    name?: SortOrder
-    _count?: SequelizeMetaCountOrderByAggregateInput
-    _max?: SequelizeMetaMaxOrderByAggregateInput
-    _min?: SequelizeMetaMinOrderByAggregateInput
-  }
-
-  export type SequelizeMetaScalarWhereWithAggregatesInput = {
-    AND?: SequelizeMetaScalarWhereWithAggregatesInput | SequelizeMetaScalarWhereWithAggregatesInput[]
-    OR?: SequelizeMetaScalarWhereWithAggregatesInput[]
-    NOT?: SequelizeMetaScalarWhereWithAggregatesInput | SequelizeMetaScalarWhereWithAggregatesInput[]
-    name?: StringWithAggregatesFilter<"SequelizeMeta"> | string
-  }
 
   export type cache_filesWhereInput = {
     AND?: cache_filesWhereInput | cache_filesWhereInput[]
@@ -9193,6 +9353,7 @@ export namespace Prisma {
     schedule_job?: XOR<Schedule_jobScalarRelationFilter, schedule_jobWhereInput>
     cache_files?: Cache_filesListRelationFilter
     output_files?: Output_filesListRelationFilter
+    events?: Job_event_logListRelationFilter
   }
 
   export type schedule_job_logOrderByWithRelationInput = {
@@ -9206,6 +9367,7 @@ export namespace Prisma {
     schedule_job?: schedule_jobOrderByWithRelationInput
     cache_files?: cache_filesOrderByRelationAggregateInput
     output_files?: output_filesOrderByRelationAggregateInput
+    events?: job_event_logOrderByRelationAggregateInput
     _relevance?: schedule_job_logOrderByRelevanceInput
   }
 
@@ -9223,6 +9385,7 @@ export namespace Prisma {
     schedule_job?: XOR<Schedule_jobScalarRelationFilter, schedule_jobWhereInput>
     cache_files?: Cache_filesListRelationFilter
     output_files?: Output_filesListRelationFilter
+    events?: Job_event_logListRelationFilter
   }, "job_log_id">
 
   export type schedule_job_logOrderByWithAggregationInput = {
@@ -9253,32 +9416,72 @@ export namespace Prisma {
     error?: StringNullableWithAggregatesFilter<"schedule_job_log"> | string | null
   }
 
-  export type SequelizeMetaCreateInput = {
-    name: string
+  export type job_event_logWhereInput = {
+    AND?: job_event_logWhereInput | job_event_logWhereInput[]
+    OR?: job_event_logWhereInput[]
+    NOT?: job_event_logWhereInput | job_event_logWhereInput[]
+    id?: IntFilter<"job_event_log"> | number
+    job_log_id?: StringFilter<"job_event_log"> | string
+    event?: StringFilter<"job_event_log"> | string
+    event_message?: StringFilter<"job_event_log"> | string
+    type?: StringFilter<"job_event_log"> | string
+    created_at?: DateTimeFilter<"job_event_log"> | Date | string
+    handled_on?: DateTimeNullableFilter<"job_event_log"> | Date | string | null
+    schedule_job_log?: XOR<Schedule_job_logScalarRelationFilter, schedule_job_logWhereInput>
   }
 
-  export type SequelizeMetaUncheckedCreateInput = {
-    name: string
+  export type job_event_logOrderByWithRelationInput = {
+    id?: SortOrder
+    job_log_id?: SortOrder
+    event?: SortOrder
+    event_message?: SortOrder
+    type?: SortOrder
+    created_at?: SortOrder
+    handled_on?: SortOrderInput | SortOrder
+    schedule_job_log?: schedule_job_logOrderByWithRelationInput
+    _relevance?: job_event_logOrderByRelevanceInput
   }
 
-  export type SequelizeMetaUpdateInput = {
-    name?: StringFieldUpdateOperationsInput | string
+  export type job_event_logWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: job_event_logWhereInput | job_event_logWhereInput[]
+    OR?: job_event_logWhereInput[]
+    NOT?: job_event_logWhereInput | job_event_logWhereInput[]
+    job_log_id?: StringFilter<"job_event_log"> | string
+    event?: StringFilter<"job_event_log"> | string
+    event_message?: StringFilter<"job_event_log"> | string
+    type?: StringFilter<"job_event_log"> | string
+    created_at?: DateTimeFilter<"job_event_log"> | Date | string
+    handled_on?: DateTimeNullableFilter<"job_event_log"> | Date | string | null
+    schedule_job_log?: XOR<Schedule_job_logScalarRelationFilter, schedule_job_logWhereInput>
+  }, "id">
+
+  export type job_event_logOrderByWithAggregationInput = {
+    id?: SortOrder
+    job_log_id?: SortOrder
+    event?: SortOrder
+    event_message?: SortOrder
+    type?: SortOrder
+    created_at?: SortOrder
+    handled_on?: SortOrderInput | SortOrder
+    _count?: job_event_logCountOrderByAggregateInput
+    _avg?: job_event_logAvgOrderByAggregateInput
+    _max?: job_event_logMaxOrderByAggregateInput
+    _min?: job_event_logMinOrderByAggregateInput
+    _sum?: job_event_logSumOrderByAggregateInput
   }
 
-  export type SequelizeMetaUncheckedUpdateInput = {
-    name?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type SequelizeMetaCreateManyInput = {
-    name: string
-  }
-
-  export type SequelizeMetaUpdateManyMutationInput = {
-    name?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type SequelizeMetaUncheckedUpdateManyInput = {
-    name?: StringFieldUpdateOperationsInput | string
+  export type job_event_logScalarWhereWithAggregatesInput = {
+    AND?: job_event_logScalarWhereWithAggregatesInput | job_event_logScalarWhereWithAggregatesInput[]
+    OR?: job_event_logScalarWhereWithAggregatesInput[]
+    NOT?: job_event_logScalarWhereWithAggregatesInput | job_event_logScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"job_event_log"> | number
+    job_log_id?: StringWithAggregatesFilter<"job_event_log"> | string
+    event?: StringWithAggregatesFilter<"job_event_log"> | string
+    event_message?: StringWithAggregatesFilter<"job_event_log"> | string
+    type?: StringWithAggregatesFilter<"job_event_log"> | string
+    created_at?: DateTimeWithAggregatesFilter<"job_event_log"> | Date | string
+    handled_on?: DateTimeNullableWithAggregatesFilter<"job_event_log"> | Date | string | null
   }
 
   export type cache_filesCreateInput = {
@@ -9704,6 +9907,7 @@ export namespace Prisma {
     schedule_job: schedule_jobCreateNestedOneWithoutJob_logsInput
     cache_files?: cache_filesCreateNestedManyWithoutSchedule_job_logInput
     output_files?: output_filesCreateNestedManyWithoutSchedule_job_logInput
+    events?: job_event_logCreateNestedManyWithoutSchedule_job_logInput
   }
 
   export type schedule_job_logUncheckedCreateInput = {
@@ -9716,6 +9920,7 @@ export namespace Prisma {
     error?: string | null
     cache_files?: cache_filesUncheckedCreateNestedManyWithoutSchedule_job_logInput
     output_files?: output_filesUncheckedCreateNestedManyWithoutSchedule_job_logInput
+    events?: job_event_logUncheckedCreateNestedManyWithoutSchedule_job_logInput
   }
 
   export type schedule_job_logUpdateInput = {
@@ -9728,6 +9933,7 @@ export namespace Prisma {
     schedule_job?: schedule_jobUpdateOneRequiredWithoutJob_logsNestedInput
     cache_files?: cache_filesUpdateManyWithoutSchedule_job_logNestedInput
     output_files?: output_filesUpdateManyWithoutSchedule_job_logNestedInput
+    events?: job_event_logUpdateManyWithoutSchedule_job_logNestedInput
   }
 
   export type schedule_job_logUncheckedUpdateInput = {
@@ -9740,6 +9946,7 @@ export namespace Prisma {
     error?: NullableStringFieldUpdateOperationsInput | string | null
     cache_files?: cache_filesUncheckedUpdateManyWithoutSchedule_job_logNestedInput
     output_files?: output_filesUncheckedUpdateManyWithoutSchedule_job_logNestedInput
+    events?: job_event_logUncheckedUpdateManyWithoutSchedule_job_logNestedInput
   }
 
   export type schedule_job_logCreateManyInput = {
@@ -9771,6 +9978,83 @@ export namespace Prisma {
     error?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type job_event_logCreateInput = {
+    event: string
+    event_message: string
+    type: string
+    created_at?: Date | string
+    handled_on?: Date | string | null
+    schedule_job_log: schedule_job_logCreateNestedOneWithoutEventsInput
+  }
+
+  export type job_event_logUncheckedCreateInput = {
+    id?: number
+    job_log_id: string
+    event: string
+    event_message: string
+    type: string
+    created_at?: Date | string
+    handled_on?: Date | string | null
+  }
+
+  export type job_event_logUpdateInput = {
+    event?: StringFieldUpdateOperationsInput | string
+    event_message?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    handled_on?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    schedule_job_log?: schedule_job_logUpdateOneRequiredWithoutEventsNestedInput
+  }
+
+  export type job_event_logUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    job_log_id?: StringFieldUpdateOperationsInput | string
+    event?: StringFieldUpdateOperationsInput | string
+    event_message?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    handled_on?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type job_event_logCreateManyInput = {
+    id?: number
+    job_log_id: string
+    event: string
+    event_message: string
+    type: string
+    created_at?: Date | string
+    handled_on?: Date | string | null
+  }
+
+  export type job_event_logUpdateManyMutationInput = {
+    event?: StringFieldUpdateOperationsInput | string
+    event_message?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    handled_on?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type job_event_logUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    job_log_id?: StringFieldUpdateOperationsInput | string
+    event?: StringFieldUpdateOperationsInput | string
+    event_message?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    handled_on?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[]
@@ -9784,53 +10068,6 @@ export namespace Prisma {
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     search?: string
     not?: NestedStringFilter<$PrismaModel> | string
-  }
-
-  export type SequelizeMetaOrderByRelevanceInput = {
-    fields: SequelizeMetaOrderByRelevanceFieldEnum | SequelizeMetaOrderByRelevanceFieldEnum[]
-    sort: SortOrder
-    search: string
-  }
-
-  export type SequelizeMetaCountOrderByAggregateInput = {
-    name?: SortOrder
-  }
-
-  export type SequelizeMetaMaxOrderByAggregateInput = {
-    name?: SortOrder
-  }
-
-  export type SequelizeMetaMinOrderByAggregateInput = {
-    name?: SortOrder
-  }
-
-  export type StringWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[]
-    notIn?: string[]
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    search?: string
-    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedStringFilter<$PrismaModel>
-    _max?: NestedStringFilter<$PrismaModel>
-  }
-
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
   }
 
   export type DateTimeFilter<$PrismaModel = never> = {
@@ -9965,6 +10202,24 @@ export namespace Prisma {
     _sum?: NestedIntFilter<$PrismaModel>
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type StringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[]
+    notIn?: string[]
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
   }
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -10313,11 +10568,21 @@ export namespace Prisma {
     none?: output_filesWhereInput
   }
 
+  export type Job_event_logListRelationFilter = {
+    every?: job_event_logWhereInput
+    some?: job_event_logWhereInput
+    none?: job_event_logWhereInput
+  }
+
   export type cache_filesOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type output_filesOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type job_event_logOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -10365,8 +10630,48 @@ export namespace Prisma {
     job_id?: SortOrder
   }
 
-  export type StringFieldUpdateOperationsInput = {
-    set?: string
+  export type job_event_logOrderByRelevanceInput = {
+    fields: job_event_logOrderByRelevanceFieldEnum | job_event_logOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type job_event_logCountOrderByAggregateInput = {
+    id?: SortOrder
+    job_log_id?: SortOrder
+    event?: SortOrder
+    event_message?: SortOrder
+    type?: SortOrder
+    created_at?: SortOrder
+    handled_on?: SortOrder
+  }
+
+  export type job_event_logAvgOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type job_event_logMaxOrderByAggregateInput = {
+    id?: SortOrder
+    job_log_id?: SortOrder
+    event?: SortOrder
+    event_message?: SortOrder
+    type?: SortOrder
+    created_at?: SortOrder
+    handled_on?: SortOrder
+  }
+
+  export type job_event_logMinOrderByAggregateInput = {
+    id?: SortOrder
+    job_log_id?: SortOrder
+    event?: SortOrder
+    event_message?: SortOrder
+    type?: SortOrder
+    created_at?: SortOrder
+    handled_on?: SortOrder
+  }
+
+  export type job_event_logSumOrderByAggregateInput = {
+    id?: SortOrder
   }
 
   export type schedule_job_logCreateNestedOneWithoutCache_filesInput = {
@@ -10377,6 +10682,10 @@ export namespace Prisma {
 
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
+  }
+
+  export type StringFieldUpdateOperationsInput = {
+    set?: string
   }
 
   export type NullableStringFieldUpdateOperationsInput = {
@@ -10611,6 +10920,13 @@ export namespace Prisma {
     connect?: output_filesWhereUniqueInput | output_filesWhereUniqueInput[]
   }
 
+  export type job_event_logCreateNestedManyWithoutSchedule_job_logInput = {
+    create?: XOR<job_event_logCreateWithoutSchedule_job_logInput, job_event_logUncheckedCreateWithoutSchedule_job_logInput> | job_event_logCreateWithoutSchedule_job_logInput[] | job_event_logUncheckedCreateWithoutSchedule_job_logInput[]
+    connectOrCreate?: job_event_logCreateOrConnectWithoutSchedule_job_logInput | job_event_logCreateOrConnectWithoutSchedule_job_logInput[]
+    createMany?: job_event_logCreateManySchedule_job_logInputEnvelope
+    connect?: job_event_logWhereUniqueInput | job_event_logWhereUniqueInput[]
+  }
+
   export type cache_filesUncheckedCreateNestedManyWithoutSchedule_job_logInput = {
     create?: XOR<cache_filesCreateWithoutSchedule_job_logInput, cache_filesUncheckedCreateWithoutSchedule_job_logInput> | cache_filesCreateWithoutSchedule_job_logInput[] | cache_filesUncheckedCreateWithoutSchedule_job_logInput[]
     connectOrCreate?: cache_filesCreateOrConnectWithoutSchedule_job_logInput | cache_filesCreateOrConnectWithoutSchedule_job_logInput[]
@@ -10623,6 +10939,13 @@ export namespace Prisma {
     connectOrCreate?: output_filesCreateOrConnectWithoutSchedule_job_logInput | output_filesCreateOrConnectWithoutSchedule_job_logInput[]
     createMany?: output_filesCreateManySchedule_job_logInputEnvelope
     connect?: output_filesWhereUniqueInput | output_filesWhereUniqueInput[]
+  }
+
+  export type job_event_logUncheckedCreateNestedManyWithoutSchedule_job_logInput = {
+    create?: XOR<job_event_logCreateWithoutSchedule_job_logInput, job_event_logUncheckedCreateWithoutSchedule_job_logInput> | job_event_logCreateWithoutSchedule_job_logInput[] | job_event_logUncheckedCreateWithoutSchedule_job_logInput[]
+    connectOrCreate?: job_event_logCreateOrConnectWithoutSchedule_job_logInput | job_event_logCreateOrConnectWithoutSchedule_job_logInput[]
+    createMany?: job_event_logCreateManySchedule_job_logInputEnvelope
+    connect?: job_event_logWhereUniqueInput | job_event_logWhereUniqueInput[]
   }
 
   export type schedule_jobUpdateOneRequiredWithoutJob_logsNestedInput = {
@@ -10661,6 +10984,20 @@ export namespace Prisma {
     deleteMany?: output_filesScalarWhereInput | output_filesScalarWhereInput[]
   }
 
+  export type job_event_logUpdateManyWithoutSchedule_job_logNestedInput = {
+    create?: XOR<job_event_logCreateWithoutSchedule_job_logInput, job_event_logUncheckedCreateWithoutSchedule_job_logInput> | job_event_logCreateWithoutSchedule_job_logInput[] | job_event_logUncheckedCreateWithoutSchedule_job_logInput[]
+    connectOrCreate?: job_event_logCreateOrConnectWithoutSchedule_job_logInput | job_event_logCreateOrConnectWithoutSchedule_job_logInput[]
+    upsert?: job_event_logUpsertWithWhereUniqueWithoutSchedule_job_logInput | job_event_logUpsertWithWhereUniqueWithoutSchedule_job_logInput[]
+    createMany?: job_event_logCreateManySchedule_job_logInputEnvelope
+    set?: job_event_logWhereUniqueInput | job_event_logWhereUniqueInput[]
+    disconnect?: job_event_logWhereUniqueInput | job_event_logWhereUniqueInput[]
+    delete?: job_event_logWhereUniqueInput | job_event_logWhereUniqueInput[]
+    connect?: job_event_logWhereUniqueInput | job_event_logWhereUniqueInput[]
+    update?: job_event_logUpdateWithWhereUniqueWithoutSchedule_job_logInput | job_event_logUpdateWithWhereUniqueWithoutSchedule_job_logInput[]
+    updateMany?: job_event_logUpdateManyWithWhereWithoutSchedule_job_logInput | job_event_logUpdateManyWithWhereWithoutSchedule_job_logInput[]
+    deleteMany?: job_event_logScalarWhereInput | job_event_logScalarWhereInput[]
+  }
+
   export type cache_filesUncheckedUpdateManyWithoutSchedule_job_logNestedInput = {
     create?: XOR<cache_filesCreateWithoutSchedule_job_logInput, cache_filesUncheckedCreateWithoutSchedule_job_logInput> | cache_filesCreateWithoutSchedule_job_logInput[] | cache_filesUncheckedCreateWithoutSchedule_job_logInput[]
     connectOrCreate?: cache_filesCreateOrConnectWithoutSchedule_job_logInput | cache_filesCreateOrConnectWithoutSchedule_job_logInput[]
@@ -10689,6 +11026,45 @@ export namespace Prisma {
     deleteMany?: output_filesScalarWhereInput | output_filesScalarWhereInput[]
   }
 
+  export type job_event_logUncheckedUpdateManyWithoutSchedule_job_logNestedInput = {
+    create?: XOR<job_event_logCreateWithoutSchedule_job_logInput, job_event_logUncheckedCreateWithoutSchedule_job_logInput> | job_event_logCreateWithoutSchedule_job_logInput[] | job_event_logUncheckedCreateWithoutSchedule_job_logInput[]
+    connectOrCreate?: job_event_logCreateOrConnectWithoutSchedule_job_logInput | job_event_logCreateOrConnectWithoutSchedule_job_logInput[]
+    upsert?: job_event_logUpsertWithWhereUniqueWithoutSchedule_job_logInput | job_event_logUpsertWithWhereUniqueWithoutSchedule_job_logInput[]
+    createMany?: job_event_logCreateManySchedule_job_logInputEnvelope
+    set?: job_event_logWhereUniqueInput | job_event_logWhereUniqueInput[]
+    disconnect?: job_event_logWhereUniqueInput | job_event_logWhereUniqueInput[]
+    delete?: job_event_logWhereUniqueInput | job_event_logWhereUniqueInput[]
+    connect?: job_event_logWhereUniqueInput | job_event_logWhereUniqueInput[]
+    update?: job_event_logUpdateWithWhereUniqueWithoutSchedule_job_logInput | job_event_logUpdateWithWhereUniqueWithoutSchedule_job_logInput[]
+    updateMany?: job_event_logUpdateManyWithWhereWithoutSchedule_job_logInput | job_event_logUpdateManyWithWhereWithoutSchedule_job_logInput[]
+    deleteMany?: job_event_logScalarWhereInput | job_event_logScalarWhereInput[]
+  }
+
+  export type schedule_job_logCreateNestedOneWithoutEventsInput = {
+    create?: XOR<schedule_job_logCreateWithoutEventsInput, schedule_job_logUncheckedCreateWithoutEventsInput>
+    connectOrCreate?: schedule_job_logCreateOrConnectWithoutEventsInput
+    connect?: schedule_job_logWhereUniqueInput
+  }
+
+  export type schedule_job_logUpdateOneRequiredWithoutEventsNestedInput = {
+    create?: XOR<schedule_job_logCreateWithoutEventsInput, schedule_job_logUncheckedCreateWithoutEventsInput>
+    connectOrCreate?: schedule_job_logCreateOrConnectWithoutEventsInput
+    upsert?: schedule_job_logUpsertWithoutEventsInput
+    connect?: schedule_job_logWhereUniqueInput
+    update?: XOR<XOR<schedule_job_logUpdateToOneWithWhereWithoutEventsInput, schedule_job_logUpdateWithoutEventsInput>, schedule_job_logUncheckedUpdateWithoutEventsInput>
+  }
+
+  export type NestedIntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[]
@@ -10702,35 +11078,6 @@ export namespace Prisma {
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     search?: string
     not?: NestedStringFilter<$PrismaModel> | string
-  }
-
-  export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[]
-    notIn?: string[]
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    search?: string
-    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedStringFilter<$PrismaModel>
-    _max?: NestedStringFilter<$PrismaModel>
-  }
-
-  export type NestedIntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
   }
 
   export type NestedDateTimeFilter<$PrismaModel = never> = {
@@ -10806,6 +11153,24 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[]
+    notIn?: string[]
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
+    not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
   }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -10934,6 +11299,7 @@ export namespace Prisma {
     error?: string | null
     schedule_job: schedule_jobCreateNestedOneWithoutJob_logsInput
     output_files?: output_filesCreateNestedManyWithoutSchedule_job_logInput
+    events?: job_event_logCreateNestedManyWithoutSchedule_job_logInput
   }
 
   export type schedule_job_logUncheckedCreateWithoutCache_filesInput = {
@@ -10945,6 +11311,7 @@ export namespace Prisma {
     result?: string | null
     error?: string | null
     output_files?: output_filesUncheckedCreateNestedManyWithoutSchedule_job_logInput
+    events?: job_event_logUncheckedCreateNestedManyWithoutSchedule_job_logInput
   }
 
   export type schedule_job_logCreateOrConnectWithoutCache_filesInput = {
@@ -10972,6 +11339,7 @@ export namespace Prisma {
     error?: NullableStringFieldUpdateOperationsInput | string | null
     schedule_job?: schedule_jobUpdateOneRequiredWithoutJob_logsNestedInput
     output_files?: output_filesUpdateManyWithoutSchedule_job_logNestedInput
+    events?: job_event_logUpdateManyWithoutSchedule_job_logNestedInput
   }
 
   export type schedule_job_logUncheckedUpdateWithoutCache_filesInput = {
@@ -10983,6 +11351,7 @@ export namespace Prisma {
     result?: NullableStringFieldUpdateOperationsInput | string | null
     error?: NullableStringFieldUpdateOperationsInput | string | null
     output_files?: output_filesUncheckedUpdateManyWithoutSchedule_job_logNestedInput
+    events?: job_event_logUncheckedUpdateManyWithoutSchedule_job_logNestedInput
   }
 
   export type schedule_job_logCreateWithoutOutput_filesInput = {
@@ -10994,6 +11363,7 @@ export namespace Prisma {
     error?: string | null
     schedule_job: schedule_jobCreateNestedOneWithoutJob_logsInput
     cache_files?: cache_filesCreateNestedManyWithoutSchedule_job_logInput
+    events?: job_event_logCreateNestedManyWithoutSchedule_job_logInput
   }
 
   export type schedule_job_logUncheckedCreateWithoutOutput_filesInput = {
@@ -11005,6 +11375,7 @@ export namespace Prisma {
     result?: string | null
     error?: string | null
     cache_files?: cache_filesUncheckedCreateNestedManyWithoutSchedule_job_logInput
+    events?: job_event_logUncheckedCreateNestedManyWithoutSchedule_job_logInput
   }
 
   export type schedule_job_logCreateOrConnectWithoutOutput_filesInput = {
@@ -11032,6 +11403,7 @@ export namespace Prisma {
     error?: NullableStringFieldUpdateOperationsInput | string | null
     schedule_job?: schedule_jobUpdateOneRequiredWithoutJob_logsNestedInput
     cache_files?: cache_filesUpdateManyWithoutSchedule_job_logNestedInput
+    events?: job_event_logUpdateManyWithoutSchedule_job_logNestedInput
   }
 
   export type schedule_job_logUncheckedUpdateWithoutOutput_filesInput = {
@@ -11043,6 +11415,7 @@ export namespace Prisma {
     result?: NullableStringFieldUpdateOperationsInput | string | null
     error?: NullableStringFieldUpdateOperationsInput | string | null
     cache_files?: cache_filesUncheckedUpdateManyWithoutSchedule_job_logNestedInput
+    events?: job_event_logUncheckedUpdateManyWithoutSchedule_job_logNestedInput
   }
 
   export type proxy_jobCreateWithoutProxyInput = {
@@ -11236,6 +11609,7 @@ export namespace Prisma {
     error?: string | null
     cache_files?: cache_filesCreateNestedManyWithoutSchedule_job_logInput
     output_files?: output_filesCreateNestedManyWithoutSchedule_job_logInput
+    events?: job_event_logCreateNestedManyWithoutSchedule_job_logInput
   }
 
   export type schedule_job_logUncheckedCreateWithoutSchedule_jobInput = {
@@ -11247,6 +11621,7 @@ export namespace Prisma {
     error?: string | null
     cache_files?: cache_filesUncheckedCreateNestedManyWithoutSchedule_job_logInput
     output_files?: output_filesUncheckedCreateNestedManyWithoutSchedule_job_logInput
+    events?: job_event_logUncheckedCreateNestedManyWithoutSchedule_job_logInput
   }
 
   export type schedule_job_logCreateOrConnectWithoutSchedule_jobInput = {
@@ -11425,6 +11800,33 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type job_event_logCreateWithoutSchedule_job_logInput = {
+    event: string
+    event_message: string
+    type: string
+    created_at?: Date | string
+    handled_on?: Date | string | null
+  }
+
+  export type job_event_logUncheckedCreateWithoutSchedule_job_logInput = {
+    id?: number
+    event: string
+    event_message: string
+    type: string
+    created_at?: Date | string
+    handled_on?: Date | string | null
+  }
+
+  export type job_event_logCreateOrConnectWithoutSchedule_job_logInput = {
+    where: job_event_logWhereUniqueInput
+    create: XOR<job_event_logCreateWithoutSchedule_job_logInput, job_event_logUncheckedCreateWithoutSchedule_job_logInput>
+  }
+
+  export type job_event_logCreateManySchedule_job_logInputEnvelope = {
+    data: job_event_logCreateManySchedule_job_logInput | job_event_logCreateManySchedule_job_logInput[]
+    skipDuplicates?: boolean
+  }
+
   export type schedule_jobUpsertWithoutJob_logsInput = {
     update: XOR<schedule_jobUpdateWithoutJob_logsInput, schedule_jobUncheckedUpdateWithoutJob_logsInput>
     create: XOR<schedule_jobCreateWithoutJob_logsInput, schedule_jobUncheckedCreateWithoutJob_logsInput>
@@ -11526,6 +11928,99 @@ export namespace Prisma {
     last_downloaded?: DateTimeNullableFilter<"output_files"> | Date | string | null
   }
 
+  export type job_event_logUpsertWithWhereUniqueWithoutSchedule_job_logInput = {
+    where: job_event_logWhereUniqueInput
+    update: XOR<job_event_logUpdateWithoutSchedule_job_logInput, job_event_logUncheckedUpdateWithoutSchedule_job_logInput>
+    create: XOR<job_event_logCreateWithoutSchedule_job_logInput, job_event_logUncheckedCreateWithoutSchedule_job_logInput>
+  }
+
+  export type job_event_logUpdateWithWhereUniqueWithoutSchedule_job_logInput = {
+    where: job_event_logWhereUniqueInput
+    data: XOR<job_event_logUpdateWithoutSchedule_job_logInput, job_event_logUncheckedUpdateWithoutSchedule_job_logInput>
+  }
+
+  export type job_event_logUpdateManyWithWhereWithoutSchedule_job_logInput = {
+    where: job_event_logScalarWhereInput
+    data: XOR<job_event_logUpdateManyMutationInput, job_event_logUncheckedUpdateManyWithoutSchedule_job_logInput>
+  }
+
+  export type job_event_logScalarWhereInput = {
+    AND?: job_event_logScalarWhereInput | job_event_logScalarWhereInput[]
+    OR?: job_event_logScalarWhereInput[]
+    NOT?: job_event_logScalarWhereInput | job_event_logScalarWhereInput[]
+    id?: IntFilter<"job_event_log"> | number
+    job_log_id?: StringFilter<"job_event_log"> | string
+    event?: StringFilter<"job_event_log"> | string
+    event_message?: StringFilter<"job_event_log"> | string
+    type?: StringFilter<"job_event_log"> | string
+    created_at?: DateTimeFilter<"job_event_log"> | Date | string
+    handled_on?: DateTimeNullableFilter<"job_event_log"> | Date | string | null
+  }
+
+  export type schedule_job_logCreateWithoutEventsInput = {
+    job_log_id: string
+    machine?: string | null
+    start_time: Date | string
+    end_time?: Date | string | null
+    result?: string | null
+    error?: string | null
+    schedule_job: schedule_jobCreateNestedOneWithoutJob_logsInput
+    cache_files?: cache_filesCreateNestedManyWithoutSchedule_job_logInput
+    output_files?: output_filesCreateNestedManyWithoutSchedule_job_logInput
+  }
+
+  export type schedule_job_logUncheckedCreateWithoutEventsInput = {
+    job_log_id: string
+    job_id: number
+    machine?: string | null
+    start_time: Date | string
+    end_time?: Date | string | null
+    result?: string | null
+    error?: string | null
+    cache_files?: cache_filesUncheckedCreateNestedManyWithoutSchedule_job_logInput
+    output_files?: output_filesUncheckedCreateNestedManyWithoutSchedule_job_logInput
+  }
+
+  export type schedule_job_logCreateOrConnectWithoutEventsInput = {
+    where: schedule_job_logWhereUniqueInput
+    create: XOR<schedule_job_logCreateWithoutEventsInput, schedule_job_logUncheckedCreateWithoutEventsInput>
+  }
+
+  export type schedule_job_logUpsertWithoutEventsInput = {
+    update: XOR<schedule_job_logUpdateWithoutEventsInput, schedule_job_logUncheckedUpdateWithoutEventsInput>
+    create: XOR<schedule_job_logCreateWithoutEventsInput, schedule_job_logUncheckedCreateWithoutEventsInput>
+    where?: schedule_job_logWhereInput
+  }
+
+  export type schedule_job_logUpdateToOneWithWhereWithoutEventsInput = {
+    where?: schedule_job_logWhereInput
+    data: XOR<schedule_job_logUpdateWithoutEventsInput, schedule_job_logUncheckedUpdateWithoutEventsInput>
+  }
+
+  export type schedule_job_logUpdateWithoutEventsInput = {
+    job_log_id?: StringFieldUpdateOperationsInput | string
+    machine?: NullableStringFieldUpdateOperationsInput | string | null
+    start_time?: DateTimeFieldUpdateOperationsInput | Date | string
+    end_time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    result?: NullableStringFieldUpdateOperationsInput | string | null
+    error?: NullableStringFieldUpdateOperationsInput | string | null
+    schedule_job?: schedule_jobUpdateOneRequiredWithoutJob_logsNestedInput
+    cache_files?: cache_filesUpdateManyWithoutSchedule_job_logNestedInput
+    output_files?: output_filesUpdateManyWithoutSchedule_job_logNestedInput
+  }
+
+  export type schedule_job_logUncheckedUpdateWithoutEventsInput = {
+    job_log_id?: StringFieldUpdateOperationsInput | string
+    job_id?: IntFieldUpdateOperationsInput | number
+    machine?: NullableStringFieldUpdateOperationsInput | string | null
+    start_time?: DateTimeFieldUpdateOperationsInput | Date | string
+    end_time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    result?: NullableStringFieldUpdateOperationsInput | string | null
+    error?: NullableStringFieldUpdateOperationsInput | string | null
+    cache_files?: cache_filesUncheckedUpdateManyWithoutSchedule_job_logNestedInput
+    output_files?: output_filesUncheckedUpdateManyWithoutSchedule_job_logNestedInput
+  }
+
   export type proxy_jobCreateManyProxyInput = {
     id?: number
     job_id: number
@@ -11578,6 +12073,7 @@ export namespace Prisma {
     error?: NullableStringFieldUpdateOperationsInput | string | null
     cache_files?: cache_filesUpdateManyWithoutSchedule_job_logNestedInput
     output_files?: output_filesUpdateManyWithoutSchedule_job_logNestedInput
+    events?: job_event_logUpdateManyWithoutSchedule_job_logNestedInput
   }
 
   export type schedule_job_logUncheckedUpdateWithoutSchedule_jobInput = {
@@ -11589,6 +12085,7 @@ export namespace Prisma {
     error?: NullableStringFieldUpdateOperationsInput | string | null
     cache_files?: cache_filesUncheckedUpdateManyWithoutSchedule_job_logNestedInput
     output_files?: output_filesUncheckedUpdateManyWithoutSchedule_job_logNestedInput
+    events?: job_event_logUncheckedUpdateManyWithoutSchedule_job_logNestedInput
   }
 
   export type schedule_job_logUncheckedUpdateManyWithoutSchedule_jobInput = {
@@ -11643,6 +12140,15 @@ export namespace Prisma {
     file_size: bigint | number
     file_type: string
     last_downloaded?: Date | string | null
+  }
+
+  export type job_event_logCreateManySchedule_job_logInput = {
+    id?: number
+    event: string
+    event_message: string
+    type: string
+    created_at?: Date | string
+    handled_on?: Date | string | null
   }
 
   export type cache_filesUpdateWithoutSchedule_job_logInput = {
@@ -11716,6 +12222,32 @@ export namespace Prisma {
     file_size?: BigIntFieldUpdateOperationsInput | bigint | number
     file_type?: StringFieldUpdateOperationsInput | string
     last_downloaded?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type job_event_logUpdateWithoutSchedule_job_logInput = {
+    event?: StringFieldUpdateOperationsInput | string
+    event_message?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    handled_on?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type job_event_logUncheckedUpdateWithoutSchedule_job_logInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    event?: StringFieldUpdateOperationsInput | string
+    event_message?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    handled_on?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type job_event_logUncheckedUpdateManyWithoutSchedule_job_logInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    event?: StringFieldUpdateOperationsInput | string
+    event_message?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    handled_on?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
 

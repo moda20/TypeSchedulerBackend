@@ -293,3 +293,11 @@ export interface JobOptions {
   utils?: typeof JobConsumerUtils;
   config?: { [key: string]: any };
 }
+
+export enum JobEventTypes {
+  ERROR = "ERROR",
+  WARNING = "WARNING",
+  INFO = "INFO",
+}
+
+export const JobEventTypesArray = Object.values(JobEventTypes);

@@ -117,10 +117,6 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
-exports.Prisma.SequelizeMetaScalarFieldEnum = {
-  name: 'name'
-};
-
 exports.Prisma.Cache_filesScalarFieldEnum = {
   id: 'id',
   job_log_id: 'job_log_id',
@@ -191,13 +187,19 @@ exports.Prisma.Schedule_job_logScalarFieldEnum = {
   error: 'error'
 };
 
+exports.Prisma.Job_event_logScalarFieldEnum = {
+  id: 'id',
+  job_log_id: 'job_log_id',
+  event: 'event',
+  event_message: 'event_message',
+  type: 'type',
+  created_at: 'created_at',
+  handled_on: 'handled_on'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
-};
-
-exports.Prisma.SequelizeMetaOrderByRelevanceFieldEnum = {
-  name: 'name'
 };
 
 exports.Prisma.NullsOrder = {
@@ -244,19 +246,26 @@ exports.Prisma.schedule_job_logOrderByRelevanceFieldEnum = {
   result: 'result',
   error: 'error'
 };
+
+exports.Prisma.job_event_logOrderByRelevanceFieldEnum = {
+  job_log_id: 'job_log_id',
+  event: 'event',
+  event_message: 'event_message',
+  type: 'type'
+};
 exports.proxy_status = exports.$Enums.proxy_status = {
   active: 'active',
   inactive: 'inactive'
 };
 
 exports.Prisma.ModelName = {
-  SequelizeMeta: 'SequelizeMeta',
   cache_files: 'cache_files',
   output_files: 'output_files',
   proxy: 'proxy',
   proxy_job: 'proxy_job',
   schedule_job: 'schedule_job',
-  schedule_job_log: 'schedule_job_log'
+  schedule_job_log: 'schedule_job_log',
+  job_event_log: 'job_event_log'
 };
 
 /**
