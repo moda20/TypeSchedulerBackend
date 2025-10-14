@@ -1,5 +1,6 @@
 import mainSocketService from "@api/websocket/mainSocket.service";
 import { addEventLog } from "@repositories/events";
+import { LogEventNames } from "@typesDef/api/jobs";
 import { JobEventTypes } from "@typesDef/models/job";
 import {
   exportCacheFiles,
@@ -14,6 +15,7 @@ export const emitJobEvent = async (
   message: string,
   type: JobEventTypes,
   jobLogId: string,
+  jobId: number,
 ) => {
   const eventLogger = eventLog("JobEvents");
   await addEventLog({
@@ -45,7 +47,23 @@ export const emitJobEvent = async (
     eventName: event,
     message,
   });
-  mainSocketService.sendJobStatusEvents();
+  mainSocketService.broadcastMessage(
+    {
+      id: `JOB_EVENT_${jobId}_${type}`,
+      data: JSON.stringify({
+        level: type,
+        eventName: event,
+        message,
+      }),
+    },
+    `JOB_EVENT_${jobId}_${type}`,
+  );
+  mainSocketService.sendJobStatusEvents().catch((err) => {
+    const sysLog = eventLog(LogEventNames.SysLogEvent);
+    sysLog.warn(err, {
+      eventName: "STATUS_VIA_SOCKET_FAILED",
+    });
+  });
 };
 
 export { exportCacheFiles, exportResultsToFile, getNextJobExecution, sleep };

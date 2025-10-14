@@ -12,6 +12,7 @@ import LokiTransport from "winston-loki";
 import "winston-daily-rotate-file";
 
 const loggers: { [key: string]: Logger } = {};
+const eventLoggers: { [key: string]: Logger } = {};
 
 const regularLoggerFormat = format.combine(
   format.timestamp(),
@@ -128,7 +129,7 @@ const generalLogger = pino(generalTransport);
 // create a logger using winston with daily rotated files
 
 const eventLog = (source: string) => {
-  if (loggers[source]) return loggers[source];
+  if (eventLoggers[source]) return eventLoggers[source];
   const options = (
     level: string,
   ): DailyRotateFile.DailyRotateFileTransportOptions => ({
@@ -193,7 +194,7 @@ const eventLog = (source: string) => {
     transports: transportsList,
     level: "debug",
   });
-  loggers[source] = newLogger;
+  eventLoggers[source] = newLogger;
   return newLogger;
 };
 

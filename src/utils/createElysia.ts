@@ -18,6 +18,11 @@ export const FilterableType = t.Optional(
   }),
 );
 
+export const ToArrayType = t
+  .Transform(t.Any())
+  .Decode((v) => (Array.isArray(v) ? v : [v]))
+  .Encode((v) => v);
+
 export const JobsAdvancedFilters = t.Object({
   name: t.Optional(FilterableType),
   consumer: t.Optional(FilterableType),

@@ -51,6 +51,7 @@ export interface JobInitialization {
 export enum LogEventNames {
   "JobLogEvent" = "JobLogEvent",
   "JobScheduleEvent" = "JobScheduleEvent",
+  "SysLogEvent" = "SysLogEvent",
 }
 export enum jobEventLog {
   JOB_ENDED = "JOB_ENDED",

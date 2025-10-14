@@ -7,43 +7,78 @@ export const getEvents = async ({
   job_log_id,
   offset,
   limit,
-  handled,
+  unhandled,
+  dateFrom,
+  dateTo,
+  job_id,
 }: {
   limit?: number;
   offset?: number;
   search?: string;
   job_log_id?: string;
-  type?: string;
-  handled?: boolean;
+  type?: string[];
+  unhandled?: boolean;
+  dateFrom?: string;
+  dateTo?: string;
+  job_id?: string[];
 }) => {
-  const records = prisma.job_event_log.findMany({
-    where: {
-      type: type,
-      job_log_id: job_log_id,
-      handled_on: {
-        ...(handled ? { not: null } : { equals: null }),
-      },
+  const eventFilterObject = {
+    type: {
+      in: type,
     },
-    take: limit,
-    skip: offset,
-  });
+    ...(job_id
+      ? {
+          OR: job_id?.map((jd) => ({
+            job_log_id: job_id
+              ? {
+                  startsWith: `${jd}-`,
+                }
+              : job_log_id,
+          })),
+        }
+      : {
+          job_log_id: job_log_id,
+        }),
+    ...(unhandled ? { handled_on: { equals: null } } : {}),
+    created_at: {
+      gte: dateFrom,
+      lte: dateTo,
+    },
+  };
+  const [data, count] = await Promise.all([
+    prisma.job_event_log.findMany({
+      where: eventFilterObject,
+      take: limit,
+      skip: offset,
+      orderBy: {
+        created_at: "desc",
+      },
+    }),
+    prisma.job_event_log.count({
+      where: eventFilterObject,
+    }),
+  ]);
 
-  return records;
+  return {
+    data: data,
+    total: count,
+  };
 };
 
+// TODO This needs a rework using the main event reading function
 export const getAllPendingJobEvents = async ({
   type,
   jobId,
   offset,
   limit,
-  handled,
+  unhandled,
 }: {
   limit?: number;
   offset?: number;
   search?: string;
   jobId?: number;
   type?: string;
-  handled?: boolean;
+  unhandled?: boolean;
 }) => {
   const records = await prisma.schedule_job.findMany({
     where: {
@@ -62,9 +97,7 @@ export const getAllPendingJobEvents = async ({
           events: {
             where: {
               type: type,
-              handled_on: {
-                ...(handled ? { not: null } : { equals: null }),
-              },
+              ...(unhandled ? { handled_on: { equals: null } } : {}),
             },
           },
         },
@@ -127,6 +160,17 @@ export const setEventsToHandled = async ({
       id: {
         in: ids.map(Number),
       },
+    },
+    data: {
+      handled_on: new Date(),
+    },
+  });
+};
+
+export const setAllEventsToHandled = async () => {
+  return prisma.job_event_log.updateMany({
+    where: {
+      handled_on: null,
     },
     data: {
       handled_on: new Date(),

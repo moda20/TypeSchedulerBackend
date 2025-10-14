@@ -115,6 +115,7 @@ export class JobConsumer extends Consumer {
       error,
       JobEventTypes.ERROR,
       this.jobLog!.getId()!,
+      this.job!.getId()!,
     );
   }
 
@@ -124,6 +125,7 @@ export class JobConsumer extends Consumer {
       warning,
       JobEventTypes.WARNING,
       this.jobLog!.getId()!,
+      this.job!.getId()!,
     );
   }
 
