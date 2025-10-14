@@ -129,6 +129,16 @@ export class JobConsumer extends Consumer {
     );
   }
 
+  emitInfo(info: any) {
+    return jobConsumerUtils.emitJobEvent(
+      "JOB_INFO",
+      info,
+      JobEventTypes.INFO,
+      this.jobLog!.getId()!,
+      this.job!.getId()!,
+    );
+  }
+
   jobInputParse(job: JobDTO, jobLog: JobLogDTO) {
     if (job.param && typeof job.param === "string") {
       job.param = JSON.parse(job.param);
