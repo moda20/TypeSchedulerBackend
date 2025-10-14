@@ -1,17 +1,27 @@
 import { ElysiaWS } from "elysia/dist/ws";
 
+import { getAllPendingJobEvents } from "@repositories/events";
+import { LogEventNames } from "@typesDef/api/jobs";
 import {
   EventLogNotification,
   JobNotificationTopics,
   MiscNotificationTopics,
-  MiscNotificationTopicsList,
 } from "@typesDef/api/websocket";
 import { JobDTO } from "@typesDef/models/job";
+import currentRunsManager from "@utils/CurrentRunsManager";
+import { eventLog } from "@utils/loggers";
+import { isAcceptedTopic } from "@utils/socketUtils";
 
 export default {
   clients: {} as { [key: string]: ElysiaWS<any> },
   topicsSubscriptions: {} as { [key: string]: string[] },
   socket: null,
+  sysLog: (err: any) => {
+    const sysLog = eventLog(LogEventNames.SysLogEvent);
+    sysLog.warn(err, {
+      eventName: "STATUS_VIA_SOCKET_FAILED",
+    });
+  },
   setWsClient(client: any, userId: string) {
     this.clients[userId] = client;
     this.socket = client;
@@ -62,8 +72,34 @@ export default {
       MiscNotificationTopics.EventLog,
     );
   },
+
+  async sendJobStatusEvents(clientId?: string) {
+    try {
+      const jobEvents = await getAllPendingJobEvents({
+        unhandled: true,
+      });
+
+      const message = {
+        id: JobNotificationTopics.Status,
+        data: JSON.stringify({
+          runningJobCount: currentRunsManager.getRunningJobCount(),
+          jobEvents: {
+            errorsCount: jobEvents[0]?.events?.errors?.length,
+            warningsCount: jobEvents[0]?.events?.warnings?.length,
+          },
+        }),
+      };
+      if (clientId) {
+        return this.clients[clientId]?.send(message);
+      } else {
+        return this.broadcastMessage(message);
+      }
+    } catch (err) {
+      this.sysLog(err);
+    }
+  },
   subscribeToTopic(userId: string, topics: string[]) {
-    if (topics.every((e) => MiscNotificationTopicsList.includes(e))) {
+    if (topics.every(isAcceptedTopic)) {
       this.topicsSubscriptions[userId] = Array.from(
         new Set([...(this.topicsSubscriptions[userId] ?? []), ...topics]),
       );

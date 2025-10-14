@@ -9,17 +9,13 @@ import mainSocketService from "./mainSocket.service";
 export default function handleSocketMessage(message: any, ws: ElysiaWS<any>) {
   switch (message.id) {
     case JobNotificationTopics.Status: {
-      ws.send({
-        id: JobNotificationTopics.Status,
-        data: JSON.stringify({
-          runningJobCount: currentRunsManager.getRunningJobCount(),
-        }),
-      });
+      const cid = ws.data.set.headers["x-user-id"];
+      mainSocketService.sendJobStatusEvents(cid);
       break;
     }
     case JobNotificationTopics.SubscribeToTopic: {
       if (message.message) {
-        const userId = ws.data.headers["x-user-id"];
+        const userId = ws.data.set.headers["x-user-id"];
         mainSocketService.subscribeToTopic(
           userId,
           forceToArray(message.message),
@@ -29,7 +25,7 @@ export default function handleSocketMessage(message: any, ws: ElysiaWS<any>) {
     }
     case JobNotificationTopics.UnsubscribeFromTopic: {
       if (message.message) {
-        const userId = ws.data.headers["x-user-id"];
+        const userId = ws.data.set.headers["x-user-id"];
         mainSocketService.unsubscribeFromTopics(
           userId,
           forceToArray(message.message),

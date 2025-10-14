@@ -2,7 +2,12 @@ import config from "@config/config";
 import * as BrowserlessService from "@external/browserless";
 import GotifyService from "@notifications/gotify";
 import { getNotificationService } from "@repositories/notificationServices";
-import { JobDTO, JobLogDTO, JobOptions } from "@typesDef/models/job";
+import {
+  JobDTO,
+  JobEventTypes,
+  JobLogDTO,
+  JobOptions,
+} from "@typesDef/models/job";
 import defaultAxiosInstance from "@utils/httpRequestConfig";
 import * as jobConsumerUtils from "@utils/jobConsumerUtils";
 import {
@@ -17,6 +22,7 @@ import scheduleManager, {
   IScheduleJob,
   IScheduleJobLog,
 } from "schedule-manager";
+
 const { JobConsumer: Consumer } = scheduleManager;
 
 export class JobConsumer extends Consumer {
@@ -101,6 +107,36 @@ export class JobConsumer extends Consumer {
         },
       );
     }
+  }
+
+  emitError(error: any) {
+    return jobConsumerUtils.emitJobEvent(
+      "JOB_ERROR",
+      error,
+      JobEventTypes.ERROR,
+      this.jobLog!.getId()!,
+      this.job!.getId()!,
+    );
+  }
+
+  emitWarning(warning: any) {
+    return jobConsumerUtils.emitJobEvent(
+      "JOB_WARNING",
+      warning,
+      JobEventTypes.WARNING,
+      this.jobLog!.getId()!,
+      this.job!.getId()!,
+    );
+  }
+
+  emitInfo(info: any) {
+    return jobConsumerUtils.emitJobEvent(
+      "JOB_INFO",
+      info,
+      JobEventTypes.INFO,
+      this.jobLog!.getId()!,
+      this.job!.getId()!,
+    );
   }
 
   jobInputParse(job: JobDTO, jobLog: JobLogDTO) {

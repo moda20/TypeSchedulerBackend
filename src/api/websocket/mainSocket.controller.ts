@@ -23,7 +23,7 @@ export const websocketController = createElysia().ws("/ws", {
       ws.close(401);
       return;
     }
-    socketService.setWsClient(ws, ws.data.headers["x-user-id"]);
+    socketService.setWsClient(ws, ws.data.set.headers["x-user-id"]);
     ws.send({
       id: JobNotificationTopics.NOOP,
     });

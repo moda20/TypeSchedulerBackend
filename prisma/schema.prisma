@@ -1,16 +1,12 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
+  provider      = "prisma-client-js"
+  output        = "../src/generated/prisma"
   binaryTargets = ["linux-arm64-openssl-1.1.x", "darwin-arm64", "debian-openssl-1.1.x", "linux-arm64-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-}
-
-model SequelizeMeta {
-  name String @id @unique(map: "name") @db.VarChar(255)
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -90,18 +86,31 @@ model schedule_job {
 }
 
 model schedule_job_log {
-  job_log_id   String         @id @db.VarChar(100)
+  job_log_id   String          @id @db.VarChar(100)
   job_id       Int
-  machine      String?        @db.VarChar(100)
-  start_time   DateTime       @db.DateTime(0)
-  end_time     DateTime?      @db.DateTime(0)
-  result       String?        @db.LongText
-  error        String?        @db.LongText
-  schedule_job schedule_job   @relation(fields: [job_id], references: [job_id], onDelete: NoAction, onUpdate: NoAction)
+  machine      String?         @db.VarChar(100)
+  start_time   DateTime        @db.DateTime(0)
+  end_time     DateTime?       @db.DateTime(0)
+  result       String?         @db.LongText
+  error        String?         @db.LongText
+  schedule_job schedule_job    @relation(fields: [job_id], references: [job_id], onDelete: NoAction, onUpdate: NoAction)
   cache_files  cache_files[]
   output_files output_files[]
+  events       job_event_log[]
 
   @@index([job_id], map: "job_id")
+}
+
+model job_event_log {
+  id               Int              @id @default(autoincrement())
+  job_log_id       String           @db.VarChar(255)
+  event            String           @db.Text
+  event_message    String           @db.LongText
+  type             String           @db.VarChar(255)
+  schedule_job_log schedule_job_log @relation(fields: [job_log_id], references: [job_log_id], onDelete: NoAction, onUpdate: NoAction)
+  created_at   DateTime     @default(now()) @db.DateTime(0)
+  handled_on   DateTime?    @db.DateTime(0)
+  @@index([type], map: "type")
 }
 
 enum proxy_status {
