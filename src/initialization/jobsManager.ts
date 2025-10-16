@@ -65,18 +65,18 @@ export const fullStartAJob = async (job: JobDTO) => {
 export const registerJobStartAndEndActions = (job: JobDTO) => {
   logger.info(`Registering jobs ${job.getName()}`);
   const eventTargetId = job.getName();
-  if (currentRunsManager.initialized[job.getName()]) {
+  if (currentRunsManager.isInitialized(job)) {
     return; // Already initialized;
   }
   onJobStarted<JobDTO>(eventTargetId).then(({ job: startedJob, off }) => {
     currentRunsManager.startJob(startedJob);
-    currentRunsManager.initialized[eventTargetId].startEventOff = off;
+    currentRunsManager.initialized.get(eventTargetId)!.startEventOff = off;
   });
   onJobFinished<JobDTO>(eventTargetId).then(({ job: endedJob, off }) => {
     currentRunsManager.endJob(endedJob);
-    currentRunsManager.initialized[eventTargetId].endEventOff = off;
+    currentRunsManager.initialized.get(eventTargetId)!.endEventOff = off;
   });
-  currentRunsManager.initialized[job.getName()] = {};
+  currentRunsManager.initializeJob(job.getName());
 };
 
 export const registerSingularJobStartAndEndActions = (job: JobDTO) => {
@@ -84,7 +84,7 @@ export const registerSingularJobStartAndEndActions = (job: JobDTO) => {
   logger.info(
     `Registering single job ${job.getName()} with id ${eventTargetId}`,
   );
-  if (currentRunsManager.initialized[eventTargetId]) {
+  if (currentRunsManager.isInitialized(job, eventTargetId)) {
     return; // Already initialized;
   }
   const evenLogger = eventLog(LogEventNames.JobScheduleEvent);
@@ -95,10 +95,10 @@ export const registerSingularJobStartAndEndActions = (job: JobDTO) => {
   onJobFinished<JobDTO>(eventTargetId, true).then(({ job: endedJob }) => {
     logger.trace(`Singular job completed ${job.getUniqueSingularId()!}`);
     currentRunsManager.endJob(endedJob);
-    delete currentRunsManager.initialized[eventTargetId];
+    currentRunsManager.unInitializeJob(eventTargetId);
     // TODO figure out if deleting the logger manually is useful
   });
-  currentRunsManager.initialized[eventTargetId] = {};
+  currentRunsManager.initializeJob(job.getName());
 };
 
 export const onJobFinished = <T>(
@@ -154,11 +154,11 @@ export const unsubscribeFromAllLogs = (id: number) => {
 };
 
 export const deleteJobStartAndEndActions = (job: JobDTO) => {
-  const jobInitialization = currentRunsManager.initialized[job.getName()];
+  const jobInitialization = currentRunsManager.initialized.get(job.getName());
   if (jobInitialization) {
     jobInitialization.startEventOff?.();
     jobInitialization.endEventOff?.();
-    delete currentRunsManager.initialized[job.getName()];
+    currentRunsManager.unInitializeJob(job.getName());
   }
 };
 
