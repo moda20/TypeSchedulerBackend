@@ -106,7 +106,7 @@ export default {
     const stm = this.db.prepare(
       "SELECT * FROM job_initializations WHERE id = ?",
     );
-    const foundJob = stm.get(targetId ?? job.getId());
+    const foundJob = stm.get(targetId ?? job.getName());
     if (foundJob) return true;
     return false;
   },
@@ -157,7 +157,6 @@ export default {
         `);
 
         stmt.run(jobName, jobName, JSON.stringify(initConfig ?? {}));
-
         this.initialized.set(jobName, initConfig ?? {});
       });
 

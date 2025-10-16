@@ -32,8 +32,8 @@ export const initialize = async () => {
   }
   logger.info("Config synced with DB");
   await seedBaseDatabase();
-  const managerResults = await start();
   currentRunsManager.init();
+  const managerResults = await start();
   logger.info("Schedule manager initialized");
   return { managerResults };
 };
