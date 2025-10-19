@@ -76,7 +76,7 @@ export const registerJobStartAndEndActions = (job: JobDTO) => {
     currentRunsManager.endJob(endedJob);
     currentRunsManager.initialized.get(eventTargetId)!.endEventOff = off;
   });
-  currentRunsManager.initializeJob(job.getName());
+  currentRunsManager.initializeJob(eventTargetId);
 };
 
 export const registerSingularJobStartAndEndActions = (job: JobDTO) => {
@@ -98,7 +98,7 @@ export const registerSingularJobStartAndEndActions = (job: JobDTO) => {
     currentRunsManager.unInitializeJob(eventTargetId);
     // TODO figure out if deleting the logger manually is useful
   });
-  currentRunsManager.initializeJob(job.getName());
+  currentRunsManager.initializeJob(eventTargetId);
 };
 
 export const onJobFinished = <T>(
