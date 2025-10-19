@@ -170,7 +170,13 @@ export class JobConsumer extends Consumer {
       await this.injectNotificationServices(
         job?.param?.notificationServices || [],
       );
-      return await this.run(job, jobLog);
+      const completedResults = await this.run(job, jobLog);
+      if (!completedResults.success) {
+        this.emitError(
+          `Job didn't complete correctly: ${JSON.stringify(completedResults)}`,
+        );
+      }
+      return completedResults;
     } catch (err) {
       this.logEvent(`job ${job.name} crashed with an error ${err?.toString()}`);
       this.logEvent(err, (e) => this.serializeLogs(e, 10));
