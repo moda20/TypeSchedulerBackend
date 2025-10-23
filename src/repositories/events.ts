@@ -76,56 +76,50 @@ export const getAllPendingJobEvents = async ({
   limit?: number;
   offset?: number;
   search?: string;
-  jobId?: number;
-  type?: string;
+  jobId?: number[];
+  type?: string[];
   unhandled?: boolean;
 }) => {
-  const records = await prisma.schedule_job.findMany({
-    where: {
-      job_id: jobId,
-      job_logs: {
-        some: {
-          events: {
-            some: {},
-          },
-        },
-      },
+  const eventFilterObject = {
+    type: {
+      in: type,
     },
-    include: {
-      job_logs: {
-        include: {
-          events: {
-            where: {
-              type: type,
-              ...(unhandled ? { handled_on: { equals: null } } : {}),
-            },
-          },
-        },
-      },
+    ...(jobId
+      ? {
+          OR: jobId?.map((jd) => ({
+            job_log_id: jobId
+              ? {
+                  startsWith: `${jd}-`,
+                }
+              : jobId,
+          })),
+        }
+      : {}),
+    ...(unhandled ? { handled_on: { equals: null } } : {}),
+  };
+  const records = await prisma.job_event_log.groupBy({
+    where: eventFilterObject,
+    by: "type",
+    _count: {
+      id: true,
     },
   });
 
-  const parsedRecords = records.map((rec) => {
-    const events = rec.job_logs.reduce(
-      (p: any, c: any) => {
-        c.events.forEach((ev: job_event_log) => {
-          if (ev.type === JobEventTypes.ERROR) {
-            p.errors.push(ev);
-          }
-          if (ev.type === JobEventTypes.WARNING) {
-            p.warnings.push(ev);
-          }
-        });
-        return p;
-      },
-      { errors: [] as job_event_log[], warnings: [] as job_event_log[] },
-    );
-    return {
-      jobName: rec.job_name,
-      jobId: rec.job_id,
-      events: events,
-    };
-  });
+  const parsedRecords = records.reduce(
+    (p, c) => {
+      if (c.type === JobEventTypes.ERROR) {
+        p.errors += c._count.id;
+      }
+      if (c.type === JobEventTypes.WARNING) {
+        p.warnings += c._count.id;
+      }
+      return p;
+    },
+    {
+      errors: 0,
+      warnings: 0,
+    },
+  );
 
   return parsedRecords;
 };
