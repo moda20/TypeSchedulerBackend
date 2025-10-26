@@ -83,10 +83,7 @@ export default {
         id: JobNotificationTopics.Status,
         data: JSON.stringify({
           runningJobCount: currentRunsManager.getRunningJobCount(),
-          jobEvents: {
-            errorsCount: jobEvents[0]?.events?.errors?.length,
-            warningsCount: jobEvents[0]?.events?.warnings?.length,
-          },
+          jobEvents: jobEvents,
         }),
       };
       if (clientId) {
