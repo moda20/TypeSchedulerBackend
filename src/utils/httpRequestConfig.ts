@@ -5,11 +5,13 @@ export default axios;
 
 export const lokiHttpService = axios.create({
   baseURL: config.get("grafana.lokiUrl") || "",
+  adapter: "fetch",
   timeout: 60000,
 });
 
 export const GotifyHttpService = axios.create({
   baseURL: config.get("gotify.url") || "",
+  adapter: "fetch",
   headers: {
     Authorization: `Bearer ${config.get("gotify.token")}`,
   },
@@ -21,6 +23,7 @@ export const GotifyHttpService = axios.create({
 
 export const BrowserlessHttpService = axios.create({
   baseURL: config.get("browserless.url") || "",
+  adapter: "fetch",
   headers: {
     "Content-Type": "application/json",
   },
