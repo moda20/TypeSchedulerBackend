@@ -1,7 +1,11 @@
 import mainSocketService from "@api/websocket/mainSocket.service";
+import config from "@config/config";
+import GotifyService from "@notifications/gotify";
+import NtfyService from "@notifications/ntfy";
 import { addEventLog } from "@repositories/events";
 import { LogEventNames } from "@typesDef/api/jobs";
 import { JobEventTypes } from "@typesDef/models/job";
+import { DefaultNotificationService } from "@typesDef/notifications";
 import {
   exportCacheFiles,
   exportResultsToFile,
@@ -65,5 +69,16 @@ export const emitJobEvent = async (
     });
   });
 };
+
+export function getDefaultNotificationService(): new () => DefaultNotificationService {
+  switch (config.get("notifications.defaultService")) {
+    case "gotify":
+      return GotifyService;
+    case "ntfy":
+      return NtfyService;
+    default:
+      return GotifyService;
+  }
+}
 
 export { exportCacheFiles, exportResultsToFile, getNextJobExecution, sleep };

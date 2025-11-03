@@ -21,6 +21,15 @@ export const GotifyHttpService = axios.create({
   timeout: 60000,
 });
 
+export const NtfyHttpService = axios.create({
+  baseURL: config.get("ntfy.url") || "",
+  adapter: "fetch",
+  headers: {
+    Authorization: `Bearer ${config.get("ntfy.token")}`,
+  },
+  timeout: 60000,
+});
+
 export const BrowserlessHttpService = axios.create({
   baseURL: config.get("browserless.url") || "",
   adapter: "fetch",
