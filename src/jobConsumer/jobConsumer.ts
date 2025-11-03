@@ -1,6 +1,5 @@
 import config from "@config/config";
 import * as BrowserlessService from "@external/browserless";
-import GotifyService from "@notifications/gotify";
 import { getNotificationService } from "@repositories/notificationServices";
 import {
   JobDTO,
@@ -8,6 +7,7 @@ import {
   JobLogDTO,
   JobOptions,
 } from "@typesDef/models/job";
+import { DefaultNotificationService } from "@typesDef/notifications";
 import defaultAxiosInstance from "@utils/httpRequestConfig";
 import * as jobConsumerUtils from "@utils/jobConsumerUtils";
 import {
@@ -28,14 +28,15 @@ const { JobConsumer: Consumer } = scheduleManager;
 export class JobConsumer extends Consumer {
   public axios: AxiosInstance;
   public options?: JobOptions;
-  notification: GotifyService;
+  notification: DefaultNotificationService;
   public browserless: typeof BrowserlessService;
   onEnd?: (job: IScheduleJob, jobLog: IScheduleJobLog) => Promise<void>;
   notificationServices: { [key: string]: any } = {};
   constructor() {
     super();
     this.axios = defaultAxiosInstance.create();
-    this.notification = new GotifyService();
+    this.notification =
+      new (jobConsumerUtils.getDefaultNotificationService() as new () => DefaultNotificationService)();
     this.browserless = BrowserlessService;
   }
 
@@ -52,11 +53,16 @@ export class JobConsumer extends Consumer {
   }
 
   private async initializeNotificationService(job: JobDTO, jobLog: JobLogDTO) {
-    this.notification.init(
-      job,
-      jobLog,
-      (await getNotificationService(0, this.notification.name))!,
+    const targetNotificationService = await getNotificationService(
+      0,
+      this.notification.name,
     );
+    if (!targetNotificationService) {
+      this.emitWarning(
+        `Notification service ==> ${this.notification.name} <== not found in db`,
+      );
+    }
+    this.notification.init(job, jobLog, targetNotificationService!);
   }
 
   async injectProxies() {
