@@ -2,19 +2,22 @@ import config from "@config/config";
 import { notificationServices } from "@generated/prisma_base";
 import { addNotifications } from "@repositories/notification";
 import { JobDTO, JobLogDTO } from "@typesDef/models/job";
-import { DefaultNotificationService } from "@typesDef/notifications";
-import { GotifyHttpService } from "@utils/httpRequestConfig";
+import {
+  DefaultNotificationService,
+  NtfyExtraHeaders,
+} from "@typesDef/notifications";
+import { NtfyHttpService } from "@utils/httpRequestConfig";
 import logger from "@utils/loggers";
 import { IScheduleJobLog } from "schedule-manager";
 
-export default class GotifyService implements DefaultNotificationService {
+export default class NtfyService implements DefaultNotificationService {
   name?: string;
   description?: string;
   serviceDbId?: number;
   jobLogId?: string;
   constructor() {
-    this.name = "gotify";
-    this.description = "Default gotify notification service";
+    this.name = "ntfy";
+    this.description = "Default ntfy notification service";
   }
 
   init(
@@ -33,7 +36,7 @@ export default class GotifyService implements DefaultNotificationService {
     jobLogDTO: JobLogDTO | IScheduleJobLog,
     serviceDbObject: notificationServices,
   ) {
-    const newService = new GotifyService();
+    const newService = new NtfyService();
     newService.name = serviceDbObject.name;
     newService.description = serviceDbObject.description;
     newService.serviceDbId = serviceDbObject.id;
@@ -41,22 +44,40 @@ export default class GotifyService implements DefaultNotificationService {
     return newService;
   }
 
-  sendMessage(message: string, title?: string): Promise<any> {
-    return GotifyHttpService.post("/message", {
-      message,
-      priority: 1,
-      title,
+  sendMessage(
+    message: string,
+    title?: string,
+    extraHeaders?: NtfyExtraHeaders,
+  ): Promise<any> {
+    const headers = {
+      Authorization: `Bearer ${config.get("ntfy.token")}`,
+      "Content-Type": "application/json",
+      "X-Title": title,
+      ...extraHeaders,
+    };
+    return NtfyHttpService.post(`/${config.get("ntfy.topic")}`, message, {
+      headers: headers,
     }) as Promise<any>;
   }
 
-  async sendBaseMessage(body: any, options?: any) {
+  async sendBaseMessage(body: any, extraHeaders?: NtfyExtraHeaders) {
+    const headers = {
+      Authorization: `Bearer ${config.get("ntfy.token")}`,
+      "Content-Type": "application/json",
+      "X-Title": body.title,
+      ...extraHeaders,
+    };
+
     await addNotifications({
       message: body.title,
       service_id: this.serviceDbId,
       job_log_id: this.jobLogId,
       data: body.message,
     });
-    return GotifyHttpService.post("/message", body, options) as Promise<any>;
+
+    return NtfyHttpService.post(`/${config.get("ntfy.topic")}`, body.message, {
+      headers: headers,
+    }) as Promise<any>;
   }
 
   sendJobFinishNotification(
@@ -65,50 +86,58 @@ export default class GotifyService implements DefaultNotificationService {
     results: string,
     options?: { title?: string; message?: string; priority?: number },
   ) {
-    const url = config.get("gotify.url");
-    const token = config.get("gotify.token");
+    const url = config.get("ntfy.url");
+    const token = config.get("ntfy.token");
     if (!url || !token) {
-      logger.error("Gotify Is not configured to use");
+      logger.error("Ntfy Is not configured to use");
       return Promise.resolve();
     }
     const envPrefix = config.get("env") === "production" ? "" : "(DEV) ";
-    const { title, message, priority } = options ?? {};
-    return this.sendBaseMessage({
-      message:
-        message ??
-        `${envPrefix}Job ${jobName} finished with results: ${results}`,
-      priority: priority ?? 1,
-      title:
-        title ?? `${envPrefix}Job ${jobName}${jobId && ` ${jobId} `}finished`,
-    });
+    const { title, message, priority, ...rest } = options ?? {};
+    return this.sendBaseMessage(
+      {
+        message:
+          message ??
+          `${envPrefix}Job ${jobName} finished with results: ${results}`,
+        title:
+          title ?? `${envPrefix}Job ${jobName}${jobId && ` ${jobId} `}finished`,
+      },
+      {
+        "X-Priority": (priority ?? "1").toString(),
+        ...rest,
+      },
+    );
   }
 
   sendJobCrashNotification(
     jobId: string,
     jobName: string,
     error?: string,
-    options?: { title?: string; message?: string; priority?: number },
+    options?: {
+      title?: string;
+      message?: string;
+      priority?: number | string;
+      [key: string]: any;
+    },
   ): Promise<any> {
-    const url = config.get("gotify.url");
-    const token = config.get("gotify.token");
+    const url = config.get("ntfy.url");
+    const token = config.get("ntfy.token");
     if (!url || !token) {
-      logger.error("Gotify Is not configured to use");
+      logger.error("Ntfy Is not configured to use");
       return Promise.resolve();
     }
     const envPrefix = config.get("env") === "production" ? "" : "(DEV) ";
-    const { title, message, priority } = options ?? {};
+    const { title, message, priority, ...rest } = options ?? {};
     return this.sendBaseMessage(
       {
         message:
           message ?? `${envPrefix}Job ${jobName} crashed with error: ${error}`,
-        priority: priority ?? 1,
         title:
           title ?? `${envPrefix}Job ${jobName}${jobId && ` ${jobId} `} Crashed`,
       },
       {
-        params: {
-          token: config.get("gotify.appErrorChannelToken"),
-        },
+        "X-Priority": (priority ?? "5").toString(),
+        ...rest,
       },
     ) as Promise<any>;
   }

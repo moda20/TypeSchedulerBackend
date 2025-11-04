@@ -177,6 +177,36 @@ const config = convict({
       env: "BASE_DB_PASSWORD_SALT_ROUNDS",
     },
   },
+  notifications: {
+    defaultService: {
+      doc: "The default notification service to use",
+      format: String,
+      default: "gotify",
+      env: "DEFAULT_NOTIFICATION_SERVICE",
+    },
+  },
+  ntfy: {
+    url: {
+      doc: "The ntfy url.",
+      format: String,
+      default: null,
+      env: "NTFY_URL",
+      nullable: true,
+    },
+    token: {
+      doc: "The ntfy token.",
+      format: String,
+      default: "token",
+      env: "NTFY_TOKEN",
+      sensitive: true,
+    },
+    topic: {
+      doc: "the default ntfy topic",
+      format: String,
+      default: "scheduler_backend",
+      env: "NTFY_TOPIC",
+    },
+  },
   gotify: {
     url: {
       doc: "The gotify url.",

@@ -11,6 +11,13 @@ export const seedBaseDatabase = async () => {
         "Default gotify notification service, see implementation in the code base",
       entryPoint: "src/notifications/gotify.ts",
     },
+    {
+      image: "/public/images/ntfy.png",
+      name: "ntfy",
+      description:
+        "Default ntfy notification service, see implementation in the code base",
+      entryPoint: "src/notifications/ntfy.ts",
+    },
   ];
 
   return basePrisma.notificationServices
