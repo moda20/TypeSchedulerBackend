@@ -32,6 +32,7 @@ export const JobsAdvancedFilters = t.Object({
   status: t.Optional(t.Array(t.String())),
   isRunning: t.Optional(t.Boolean()),
   sorting: t.Optional(t.Array(t.Object({ id: t.String(), desc: t.Boolean() }))),
+  jobIds: t.Optional(t.Array(t.Union([t.Number(), t.String()]))),
 });
 
 export const BatchInputJob = t.Object({

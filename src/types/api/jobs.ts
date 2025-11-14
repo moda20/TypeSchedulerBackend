@@ -14,6 +14,7 @@ export interface advancedFilters {
   isRunning?: boolean;
   averageTime?: TypedFilter;
   sorting?: Array<any>;
+  jobIds?: number[];
   latestRun?: {
     from?: Date;
     to?: Date;

@@ -19,7 +19,6 @@ import {
 import {
   BatchInputJob,
   createElysia,
-  FilterableType,
   JobsAdvancedFilters,
 } from "@utils/createElysia";
 import currentRunsManager from "@utils/CurrentRunsManager";
@@ -44,6 +43,7 @@ export const JobsController = createElysia({ prefix: "/jobs" })
         name: query.name ?? "",
         status: query.status ?? ["STARTED", "STOPPED"],
         sort: query.sorting ?? [],
+        jobIds: query.jobIds?.map(Number),
       });
     },
     {
@@ -51,7 +51,7 @@ export const JobsController = createElysia({ prefix: "/jobs" })
         limit: t.Optional(t.String()),
         offset: t.Optional(t.String()),
         name: t.Optional(t.String()),
-
+        jobIds: t.Optional(t.Array(t.Union([t.Number(), t.String()]))),
         status: t.Optional(t.Array(t.String())),
         sorting: t.Optional(
           t.Array(t.Object({ id: t.String(), desc: t.String() })),
