@@ -161,10 +161,17 @@ export const setEventsToHandled = async ({
   });
 };
 
-export const setAllEventsToHandled = async () => {
+export const setAllEventsToHandled = async ({ jobId }: { jobId?: number }) => {
   return prisma.job_event_log.updateMany({
     where: {
       handled_on: null,
+      ...(jobId
+        ? {
+            job_log_id: {
+              startsWith: `${jobId}-`,
+            },
+          }
+        : {}),
     },
     data: {
       handled_on: new Date(),
@@ -187,7 +194,7 @@ export const getEventsTimeline = async (
            ${startDate ? `WHERE created_at >= "${dayjs(startDate).format("YYYY-MM-DD HH:mm:ss")}"` : ""}
       ${endDate ? `AND created_at <= "${dayjs(endDate).format("YYYY-MM-DD HH:mm:ss")}"` : ""}
     GROUP BY period
-    ORDER BY period DESC;`;
+    ORDER BY period ASC;`;
 
   return prisma.$queryRawUnsafe<any[]>(query);
 };

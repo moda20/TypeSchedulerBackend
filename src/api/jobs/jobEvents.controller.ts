@@ -50,9 +50,17 @@ export const JobEventsController = createElysia({ prefix: "/events" })
       }),
     },
   )
-  .put("/serAllEventsToRead", () => {
-    return setAllEventsToHandled();
-  })
+  .put(
+    "/serAllEventsToRead",
+    ({ body }) => {
+      return setAllEventsToHandled(body);
+    },
+    {
+      body: t.Object({
+        jobId: t.Optional(t.Number()),
+      }),
+    },
+  )
   .get("/eventMetrics", ({ query }) => {
     const startDate = query.startDate ? new Date(query.startDate) : undefined;
     const endDate = query.endDate ? new Date(query.endDate) : undefined;
