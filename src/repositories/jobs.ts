@@ -42,7 +42,7 @@ export const getFilteredJobs = async (filters: advancedFilters) => {
     Object.keys(filters) as Array<keyof advancedFilters>
   ).filter((e: keyof advancedFilters) => (filters[e] as any)?.type === "regex");
 
-  const jobIds = regexTypes.length
+  let jobIds = regexTypes.length
     ? await prisma.$queryRawUnsafe<{ job_id: number }[]>(
         `SELECT job_id from schedule_job WHERE ${regexTypes.map((e) => `${jobModelAttributeMap[e]} REGEXP '${(filters[e] as any)?.value}'`).join(" AND ")} `,
       )
@@ -57,6 +57,10 @@ export const getFilteredJobs = async (filters: advancedFilters) => {
       )
       .map((e) => [e, filters[e]]),
   );
+
+  if (jobIds?.length && filters.jobIds) {
+    jobIds = jobIds.filter((x) => filters.jobIds?.includes(x.job_id));
+  }
 
   return getAllJobs({
     limit: 999999,
