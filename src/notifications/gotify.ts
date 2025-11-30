@@ -55,8 +55,16 @@ export default class GotifyService implements DefaultNotificationService {
       service_id: this.serviceDbId,
       job_log_id: this.jobLogId,
       data: body.message,
+    }).catch((err: any) => {
+      logger.error("Error saving notf. to database");
+      logger.error(err);
     });
-    return GotifyHttpService.post("/message", body, options) as Promise<any>;
+    return GotifyHttpService.post("/message", body, options).catch(
+      (err: any) => {
+        logger.error("ntfy error");
+        logger.error(err.message);
+      },
+    ) as Promise<any>;
   }
 
   sendJobFinishNotification(

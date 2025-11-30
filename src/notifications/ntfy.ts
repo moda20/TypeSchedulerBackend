@@ -73,10 +73,16 @@ export default class NtfyService implements DefaultNotificationService {
       service_id: this.serviceDbId,
       job_log_id: this.jobLogId,
       data: body.message,
+    }).catch((err: any) => {
+      logger.error("Error saving notf. to database");
+      logger.error(err);
     });
 
     return NtfyHttpService.post(`/${config.get("ntfy.topic")}`, body.message, {
       headers: headers,
+    }).catch((err: any) => {
+      logger.error("ntfy error");
+      logger.error(err.message);
     }) as Promise<any>;
   }
 
