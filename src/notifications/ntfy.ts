@@ -1,20 +1,23 @@
 import config from "@config/config";
 import { notificationServices } from "@generated/prisma_base";
 import { addNotifications } from "@repositories/notification";
+import { LogEventNames } from "@typesDef/api/jobs";
 import { JobDTO, JobLogDTO } from "@typesDef/models/job";
 import {
   DefaultNotificationService,
   NtfyExtraHeaders,
 } from "@typesDef/notifications";
 import { NtfyHttpService } from "@utils/httpRequestConfig";
-import logger from "@utils/loggers";
+import logger, { eventLog } from "@utils/loggers";
 import { IScheduleJobLog } from "schedule-manager";
+import type { Logger } from "winston";
 
 export default class NtfyService implements DefaultNotificationService {
   name?: string;
   description?: string;
   serviceDbId?: number;
   jobLogId?: string;
+  syslog?: Logger;
   constructor() {
     this.name = "ntfy";
     this.description = "Default ntfy notification service";
@@ -29,6 +32,7 @@ export default class NtfyService implements DefaultNotificationService {
     this.description = serviceDbObject.description;
     this.serviceDbId = serviceDbObject.id;
     this.jobLogId = jobLogDTO.id;
+    this.syslog = eventLog(LogEventNames.SysLogEvent);
     return this;
   }
   static init(
@@ -73,10 +77,22 @@ export default class NtfyService implements DefaultNotificationService {
       service_id: this.serviceDbId,
       job_log_id: this.jobLogId,
       data: body.message,
+    }).catch((err: any) => {
+      logger.error("Error saving notf. to database");
+      logger.error(err);
+      this.syslog?.error(err, {
+        eventName: "NOTIF_DB_ERROR",
+      });
     });
 
     return NtfyHttpService.post(`/${config.get("ntfy.topic")}`, body.message, {
       headers: headers,
+    }).catch((err: any) => {
+      logger.error("ntfy error");
+      logger.error(err.message);
+      this.syslog?.error(`gotify error: ${err.message}`, {
+        eventName: "NOTIF_SERVICE_ERROR",
+      });
     }) as Promise<any>;
   }
 
