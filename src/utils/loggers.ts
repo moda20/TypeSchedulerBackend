@@ -128,7 +128,7 @@ const generalLogger = pino(generalTransport);
 
 // create a logger using winston with daily rotated files
 
-const eventLog = (source: string) => {
+const eventLog = (source: string, extraLabels?: { [key: string]: string }) => {
   if (eventLoggers[source]) return eventLoggers[source];
   const options = (
     level: string,
@@ -173,6 +173,7 @@ const eventLog = (source: string) => {
           app: config.get("appName"),
           source,
           level: "debug",
+          ...(extraLabels ?? {}),
         },
         useWinstonMetaAsLabels: true,
         ignoredMeta: ["level"],

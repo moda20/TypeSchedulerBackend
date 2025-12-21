@@ -12,6 +12,7 @@ import {
 import {
   advancedFilters,
   getAllJobsInputs,
+  LogEventNames,
   queuedJobsExecutionConfig,
 } from "@typesDef/api/jobs";
 import {
@@ -30,7 +31,7 @@ import {
   getNextJobExecution,
   parseTypedValueToPrismaValue,
 } from "@utils/jobUtils";
-import logger from "@utils/loggers";
+import logger, { eventLog } from "@utils/loggers";
 import { JobQueue } from "@utils/queueUtils";
 import dayjs from "dayjs";
 import { join } from "path";
@@ -130,7 +131,8 @@ export const getAllJobs = async ({
     orderBy: sort
       ?.filter((e) => jobFilteringAttributeMap[e.id])
       .map((e) => ({
-        [jobFilteringAttributeMap[e.id]]: e.desc === "true" ? "desc" : "asc",
+        [jobFilteringAttributeMap[e.id]]:
+          e.desc?.toString() === "true" ? "desc" : "asc",
       })),
     include: {
       job_logs: {
@@ -248,6 +250,7 @@ export const jobActionExecution = async (
   id: number,
   { config }: { config?: jobUpdateConfig },
 ) => {
+  const syslog = eventLog(LogEventNames.SysLogEvent);
   switch (action) {
     case jobActions.START: {
       return ScheduleJobManager.startJobById(id).then((d: any) => {
@@ -307,6 +310,9 @@ export const jobActionExecution = async (
         jobStatus.STOPPED,
       ).then((d) => {
         if (d.success && d.job) {
+          syslog.info(`New job ${d.job.id} created`, {
+            eventName: LogEventNames.JobLogEvent,
+          });
           return registerJobStartAndEndActions(d.job);
         }
         throw new Error("Error when creating Job", {
@@ -343,7 +349,11 @@ export const jobActionExecution = async (
       if (!config) {
         throw "No config provided";
       }
-      return updateJobConfig(id.toString(), config);
+      return updateJobConfig(id.toString(), config).then((d) => {
+        syslog.info(`Job ${id} updated: result ${d}`, {
+          eventName: LogEventNames.JobLogEvent,
+        });
+      });
     }
     case jobActions.REFRESH: {
       return refreshJobRegistration(id);
@@ -420,6 +430,7 @@ export const importJobsFromJSON = async (jobs: any[] = []) => {
 export const queueJobExecution = async (
   execConfig: queuedJobsExecutionConfig,
 ) => {
+  const syslog = eventLog(LogEventNames.SysLogEvent);
   const newQueue = new JobQueue(execConfig);
   const jobList = await getAllJobs({
     limit: 999999,
@@ -441,6 +452,11 @@ export const queueJobExecution = async (
   logger.info(`will enqueue ${taskList.length} jobs`);
   newQueue.splitToBatches(taskList);
   await newQueue.enqueueNextBatch();
+  newQueue.queue.onEmpty().then(() => {
+    syslog.info(`Queue finished: jobs ${execConfig.targetJobs}`, {
+      eventName: LogEventNames.JobLogEvent,
+    });
+  });
   return newQueue;
 };
 
