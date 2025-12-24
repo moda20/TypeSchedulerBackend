@@ -264,30 +264,6 @@ const config = convict({
       sensitive: true,
     },
   },
-  browserless: {
-    url: {
-      doc: "The browserless url.",
-      format: String,
-      default: null,
-      env: "BROWSERLESS_URL",
-      nullable: true,
-    },
-    token: {
-      doc: "The browserless token.",
-      format: String,
-      default: "token",
-      env: "BROWSERLESS_TOKEN",
-      nullable: true,
-      sensitive: true,
-    },
-    timeout: {
-      doc: "The browserless Timeout",
-      format: Number,
-      default: 360000,
-      env: "BROWSERLESS_TIMEOUT",
-      nullable: false,
-    },
-  },
   encryption: {
     masterKey: {
       doc: "The master key used to encrypt and decrypt config values, it's expected to be in base64",

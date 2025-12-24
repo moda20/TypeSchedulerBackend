@@ -29,17 +29,3 @@ export const NtfyHttpService = axios.create({
   },
   timeout: 60000,
 });
-
-export const BrowserlessHttpService = axios.create({
-  baseURL: config.get("browserless.url") || "",
-  adapter: "fetch",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  params: {
-    token: config.get("browserless.token"),
-    blockAds: true,
-    stealth: true,
-    timeout: config.get("browserless.timeout"),
-  },
-});
