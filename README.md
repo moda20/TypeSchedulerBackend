@@ -67,8 +67,6 @@ the initial configuration is done via the **.env** file. The following variables
 | GRAFANA_LOKI_URL             | The URL of the Grafana Loki server (used for logging, and log retrieval)             |                   |
 | GRAFANA_LOKI_USERNAME        | The username of the Grafana Loki server                                              |                   |
 | GRAFANA_LOKI_PASSWORD        | The password of the Grafana Loki server                                              |                   |
-| BROWSERLESS_URL              | The URL of the Browserless server (used as a request alternative, i.e axios)         |                   |
-| BROWSERLESS_TOKEN            | The token for the Browserless server                                                 |                   |
 | GOTIFY_URL                   | The URL of the Gotify server (used as default notification server)                   |                   |
 | GOTIFY_TOKEN                 | The token for the Gotify server                                                      |                   |
 | GOTIFY_APP_TOKEN             | The app token for the Gotify server (used for regular notifications)                 |                   |
