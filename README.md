@@ -71,7 +71,10 @@ the initial configuration is done via the **.env** file. The following variables
 | GOTIFY_TOKEN                 | The token for the Gotify server                                                      |                   |
 | GOTIFY_APP_TOKEN             | The app token for the Gotify server (used for regular notifications)                 |                   |
 | GOTIFY_ERROR_APP_TOKEN       | The error app token for the Gotify server (used for error and crashes notifications) |                   |
-| JOBS_SUB_DIRECTORY           | The target directory for the job files inside your structure                         |                   |
+| NTFY_URL                     | The Ntfy server url (can be used as default notification server).                    |                   |
+| NTFY_TOKEN                   | The Ntfy server token.                                                               |                   |
+| NTFY_TOPIC                   | The Ntfy topic to use for all notifications.                                         |                   |
+| DEFAULT_NOTIFICATION_SERVICE | The default notification service to use for notifications.                           | gotify            |
 | JOBS_FILES_EXTENSIONS        | The extension files to search for as jobs                                            | js,ts             |
 | EXPORT_OUTPUT_FILE           | Whether to export output files or not                                                | false             |
 | EXPORT_CACHE_FILE            | Whether to export cache files or not                                                 | false             |
