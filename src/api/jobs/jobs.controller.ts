@@ -15,6 +15,7 @@ import {
   isJobRunning,
   jobActionExecution,
   queueJobExecution,
+  readConsumerFile,
 } from "@repositories/jobs";
 import {
   BatchInputJob,
@@ -191,6 +192,11 @@ export const JobsController = createElysia({ prefix: "/jobs" })
       }),
     },
   )
+  .get("/readConsumerFile", ({ query, set }) => {
+    const { filePath, id } = query;
+    set.headers["content-type"] = "text/typescript";
+    return readConsumerFile(filePath, Number(id));
+  })
   .post(
     "/exportJobsToJSON",
     ({ body, set }) => {
