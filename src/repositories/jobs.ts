@@ -34,6 +34,7 @@ import {
 import logger, { eventLog } from "@utils/loggers";
 import { JobQueue } from "@utils/queueUtils";
 import dayjs from "dayjs";
+import { readFile, readFileSync } from "fs-extra";
 import { join } from "path";
 import manager from "schedule-manager";
 const { ScheduleJobManager } = manager;
@@ -499,6 +500,21 @@ export const getAvailableConsumers = async () => {
     targetPath,
     config.get("jobs.jobsFileExtensions").split(","),
   );
+};
+
+export const readConsumerFile = async (filePath: string, id: number) => {
+  const targetJob = await prisma.schedule_job.findFirst({
+    where: {
+      job_id: id,
+      consumer: filePath,
+    },
+  });
+  if (targetJob) {
+    const targetPath = filePath?.startsWith("/") ? filePath.slice(1) : filePath;
+    return readFile(targetPath);
+  } else {
+    throw new Error("Job not found");
+  }
 };
 
 export const isJobRunning = async (jobId: number) => {
