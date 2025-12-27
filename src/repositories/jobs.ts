@@ -34,7 +34,7 @@ import {
 import logger, { eventLog } from "@utils/loggers";
 import { JobQueue } from "@utils/queueUtils";
 import dayjs from "dayjs";
-import { readFile, readFileSync } from "fs-extra";
+import { readFile } from "fs-extra";
 import { join } from "path";
 import manager from "schedule-manager";
 const { ScheduleJobManager } = manager;
