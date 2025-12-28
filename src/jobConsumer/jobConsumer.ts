@@ -1,5 +1,4 @@
 import config from "@config/config";
-import * as BrowserlessService from "@external/browserless";
 import { getNotificationService } from "@repositories/notificationServices";
 import {
   JobDTO,
@@ -29,7 +28,6 @@ export class JobConsumer extends Consumer {
   public axios: AxiosInstance;
   public options?: JobOptions;
   notification: DefaultNotificationService;
-  public browserless: typeof BrowserlessService;
   onEnd?: (job: IScheduleJob, jobLog: IScheduleJobLog) => Promise<void>;
   notificationServices: { [key: string]: any } = {};
   constructor() {
@@ -37,7 +35,6 @@ export class JobConsumer extends Consumer {
     this.axios = defaultAxiosInstance.create();
     this.notification =
       new (jobConsumerUtils.getDefaultNotificationService() as new () => DefaultNotificationService)();
-    this.browserless = BrowserlessService;
   }
 
   getFromCache(...args: Parameters<typeof getFromCache>) {

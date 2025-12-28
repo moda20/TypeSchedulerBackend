@@ -350,7 +350,8 @@ export const jobActionExecution = async (
         throw "No config provided";
       }
       return updateJobConfig(id.toString(), config).then((d) => {
-        syslog.info(`Job ${id} updated: result ${d}`, {
+        // TODO solve the full serialization for the result elsewhere
+        syslog.info(`Job ${id} updated: result ${JSON.stringify(d)}`, {
           eventName: LogEventNames.JobLogEvent,
         });
       });
