@@ -1,115 +1,324 @@
-# Scheduler Backend
+<div align="center">
 
-This is the repo for the Scheduler backend. This acts as a task manager and authentication server.
+# 📅 Scheduler Backend
 
-### Wiki
+**A powerful task management and authentication server built with Bun, Elysia, and Prisma**
 
-[The general wiki](https://scheduler-docs-xi.vercel.app/) is out now, and is a good place to start if you want to have a general idea about the project.
-This repo is only focused on the backend component
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
+[![Bun](https://img.shields.io/badge/Bun-1.0+-ff69b4)](https://bun.sh/)
+[![Elysia](https://img.shields.io/badge/Elysia-Fast-white)](https://elysiajs.com/)
 
-## 📦 Installation
+[Documentation](https://scheduler-docs-xi.vercel.app/) • [Docker Image](https://github.com/moda20/scheduler_backend/pkgs/container/scheduler_backend) • [Issues](https://github.com/moda20/scheduler_backend/issues)
 
-The installation process is best done via a docker container, here is a compose example
+</div>
+
+---
+
+## 📖 About
+
+**Scheduler Backend** is a robust task management and authentication server that provides:
+
+- ✅ **Task Scheduling**: CRON-based job scheduling with flexible configuration
+- 🔐 **Authentication & Authorization**: Secure user authentication with role-based access control
+- 📊 **API Documentation**: Auto-generated Swagger/OpenAPI documentation
+- 📝 **Logging**: Comprehensive logging with Grafana Loki integration
+- 🔔 **Notifications**: Built-in notification services (Gotify, Ntfy)
+- 🧩 **Plugin System**: Extensible plugin architecture for custom functionality (beta status)
+
+> 💡 **Note**: This repository focuses on the backend component only. For the full project documentation and starter examples, visit our [Wiki](https://scheduler-docs-xi.vercel.app/).
+
+---
+
+## 🚀 Quick Start
+
+### Docker Installation (Recommended)
+
+The recommended way to run Scheduler Backend is via Docker. Create a `docker-compose.yml`:
 
 ```yaml
+services:
   scheduler_backend:
     image: ghcr.io/moda20/scheduler_backend:latest
+    #image: ghcr.io/moda20/scheduler_backend:dev # dev for latest development, but unstable
     container_name: scheduler_backend
     restart: always
     env_file:
       - .env
     volumes:
-      - ./:/usr/src/app/src/jobs:ro
-      - ./logs:/usr/src/app/src/logs/
-      - ./outputs:/usr/src/app/src/outputs/
-      - ./plugins:/usr/src/app/src/external/userPlugins
+      - ./jobs:/usr/src/app/src/jobs:ro # Your job scripts
+      - ./logs:/usr/src/app/src/logs/ # Application logs
+      - ./outputs:/usr/src/app/src/outputs/ # Output files from jobs
+      - ./plugins:/usr/src/app/src/external/userPlugins # Custom plugins
     ports:
       - "8080:8080"
 ```
 
-the compose file above will expose port 8080 and can take 3 volumes:
+**Volume Mappings**:
 
-- the jobs directory, should map to your project root directory, if you are using extra packages this shoudl point
-  to where your `package.json` is located
-- The logs directory, will be split into sub directories for general logs and job specific logs (if enabled)
-- The outputs directory, will save output files from jobs if exporting functions are used
+| Volume      | Description                                                                                           |
+| ----------- | ----------------------------------------------------------------------------------------------------- |
+| `./jobs`    | Directory containing your job scripts (point to your project root or where `package.json` is located) |
+| `./logs`    | Stores application logs (split into general and job-specific logs if enabled)                         |
+| `./outputs` | Output files from jobs when export functions are used                                                 |
+| `./plugins` | Custom user plugins for extending functionality                                                       |
 
-## 🛠 Usage
+Run the container:
 
-To see the best way to using this scheduler backend is with the interface created for it (see starter example)
+```bash
+docker-compose up -d
+```
 
-The backend exports an API that will be detailed using swagger (enabled by default) on the route `/api-docs`.
+The API will be available at `http://localhost:8080`, and Swagger documentation at `http://localhost:8080/api-docs`.
+
+---
+
+## 📚 Documentation
+
+- 📖 [Full Documentation](https://scheduler-docs-xi.vercel.app/)
+- 🚀 [Getting Started Guide](https://scheduler-docs-xi.vercel.app/)
+- 💻 [API Reference](http://localhost:8080/api-docs) (after running)
+
+---
 
 ## ⚙️ Configuration
 
-the initial configuration is done via the **.env** file. The following variables are available:
+Configuration is managed through a `.env` file. Copy `.env.example` and customize the variables:
 
-| Variable Name                | Description                                                                          | Default Value     |
-|------------------------------|--------------------------------------------------------------------------------------|-------------------|
-| NODE_ENV                     | The environment to use                                                               | development       |
-| ENABLE_SWAGGER_SERVER        | Whether to enable the swagger server or not                                          | true              |
-| APP_NAME                     | The Application name (will be used around the app)                                   | scheduler_backend |
-| MASTER_ENCRYPTION_KEY*       | The master encryption key, should be set as a base64 encoded secret key              |                   |
-| DB_HOST                      | The database host                                                                    | localhost         |
-| DB_PORT                      | The database port                                                                    | 3306              |
-| DB_USERNAME                  | The database username                                                                | root              |
-| DB_PASSWORD                  | The database password                                                                | root              |
-| SCHEDULER_DB_NAME            | The database name for the scheduler                                                  | scheduler_db      |
-| PORT                         | The port to run the server on                                                        | 8080              |
-| IP                           | The IP to run the server on                                                          | localhost         |
-| LOG_TO_CONSOLE               | A switch to enable or disable passing logs to console (useful for development)       | localhost         |
-| BASE_DB_HOST                 | The database host for the auth database                                              | localhost         |
-| BASE_DB_NAME                 | The database name for the auth database                                              | scheduler_base    |
-| BASE_DB_USERNAME             | The database username for the auth database                                          | root              |
-| BASE_DB_PASSWORD             | The database password for the auth database                                          | root              |
-| BASE_DB_PORT                 | The database port for the auth database                                              | 3306              |
-| BASE_DB_PASSWORD_SALT_ROUNDS | The number of salt rounds used when hashing passwords                                | 12                |
-| GRAFANA_LOKI_URL             | The URL of the Grafana Loki server (used for logging, and log retrieval)             |                   |
-| GRAFANA_LOKI_USERNAME        | The username of the Grafana Loki server                                              |                   |
-| GRAFANA_LOKI_PASSWORD        | The password of the Grafana Loki server                                              |                   |
-| BROWSERLESS_URL              | The URL of the Browserless server (used as a request alternative, i.e axios)         |                   |
-| BROWSERLESS_TOKEN            | The token for the Browserless server                                                 |                   |
-| GOTIFY_URL                   | The URL of the Gotify server (used as default notification server)                   |                   |
-| GOTIFY_TOKEN                 | The token for the Gotify server                                                      |                   |
-| GOTIFY_APP_TOKEN             | The app token for the Gotify server (used for regular notifications)                 |                   |
-| GOTIFY_ERROR_APP_TOKEN       | The error app token for the Gotify server (used for error and crashes notifications) |                   |
-| JOBS_SUB_DIRECTORY           | The target directory for the job files inside your structure                         |                   |
-| JOBS_FILES_EXTENSIONS        | The extension files to search for as jobs                                            | js,ts             |
-| EXPORT_OUTPUT_FILE           | Whether to export output files or not                                                | false             |
-| EXPORT_CACHE_FILE            | Whether to export cache files or not                                                 | false             |
-| EXPORT_JOB_LOGS_TO_FILES     | Whether to export job logs as files (in addition to loki if configured)              | false             |
-| CACHE_FILES_ROOT_PATH        | The directory inside the output folder that houses cache files                       | caches            |
-| OUTPUT_FILES_ROOT_PATH       | The directory inside the output folder that houses exported files                    | exported          |
+### Essential Variables
 
-## Development
+| Variable                | Description                               | Default       | Required |
+| ----------------------- | ----------------------------------------- | ------------- | -------- |
+| `NODE_ENV`              | Environment mode (development/production) | `development` | No       |
+| `MASTER_ENCRYPTION_KEY` | Base64-encoded encryption key             | -             | **Yes**  |
+| `PORT`                  | Server port                               | `8080`        | No       |
+| `IP`                    | Server IP to bind to                      | `localhost`   | No       |
 
-The Scheduler_backend is built using [Bun](https://bun.sh/) for the runtime and [Elysia](https://elysiajs.com/) for the
-server/API framework.
-The following are the most pertinent packages used in tandem with the above :
+### Database Configuration
 
-*- [Prisma](https://www.prisma.io/) for the ORM and migr*ations
-- [Pino](https://github.com/pinojs/pino) for logging
-- [Scheduler Manager](https://github.com/moda20/node-schedule-manager) for the CRON based scheduling
+| Variable                       | Description                 | Default          |
+| ------------------------------ | --------------------------- | ---------------- |
+| `DB_HOST`                      | Scheduler database host     | `localhost`      |
+| `DB_PORT`                      | Scheduler database port     | `3306`           |
+| `DB_USERNAME`                  | Scheduler database username | `root`           |
+| `DB_PASSWORD`                  | Scheduler database password | `root`           |
+| `SCHEDULER_DB_NAME`            | Scheduler database name     | `scheduler_db`   |
+| `BASE_DB_HOST`                 | Auth database host          | `localhost`      |
+| `BASE_DB_NAME`                 | Auth database name          | `scheduler_base` |
+| `BASE_DB_USERNAME`             | Auth database username      | `root`           |
+| `BASE_DB_PASSWORD`             | Auth database password      | `root`           |
+| `BASE_DB_PORT`                 | Auth database port          | `3306`           |
+| `BASE_DB_PASSWORD_SALT_ROUNDS` | Password hash salt rounds   | `12`             |
 
-### Running backend locally
+### Logging & Monitoring
 
-To run the backend app locally :
+| Variable                   | Description              | Default |
+| -------------------------- | ------------------------ | ------- |
+| `GRAFANA_LOKI_URL`         | Grafana Loki server URL  | -       |
+| `GRAFANA_LOKI_USERNAME`    | Grafana Loki username    | -       |
+| `GRAFANA_LOKI_PASSWORD`    | Grafana Loki password    | -       |
+| `LOG_TO_CONSOLE`           | Enable console logging   | `true`  |
+| `EXPORT_JOB_LOGS_TO_FILES` | Export job logs to files | `false` |
 
-- Have bun installed : installation instructions [Bun.sh](https://bun.sh/docs/installation)
-- Clone the repo : `git clone https://github.com/moda20/scheduler_backend.git`
-- Install the dependencies : `bun install`
-- Run the app : `bun dev`
-- to build the app run : `bun build`
+### Notification Services
 
-A .env file is necessary for the app to run, the .env.example file is provided as a template and check the table above
+| Variable                       | Description                                                                         | Default |
+|--------------------------------|-------------------------------------------------------------------------------------|---------|
+| `GOTIFY_URL`                   | Gotify server URL (disables Gotify if not set)                                      | -       |
+| `GOTIFY_TOKEN`                 | Gotify server token                                                                 | -       |
+| `GOTIFY_APP_TOKEN`             | Gotify app token (regular notifications)                                            | -       |
+| `GOTIFY_ERROR_APP_TOKEN`       | Gotify app token (error notifications)                                              | -       |
+| `NTFY_URL`                     | Ntfy base url (disables Ntfy if not set)                                            | -       |
+| `NTFY_TOKEN`                   | Ntfy access token (error notifications)                                             | -       |
+| `NTFY_TOPIC`                   | Ntfy main topic                                                                     | -       |
+| `DEFAULT_NOTIFICATION_SERVICE` | Set to "gotify" or "ntfy" to switch the default service, REQUIRES container restart | -       |
 
-## 📝 License
 
-TBD
+### Job Configuration
+
+| Variable                 | Description                        | Default    |
+| ------------------------ | ---------------------------------- | ---------- |
+| `JOBS_SUB_DIRECTORY`     | Target directory for job files     | -          |
+| `JOBS_FILES_EXTENSIONS`  | File extensions to search for jobs | `js,ts`    |
+| `EXPORT_OUTPUT_FILE`     | Enable output file export          | `false`    |
+| `EXPORT_CACHE_FILE`      | Enable cache file export           | `false`    |
+| `CACHE_FILES_ROOT_PATH`  | Cache files directory name         | `caches`   |
+| `OUTPUT_FILES_ROOT_PATH` | Exported files directory name      | `exported` |
+
+### API Configuration
+
+| Variable                | Description                  | Default             |
+| ----------------------- | ---------------------------- | ------------------- |
+| `ENABLE_SWAGGER_SERVER` | Enable Swagger documentation | `true`              |
+| `APP_NAME`              | Application name             | `scheduler_backend` |
+
+---
+
+## 💻 Development
+
+### Tech Stack
+
+- **Runtime**: [Bun](https://bun.sh/) - Fast JavaScript runtime
+- **Framework**: [Elysia](https://elysiajs.com/) - Fast and type-safe web framework
+- **ORM**: [Prisma](https://www.prisma.io/) - Modern database toolkit
+- **Logging**: [Pino](https://github.com/pinojs/pino) - High-performance logger
+- **Scheduling**: [Scheduler Manager](https://github.com/moda20/node-schedule-manager) - CRON-based job scheduling
+
+### Local Development Setup
+
+1. **Prerequisites**
+
+   ```bash
+   # Install Bun (if not already installed)
+   curl -fsSL https://bun.sh/install | bash
+   ```
+
+2. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/moda20/scheduler_backend.git
+   cd scheduler_backend
+   ```
+
+3. **Install dependencies**
+
+   ```bash
+   bun install
+   ```
+
+4. **Configure environment**
+
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+5. **Run in development mode**
+
+   ```bash
+   bun dev
+   ```
+
+6. **Build for production**
+   ```bash
+   bun build
+   ```
+
+The development server will start on `http://localhost:8080` with Swagger documentation at `/api-docs`.
+
+### Running Tests
+
+```bash
+bun test
+```
+
+### Database Migrations
+
+```bash
+# Generate migration
+bun run prisma migrate dev
+
+# Apply migrations
+bun run prisma migrate deploy
+
+# Open Prisma Studio
+bun run prisma studio
+```
+
+---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to open an issue or submit a pull request.
-Please take the time to debug your issues and test your pull request changes if they need to, adding runnable tests
-would be much appreciated. 
+We welcome contributions! Here's how you can help:
 
+### Guidelines
+
+- 🐛 **Bug Reports**: Submit detailed bug reports with reproduction steps
+- 💡 **Feature Requests**: Propose new features with clear use cases
+- 🔧 **Pull Requests**: Make sure to:
+  - Follow the existing code style
+  - Add tests for new functionality
+  - Update documentation as needed
+  - Ensure all tests pass before submitting
+
+### Steps to Contribute
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+> ⚠️ Please take the time to debug your issues and test your changes. Adding runnable tests is much appreciated!
+
+---
+
+## 📋 Full Features
+
+| Feature               | Description                                       |
+| --------------------- | ------------------------------------------------- |
+| **CRON Scheduling**   | Schedule tasks with flexible CRON expressions     |
+| **Job Management**    | Create, update, delete, and monitor jobs          |
+| **Authentication**    | JWT-based authentication with role-based access   |
+| **User Management**   | Manage users and permissions                      |
+| **Notifications**     | Multi-service notification support (Gotify, Ntfy) |
+| **Logging**           | Centralized logging with Loki integration         |
+| **API Documentation** | Auto-generated Swagger documentation              |
+| **Plugin System**     | Extensible architecture for custom plugins        |
+| **File Management**   | Export job outputs and cache files                |
+| **Websocket Support** | Real-time job status updates                      |
+
+---
+
+## 🔒 License
+
+This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+
+```
+Copyright (c) 2024 Lucas
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+```
+
+**Important**: This license requires that if you run a modified version of this software on a server and provide services to users, you must make the source code of your modifications available to those users.
+
+For the full text of the license, see [LICENSE](LICENSE).
+
+---
+
+## 📞 Support
+
+- 📖 [Documentation](https://scheduler-docs-xi.vercel.app/)
+- 🐛 [Issue Tracker](https://github.com/moda20/scheduler_backend/issues)
+- 💬 [Discussions](https://github.com/moda20/scheduler_backend/discussions)
+
+---
+
+## 🙏 Acknowledgments
+
+Built with:
+
+- [Bun](https://bun.sh/) - The all-in-one JavaScript runtime
+- [Elysia](https://elysiajs.com/) - Ergonomic framework for Huma
+- [Prisma](https://www.prisma.io/) - Next-generation ORM
+- [Pino](https://github.com/pinojs/pino) - Extremely fast Node.js logger
+
+---
+
+<div align="center">
+
+**Made with ❤️ by [Moda20](https://github.com/moda20)**
+
+[⬆ Back to top](#-scheduler-backend)
+
+</div>
