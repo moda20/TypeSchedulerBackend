@@ -111,18 +111,19 @@ Configuration is managed through a `.env` file. Copy `.env.example` and customiz
 
 ### Logging & Monitoring
 
-| Variable                   | Description              | Default |
-| -------------------------- | ------------------------ | ------- |
-| `GRAFANA_LOKI_URL`         | Grafana Loki server URL  | -       |
-| `GRAFANA_LOKI_USERNAME`    | Grafana Loki username    | -       |
-| `GRAFANA_LOKI_PASSWORD`    | Grafana Loki password    | -       |
-| `LOG_TO_CONSOLE`           | Enable console logging   | `true`  |
-| `EXPORT_JOB_LOGS_TO_FILES` | Export job logs to files | `false` |
+| Variable                        | Description                                                    | Default |
+| ------------------------------- |----------------------------------------------------------------| ------- |
+| `GRAFANA_LOKI_URL`              | Grafana Loki server URL                                        | -       |
+| `GRAFANA_LOKI_USERNAME`         | Grafana Loki username                                          | -       |
+| `GRAFANA_LOKI_PASSWORD`         | Grafana Loki password                                          | -       |
+| `LOG_TO_CONSOLE`                | Enable console logging                                         | `true`  |
+| `EXPORT_JOB_LOGS_TO_FILES`      | Export job logs to files                                       | `false` |
+| `LOG_FILES_MAX_FILES_RETENTION` | Max retention period for all log files (e.g., "7d", "30d", 10) | `7d`    |
 
 ### Notification Services
 
 | Variable                       | Description                                                                         | Default |
-|--------------------------------|-------------------------------------------------------------------------------------|---------|
+| ------------------------------ | ----------------------------------------------------------------------------------- | ------- |
 | `GOTIFY_URL`                   | Gotify server URL (disables Gotify if not set)                                      | -       |
 | `GOTIFY_TOKEN`                 | Gotify server token                                                                 | -       |
 | `GOTIFY_APP_TOKEN`             | Gotify app token (regular notifications)                                            | -       |
@@ -131,7 +132,6 @@ Configuration is managed through a `.env` file. Copy `.env.example` and customiz
 | `NTFY_TOKEN`                   | Ntfy access token (error notifications)                                             | -       |
 | `NTFY_TOPIC`                   | Ntfy main topic                                                                     | -       |
 | `DEFAULT_NOTIFICATION_SERVICE` | Set to "gotify" or "ntfy" to switch the default service, REQUIRES container restart | -       |
-
 
 ### Job Configuration
 
