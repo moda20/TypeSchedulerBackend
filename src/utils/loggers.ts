@@ -28,11 +28,12 @@ const JobLogger = (uniqueId: string, name: string) => {
     level: string,
   ): DailyRotateFile.DailyRotateFileTransportOptions => ({
     filename: `./src/logs/jobs/job_log_${name}_${uniqueId}.log`,
-    auditFile: `./src/logs/jobs/audits/${name}-audit.json`,
+    auditFile: `src/logs/jobs/audits/${name}-audit.json`,
     level,
     json: true,
     format: regularLoggerFormat,
     maxSize: "20m",
+    maxFiles: config.get("files.logFilesMaxFiles"),
   });
   const transportsList = [
     config.get("files.exportJobLogsToFiles") &&
@@ -140,6 +141,7 @@ const eventLog = (source: string, extraLabels?: { [key: string]: string }) => {
     format: regularLoggerFormat,
     maxSize: "20m",
     extension: ".log",
+    maxFiles: config.get("files.logFilesMaxFiles"),
   });
   const transportsList = [
     config.get("files.exportJobLogsToFiles") &&
