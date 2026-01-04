@@ -88,6 +88,13 @@ const config = convict({
       default: false,
       env: "EXPORT_JOB_LOGS_TO_FILES",
     },
+    logFilesMaxFiles: {
+      doc: "Max file retention for job logs (",
+      format: [String, Number],
+      default: "7d",
+      env: "LOG_FILES_MAX_FILES_RETENTION",
+      nullable: true,
+    },
     cacheFilesRootPath: {
       doc: "The root path for cache files.",
       format: String,
