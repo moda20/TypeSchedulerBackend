@@ -2,8 +2,8 @@ import { Elysia } from "elysia";
 import { helmet } from "elysia-helmet";
 import cookie from "@elysiajs/cookie";
 import { cors } from "@elysiajs/cors";
+import { openapi } from "@elysiajs/openapi";
 import { staticPlugin } from "@elysiajs/static";
-import { swagger } from "@elysiajs/swagger";
 
 import { apiRoutes } from "@api/index";
 import { auth } from "@auth/auth.controller";
@@ -35,7 +35,7 @@ api.use(helmet());
 // swagger
 if (config.get("swaggerServer")) {
   api.use(
-    swagger({
+    openapi({
       path: "/api-docs",
       documentation: {
         info: {
