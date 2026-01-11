@@ -133,13 +133,14 @@ export async function readLogFile({
   offset = 0,
   jobId,
 }: ReadLogFileParams): Promise<PaginatedLogs> {
-  const file = bun.file(filePath);
+  const fullPath = path.join(path.parse(bun.main).dir, "..", filePath);
+  const file = bun.file(fullPath);
   if (!(await file.exists())) {
     throw new Error("Log file not found", { cause: 404 });
   }
   await validateJobIdAndPathname(filePath, jobId);
 
-  return readLogFilePaginated(filePath, limit, offset);
+  return readLogFilePaginated(fullPath, limit, offset);
 }
 
 export async function downloadLogFile({
