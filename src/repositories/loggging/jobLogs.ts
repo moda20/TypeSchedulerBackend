@@ -147,7 +147,8 @@ export async function downloadLogFile({
   filePath,
   jobId,
 }: ReadLogFileParams): Promise<any> {
-  const file = bun.file(filePath);
+  const fullPath = path.join(path.parse(bun.main).dir, "..", filePath);
+  const file = bun.file(fullPath);
   if (!(await file.exists())) {
     throw new Error("Log file not found", { cause: 404 });
   }
