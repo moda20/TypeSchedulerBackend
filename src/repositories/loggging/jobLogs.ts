@@ -78,7 +78,9 @@ export async function getWinstonLogFilesMetadata(
     });
 
   return {
-    data: allFiles,
+    data: allFiles.sort(
+      (a, b) => b.fileStats.lastModified - a.fileStats.lastModified,
+    ),
     total: filteredFiles.length,
   };
 }
