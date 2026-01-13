@@ -1,3 +1,4 @@
+import { jobLogsController } from "@api/files/jobLogs.controller";
 import { outputFilesController } from "@api/files/outputFiles.controller";
 import { JobEventsController } from "@api/jobs/jobEvents.controller";
 import { JobsController } from "@api/jobs/jobs.controller";
@@ -53,6 +54,7 @@ const getErrorCode = ({ code, error }: { code: string; error: any }) => {
 apiRoutes.use(JobsController);
 apiRoutes.use(systemController);
 apiRoutes.use(outputFilesController);
+apiRoutes.use(jobLogsController);
 apiRoutes.use(proxiesController);
 apiRoutes.use(websocketController);
 apiRoutes.use(configController);

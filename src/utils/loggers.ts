@@ -34,6 +34,7 @@ const JobLogger = (uniqueId: string, name: string) => {
     format: regularLoggerFormat,
     maxSize: "20m",
     maxFiles: config.get("files.logFilesMaxFiles"),
+    zippedArchive: true,
   });
   const transportsList = [
     config.get("files.exportJobLogsToFiles") &&
@@ -142,6 +143,7 @@ const eventLog = (source: string, extraLabels?: { [key: string]: string }) => {
     maxSize: "20m",
     extension: ".log",
     maxFiles: config.get("files.logFilesMaxFiles"),
+    zippedArchive: true,
   });
   const transportsList = [
     config.get("files.exportJobLogsToFiles") &&
