@@ -100,8 +100,8 @@ export const getAllJobs = async ({
   logger.debug(`advancedFilters: ${JSON.stringify(advancedFilters, null, 4)}`);
   logger.debug(`inputJobIds ${jobIds}`);
   const allJobs = await prisma.schedule_job.findMany({
-    take: limit,
-    skip: offset,
+    take: jobIds?.length ? undefined : limit,
+    skip: jobIds?.length ? undefined : offset,
     where: {
       OR: [
         {
