@@ -3,6 +3,9 @@ services:
     build:
       context: .
       dockerfile: DOCKERFILE
+      platforms:
+        - linux/amd64
+        - linux/arm64
     container_name: scheduler
     restart: always
     extra_hosts:
