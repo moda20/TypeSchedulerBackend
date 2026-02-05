@@ -14,7 +14,6 @@ title: "[DEV/MAIN-BugFix] <short description of the bug fix>"
 any notes, opinions, mention, impact :
 
 - [Note] (notes, opinions, mention, impact) : describe your note
-- 
 
 ## **How Has This Been Tested?**
 
