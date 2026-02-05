@@ -13,7 +13,7 @@ import { IScheduleJobLog } from "schedule-manager";
 import type { Logger } from "winston";
 
 /**
- * Type for the Gotify Configuration, if you are using this as a template, the name "as this test" is mandatory as the type name
+ * Type for the Gotify Configuration, if you are using this as a template, the name "InitConfigType" is mandatory as the type name
  * That's how the system initializes the configuration
  */
 export type InitConfigType = configType & {

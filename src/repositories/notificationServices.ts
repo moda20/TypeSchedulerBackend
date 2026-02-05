@@ -4,7 +4,7 @@ import { basePrisma, prisma } from "@initialization/index";
 import { getAllJobs } from "@repositories/jobs";
 import { NewNotificationService } from "@typesDef/models/notificationService";
 import { extractedServiceConfiguration } from "@typesDef/notifications";
-import { deletePublicImage } from "@utils/fileUtils";
+import { deletePublicImage, resolveFilePath } from "@utils/fileUtils";
 import { findFiles } from "@utils/jobUtils";
 import logger from "@utils/loggers";
 import { parseJsDoc } from "@utils/typeUtils";
@@ -218,7 +218,7 @@ export const getAllJobsForAService = async (serviceId: number) => {
 };
 
 export const extractServiceType = (entryPoint: string) => {
-  const fullPath = join(import.meta.dir, "../..", entryPoint);
+  const fullPath = resolveFilePath(join("..", entryPoint));
   const typeName = "InitConfigType";
 
   const program = ts.createProgram([fullPath], {
@@ -245,26 +245,24 @@ export const extractServiceType = (entryPoint: string) => {
   const result: extractedServiceConfiguration = {};
 
   const findPropertySignatures = (inputNode: ts.Node) => {
-    ts.forEachChild(inputNode, (node) => {
-      if (ts.isPropertySignature(node)) {
-        const propName = node.name.getText();
-        const propType = node.type?.getText() || "unknown";
-        const jsDocComments = ts.getJSDocCommentsAndTags(node);
-        const jsDocText = jsDocComments
-          .map((tag: ts.JSDoc | ts.JSDocTag) =>
-            tag.comment && typeof tag.comment === "string"
-              ? tag.comment.trim()
-              : "",
-          )
-          .filter((text: string) => text)
-          .join("\n");
-        result[propName] = {
-          type: propType,
-          ...parseJsDoc(jsDocText),
-        };
-      }
-      ts.forEachChild(inputNode, findPropertySignatures);
-    });
+    if (ts.isPropertySignature(inputNode)) {
+      const propName = inputNode.name.getText();
+      const propType = inputNode.type?.getText() || "unknown";
+      const jsDocComments = ts.getJSDocCommentsAndTags(inputNode);
+      const jsDocText = jsDocComments
+        .map((tag: ts.JSDoc | ts.JSDocTag) =>
+          tag.comment && typeof tag.comment === "string"
+            ? tag.comment.trim()
+            : "",
+        )
+        .filter((text: string) => text)
+        .join("\n");
+      result[propName] = {
+        type: propType,
+        ...parseJsDoc(jsDocText),
+      };
+    }
+    ts.forEachChild(inputNode, findPropertySignatures);
   };
   findPropertySignatures(targetNode.type);
 
@@ -346,12 +344,13 @@ export const validateInputConfigAgainstSchema = (
   logger.info(
     `Validating config for service ${serviceName} ${validationResult.success ? "passed" : "failed"}`,
   );
-  if (!validationResult.success) {
+  if (validationResult.success) {
+    Object.keys(inputConfig).forEach((key) => {
+      inputConfig[key].meta = typeConfig[key].meta;
+    });
+  } else {
     logger.debug(z.treeifyError(validationResult.error));
   }
-  Object.keys(inputConfig).forEach((key) => {
-    inputConfig[key].meta = typeConfig[key].meta;
-  });
 
   return validationResult;
 };

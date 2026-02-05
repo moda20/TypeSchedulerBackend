@@ -48,7 +48,7 @@ export const getConfig = (
       if (config?.is_encrypted && !keepEncryption) {
         config.value = encryptionUtils.decryptWithMasterKey(config.value);
       }
-      if (config && keepEncryption) {
+      if (config && config?.is_encrypted && keepEncryption) {
         config.value = "*******************";
       }
       return config;

@@ -14,21 +14,21 @@ import { IScheduleJobLog } from "schedule-manager";
 import type { Logger } from "winston";
 
 /**
- * Type for the Gotify Configuration, if you are using this as a template, the name "InitConfigType" is mandatory as the type name
+ * Type for the Ntfy Configuration, if you are using this as a template, the name "InitConfigType" is mandatory as the type name
  * That's how the system initializes the configuration
  */
 export type InitConfigType = configType & {
   /**
-   * The URL of the Gotify server
+   * The URL of the Ntfy server
    */
   url: string;
   /**
-   * The API token for the Gotify server
+   * The API token for the Ntfy server
    * sensitive: true
    */
   token: string;
   /**
-   * The target topic
+   * The ntfy target topic
    */
   topic: string;
 };
