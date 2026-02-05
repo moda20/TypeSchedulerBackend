@@ -134,7 +134,7 @@ export const notificationsController = createElysia({
         `notifications_${name}`,
         true,
       );
-      if (!rawConfig) throw new Error(`Service ${name} not found`);
+      if (!rawConfig.length) throw new Error(`Service ${name} not found`);
       return ObjectifyFlattenedProperties(
         rawConfig.reduce(
           (p, c) => {
