@@ -4,6 +4,7 @@ import { addNotifications } from "@repositories/notification";
 import { LogEventNames } from "@typesDef/api/jobs";
 import { JobDTO, JobLogDTO } from "@typesDef/models/job";
 import {
+  configType,
   DefaultNotificationService,
   NtfyExtraHeaders,
 } from "@typesDef/notifications";
@@ -12,39 +13,64 @@ import logger, { eventLog } from "@utils/loggers";
 import { IScheduleJobLog } from "schedule-manager";
 import type { Logger } from "winston";
 
+/**
+ * Type for the Gotify Configuration, if you are using this as a template, the name "InitConfigType" is mandatory as the type name
+ * That's how the system initializes the configuration
+ */
+export type InitConfigType = configType & {
+  /**
+   * The URL of the Gotify server
+   */
+  url: string;
+  /**
+   * The API token for the Gotify server
+   * sensitive: true
+   */
+  token: string;
+  /**
+   * The target topic
+   */
+  topic: string;
+};
+
 export default class NtfyService implements DefaultNotificationService {
   name?: string;
   description?: string;
   serviceDbId?: number;
   jobLogId?: string;
   syslog?: Logger;
+  config?: InitConfigType;
   constructor() {
     this.name = "ntfy";
     this.description = "Default ntfy notification service";
   }
 
-  init(
+  init<T>(
     job: JobDTO,
     jobLogDTO: JobLogDTO | IScheduleJobLog,
     serviceDbObject: notificationServices,
+    config: InitConfigType | T,
   ): DefaultNotificationService {
     this.name = serviceDbObject.name;
     this.description = serviceDbObject.description;
     this.serviceDbId = serviceDbObject.id;
     this.jobLogId = jobLogDTO.id;
     this.syslog = eventLog(LogEventNames.SysLogEvent);
+    this.config = config as InitConfigType;
     return this;
   }
   static init(
     job: JobDTO,
     jobLogDTO: JobLogDTO | IScheduleJobLog,
     serviceDbObject: notificationServices,
+    config: InitConfigType,
   ) {
     const newService = new NtfyService();
     newService.name = serviceDbObject.name;
     newService.description = serviceDbObject.description;
     newService.serviceDbId = serviceDbObject.id;
     newService.jobLogId = jobLogDTO.id;
+    newService.config = config;
     return newService;
   }
 
@@ -54,19 +80,19 @@ export default class NtfyService implements DefaultNotificationService {
     extraHeaders?: NtfyExtraHeaders,
   ): Promise<any> {
     const headers = {
-      Authorization: `Bearer ${config.get("ntfy.token")}`,
+      Authorization: `Bearer ${this.config?.token}`,
       "Content-Type": "application/json",
       "X-Title": title,
       ...extraHeaders,
     };
-    return NtfyHttpService.post(`/${config.get("ntfy.topic")}`, message, {
+    return NtfyHttpService.post(`/${this.config?.topic}`, message, {
       headers: headers,
     }) as Promise<any>;
   }
 
   async sendBaseMessage(body: any, extraHeaders?: NtfyExtraHeaders) {
     const headers = {
-      Authorization: `Bearer ${config.get("ntfy.token")}`,
+      Authorization: `Bearer ${this.config?.token}`,
       "Content-Type": "application/json",
       "X-Title": body.title,
       ...extraHeaders,
@@ -85,7 +111,7 @@ export default class NtfyService implements DefaultNotificationService {
       });
     });
 
-    return NtfyHttpService.post(`/${config.get("ntfy.topic")}`, body.message, {
+    return NtfyHttpService.post(`/${this.config?.topic}`, body.message, {
       headers: headers,
     }).catch((err: any) => {
       logger.error("ntfy error");
@@ -102,8 +128,8 @@ export default class NtfyService implements DefaultNotificationService {
     results: string,
     options?: { title?: string; message?: string; priority?: number },
   ) {
-    const url = config.get("ntfy.url");
-    const token = config.get("ntfy.token");
+    const url = this.config?.url;
+    const token = this.config?.token;
     if (!url || !token) {
       logger.error("Ntfy Is not configured to use");
       return Promise.resolve();
@@ -136,8 +162,8 @@ export default class NtfyService implements DefaultNotificationService {
       [key: string]: any;
     },
   ): Promise<any> {
-    const url = config.get("ntfy.url");
-    const token = config.get("ntfy.token");
+    const url = this.config?.url;
+    const token = this.config?.token;
     if (!url || !token) {
       logger.error("Ntfy Is not configured to use");
       return Promise.resolve();

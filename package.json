@@ -46,7 +46,8 @@
     "schedule-manager": "github:moda20/node-schedule-manager#Feature/typescript_rewrite",
     "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0",
-    "winston-loki": "github:moda20/winston-loki#development"
+    "winston-loki": "github:moda20/winston-loki#development",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

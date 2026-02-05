@@ -6,12 +6,12 @@ import { getNotificationService } from "@repositories/notificationServices";
 import { saveNewFile } from "@repositories/outputFiles";
 import { TypedFilter } from "@typesDef/api/jobs";
 import { JobDTO, JobLogDTO } from "@typesDef/models/job";
+import dayjs from "@utils/dayJs";
 import logger from "@utils/loggers";
 import cronParser from "cron-parser";
 import { readdirSync, statSync } from "fs-extra";
 import path, { join, parse } from "path";
 import { IScheduleJobLog } from "schedule-manager";
-import dayjs from "@utils/dayJs";
 export const Nullable = <T extends TSchema>(T: T) => {
   // type Nullable<T> = T | null
   return t.Union([T, t.Null()]);
@@ -223,8 +223,16 @@ export const injectNotificationServices = async (
           const targetFile = (
             await import(join(import.meta.dir, "../..", service.entryPoint))
           ).default;
-
-          const targetService = targetFile.init(job, jobLogDTO, service);
+          const serviceConfig = config.safeGet(
+            `notifications.${service.name}`,
+            {},
+          );
+          const targetService = targetFile.init(
+            job,
+            jobLogDTO,
+            service,
+            serviceConfig,
+          );
           return {
             name: service.name,
             service: targetService,

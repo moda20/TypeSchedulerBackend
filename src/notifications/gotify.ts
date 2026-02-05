@@ -3,11 +3,38 @@ import { notificationServices } from "@generated/prisma_base";
 import { addNotifications } from "@repositories/notification";
 import { LogEventNames } from "@typesDef/api/jobs";
 import { JobDTO, JobLogDTO } from "@typesDef/models/job";
-import { DefaultNotificationService } from "@typesDef/notifications";
+import {
+  configType,
+  DefaultNotificationService,
+} from "@typesDef/notifications";
 import { GotifyHttpService } from "@utils/httpRequestConfig";
 import logger, { eventLog } from "@utils/loggers";
 import { IScheduleJobLog } from "schedule-manager";
 import type { Logger } from "winston";
+
+/**
+ * Type for the Gotify Configuration, if you are using this as a template, the name "as this test" is mandatory as the type name
+ * That's how the system initializes the configuration
+ */
+export type InitConfigType = configType & {
+  /**
+   * The URL of the Gotify server
+   */
+  url: string;
+  /**
+   * The API token for the Gotify server
+   * sensitive: true
+   */
+  token: string;
+  /**
+   * The API token for the Gotify app
+   */
+  appToken: string;
+  /**
+   * The API token for the Gotify app error channel
+   */
+  appErrorChannelToken: string;
+};
 
 export default class GotifyService implements DefaultNotificationService {
   name?: string;
@@ -15,33 +42,38 @@ export default class GotifyService implements DefaultNotificationService {
   serviceDbId?: number;
   jobLogId?: string;
   syslog?: Logger;
+  config?: InitConfigType;
   constructor() {
     this.name = "gotify";
     this.description = "Default gotify notification service";
   }
 
-  init(
+  init<T>(
     job: JobDTO,
     jobLogDTO: JobLogDTO | IScheduleJobLog,
     serviceDbObject: notificationServices,
+    config: InitConfigType | T,
   ): DefaultNotificationService {
     this.name = serviceDbObject.name;
     this.description = serviceDbObject.description;
     this.serviceDbId = serviceDbObject.id;
     this.jobLogId = jobLogDTO.id;
     this.syslog = eventLog(LogEventNames.SysLogEvent);
+    this.config = config as InitConfigType;
     return this;
   }
   static init(
     job: JobDTO,
     jobLogDTO: JobLogDTO | IScheduleJobLog,
     serviceDbObject: notificationServices,
+    config: InitConfigType,
   ) {
     const newService = new GotifyService();
     newService.name = serviceDbObject.name;
     newService.description = serviceDbObject.description;
     newService.serviceDbId = serviceDbObject.id;
     newService.jobLogId = jobLogDTO.id;
+    newService.config = config;
     return newService;
   }
 
@@ -83,8 +115,8 @@ export default class GotifyService implements DefaultNotificationService {
     results: string,
     options?: { title?: string; message?: string; priority?: number },
   ) {
-    const url = config.get("gotify.url");
-    const token = config.get("gotify.token");
+    const url = this.config?.url;
+    const token = this.config?.token;
     if (!url || !token) {
       logger.error("Gotify Is not configured to use");
       return Promise.resolve();
@@ -107,8 +139,8 @@ export default class GotifyService implements DefaultNotificationService {
     error?: string,
     options?: { title?: string; message?: string; priority?: number },
   ): Promise<any> {
-    const url = config.get("gotify.url");
-    const token = config.get("gotify.token");
+    const url = this.config?.url;
+    const token = this.config?.token;
     if (!url || !token) {
       logger.error("Gotify Is not configured to use");
       return Promise.resolve();
@@ -125,7 +157,7 @@ export default class GotifyService implements DefaultNotificationService {
       },
       {
         params: {
-          token: config.get("gotify.appErrorChannelToken"),
+          token: this.config?.appErrorChannelToken,
         },
       },
     ) as Promise<any>;

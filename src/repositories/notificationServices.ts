@@ -1,11 +1,16 @@
 import config from "@config/config";
+import { updateConfig } from "@config/config.service";
 import { basePrisma, prisma } from "@initialization/index";
 import { getAllJobs } from "@repositories/jobs";
 import { NewNotificationService } from "@typesDef/models/notificationService";
+import { extractedServiceConfiguration } from "@typesDef/notifications";
 import { deletePublicImage } from "@utils/fileUtils";
 import { findFiles } from "@utils/jobUtils";
 import logger from "@utils/loggers";
+import { parseJsDoc } from "@utils/typeUtils";
 import { join } from "path";
+import ts from "typescript";
+import { z } from "zod";
 
 export const getAllNotificationServices = async ({
   limit,
@@ -210,4 +215,143 @@ export const getAllJobsForAService = async (serviceId: number) => {
     name: "",
   });
   return fullJobsList;
+};
+
+export const extractServiceType = (entryPoint: string) => {
+  const fullPath = join(import.meta.dir, "../..", entryPoint);
+  const typeName = "InitConfigType";
+
+  const program = ts.createProgram([fullPath], {
+    target: ts.ScriptTarget.ESNext,
+    module: ts.ModuleKind.CommonJS,
+    strict: true,
+  });
+  program.getTypeChecker();
+  const source = program.getSourceFile(fullPath);
+
+  if (!source) {
+    throw new Error(`Could not find source file ${fullPath}`);
+  }
+  let targetNode: ts.TypeAliasDeclaration | undefined;
+
+  ts.forEachChild(source, (node) => {
+    if (ts.isTypeAliasDeclaration(node) && node.name.text === typeName) {
+      targetNode = node;
+    }
+  });
+
+  if (!targetNode) throw new Error(`Type ${typeName} not found`);
+
+  const result: extractedServiceConfiguration = {};
+
+  const findPropertySignatures = (inputNode: ts.Node) => {
+    ts.forEachChild(inputNode, (node) => {
+      if (ts.isPropertySignature(node)) {
+        const propName = node.name.getText();
+        const propType = node.type?.getText() || "unknown";
+        const jsDocComments = ts.getJSDocCommentsAndTags(node);
+        const jsDocText = jsDocComments
+          .map((tag: ts.JSDoc | ts.JSDocTag) =>
+            tag.comment && typeof tag.comment === "string"
+              ? tag.comment.trim()
+              : "",
+          )
+          .filter((text: string) => text)
+          .join("\n");
+        result[propName] = {
+          type: propType,
+          ...parseJsDoc(jsDocText),
+        };
+      }
+      ts.forEachChild(inputNode, findPropertySignatures);
+    });
+  };
+  findPropertySignatures(targetNode.type);
+
+  return result;
+};
+
+export const safeUpdateServiceConfig = async (
+  inputConfig: extractedServiceConfiguration,
+  name: string,
+  userId: number,
+  skipExistingEntries: boolean = true,
+) => {
+  const updated = [],
+    skipped = [];
+  for (const [key, value] of Object.entries(inputConfig)) {
+    if (
+      skipExistingEntries
+        ? !config.get<any>(`notifications.${name}.${key}`)
+        : true
+    ) {
+      const updateRes = await updateConfig(
+        `notifications.${name}.${key}`,
+        value.value ?? "",
+        userId,
+        value.meta?.sensitive,
+      );
+      if (updateRes) updated.push(key);
+    } else {
+      skipped.push(key);
+      logger.warn(`Config ${key} already exists for service ${name}, skipping`);
+    }
+  }
+
+  return {
+    updated,
+    skipped,
+  };
+};
+
+export const InitializeServiceConfig = async (
+  name: string,
+  entryPoint: string,
+  userId: number,
+) => {
+  const existingConfig = config.get<any>(`notifications.${name}`);
+  if (existingConfig) {
+    throw new Error(
+      `Service ${name} already exists choose a different name or delete the existing config`,
+    );
+  }
+  const typeConfig = extractServiceType(entryPoint);
+
+  return await safeUpdateServiceConfig(typeConfig, name, userId, true);
+};
+
+export const validateInputConfigAgainstSchema = (
+  entryPoint: string,
+  inputConfig: any,
+  serviceName: string,
+) => {
+  const typeConfig = extractServiceType(entryPoint);
+  const zodSchema = z
+    .object(
+      Object.fromEntries(
+        Object.keys(typeConfig).map((key) => [
+          key,
+          z
+            .object({
+              value: z.string(),
+            })
+            .strict()
+            .nullable()
+            .optional(),
+        ]),
+      ),
+    )
+    .strict();
+  const validationResult = zodSchema.safeParse(inputConfig);
+  logger.info(
+    `Validating config for service ${serviceName} ${validationResult.success ? "passed" : "failed"}`,
+  );
+  if (!validationResult.success) {
+    logger.debug(z.treeifyError(validationResult.error));
+  }
+  Object.keys(inputConfig).forEach((key) => {
+    inputConfig[key].meta = typeConfig[key].meta;
+  });
+
+  return validationResult;
 };

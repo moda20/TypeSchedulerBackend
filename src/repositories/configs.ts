@@ -1,32 +1,55 @@
 import { basePrisma } from "@initialization/index";
 import encryptionUtils from "@utils/encryptionUtils";
 
-export const getAllConfigs = (limit?: number, offset?: number) => {
+export const getAllConfigs = (
+  limit?: number,
+  offset?: number,
+  key?: string,
+  name?: string,
+  keepEncryption?: boolean,
+) => {
+  const searchConfig = {
+    ...(key && { key: key }),
+    ...(name && { key: { startsWith: name } }),
+  };
   return basePrisma.appConfig
     .findMany({
       take: limit,
       skip: offset,
+      where: searchConfig,
     })
     .then((configs) => {
-      return configs.map((e) => {
-        if (e.is_encrypted) {
-          e.value = encryptionUtils.decryptWithMasterKey(e.value);
+      return configs.map((config) => {
+        if (config?.is_encrypted && !keepEncryption) {
+          config.value = encryptionUtils.decryptWithMasterKey(config.value);
         }
-        return e;
+        if (config && keepEncryption && config?.is_encrypted) {
+          config.value = "*******************";
+        }
+        return config;
       });
     });
 };
 
-export const getConfig = (key: string) => {
+export const getConfig = (
+  key?: string,
+  name?: string,
+  keepEncryption?: boolean,
+) => {
+  const searchConfig = {
+    ...(key && { key: key }),
+    ...(name && { key: { startsWith: name } }),
+  };
   return basePrisma.appConfig
-    .findUnique({
-      where: {
-        key: key,
-      },
+    .findFirst({
+      where: searchConfig,
     })
     .then((config) => {
-      if (config?.is_encrypted) {
+      if (config?.is_encrypted && !keepEncryption) {
         config.value = encryptionUtils.decryptWithMasterKey(config.value);
+      }
+      if (config && keepEncryption) {
+        config.value = "*******************";
       }
       return config;
     });
