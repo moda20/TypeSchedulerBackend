@@ -2,6 +2,13 @@
 name: Feature PR
 about: Template for new features
 title: "[DEV/MAIN-Feat] <short description of the feature>"
+agent instructions:
+  - when creating a new PR with this template follow these instructions :
+      - get the diff commits and craft a general title
+      - extract the features and add each one in a separate lines
+      - If lesser commits include improvements, create an extra section for them. otherwise add them to the features list
+      - When creating notes, each subject should have only 1 note, do not spread them across multiple nodes
+      - When creating note, choose one of the given labels (the labels between parenthesis) based on the context of the commits
 ---
 
 ## **features:**
