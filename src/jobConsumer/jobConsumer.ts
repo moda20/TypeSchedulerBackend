@@ -58,8 +58,20 @@ export class JobConsumer extends Consumer {
       this.emitWarning(
         `Notification service ==> ${this.notification.name} <== not found in db`,
       );
+      throw new Error(
+        `Notification service ==> ${this.notification.name} <== not found in db`,
+      );
     }
-    this.notification.init(job, jobLog, targetNotificationService!);
+    const serviceConfig = config.safeGet(
+      `notifications.${this.notification.name}`,
+      {},
+    );
+    this.notification.init(
+      job,
+      jobLog,
+      targetNotificationService,
+      serviceConfig,
+    );
   }
 
   async injectProxies() {

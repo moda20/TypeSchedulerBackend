@@ -3,10 +3,11 @@ import { JobDTO, JobLogDTO } from "@typesDef/models/job";
 import { IScheduleJobLog } from "schedule-manager";
 
 export interface Notifications {
-  init?(
+  init?<T extends configType>(
     job: JobDTO,
     jobLogDTO: JobLogDTO | IScheduleJobLog,
     serviceDbObject: notificationServices,
+    config: T,
   ): Notifications;
   name?: string;
   description?: string;
@@ -15,11 +16,14 @@ export interface Notifications {
   sendMessage(message: string, title?: string): Promise<any>;
 }
 
+export type configType = object;
+
 export interface DefaultNotificationService extends Notifications {
-  init(
+  init<T>(
     job: JobDTO,
     jobLogDTO: JobLogDTO | IScheduleJobLog,
     serviceDbObject: notificationServices,
+    config: T,
   ): DefaultNotificationService;
 
   sendJobFinishNotification(
@@ -48,6 +52,10 @@ export interface DefaultNotificationService extends Notifications {
   sendBaseMessage(body: any, extraHeaders?: NtfyExtraHeaders): Promise<any>;
 }
 
+export type extractedServiceConfiguration = Record<
+  string,
+  { type?: string; comment?: string; meta?: any; value?: any }
+>;
 export interface NtfyExtraHeaders {
   /** Main body of the message as shown in the notification */
   "X-Message"?: string;

@@ -7,6 +7,7 @@ import {
   PaginatedLogs,
   ReadLogFileParams,
 } from "@typesDef/models/logs";
+import { resolveFilePath } from "@utils/fileUtils";
 import { findFiles } from "@utils/jobUtils";
 import {
   getJobLogMetadata,
@@ -135,7 +136,7 @@ export async function readLogFile({
   offset = 0,
   jobId,
 }: ReadLogFileParams): Promise<PaginatedLogs> {
-  const fullPath = path.join(path.parse(bun.main).dir, "..", filePath);
+  const fullPath = resolveFilePath(path.join("..", filePath));
   const file = bun.file(fullPath);
   if (!(await file.exists())) {
     throw new Error("Log file not found", { cause: 404 });
@@ -149,7 +150,7 @@ export async function downloadLogFile({
   filePath,
   jobId,
 }: ReadLogFileParams): Promise<any> {
-  const fullPath = path.join(path.parse(bun.main).dir, "..", filePath);
+  const fullPath = resolveFilePath(path.join("..", filePath));
   const file = bun.file(fullPath);
   if (!(await file.exists())) {
     throw new Error("Log file not found", { cause: 404 });

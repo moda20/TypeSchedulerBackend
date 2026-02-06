@@ -1,5 +1,6 @@
+import bun from "bun";
 import { promises } from "fs";
-import { join, parse } from "path";
+import { join, parse, resolve, sep } from "path";
 
 export const saveToPublicFolder = async ({
   filename,
@@ -8,7 +9,7 @@ export const saveToPublicFolder = async ({
   filename: string;
   data: any;
 }) => {
-  const fullPath = join(__dirname, "../..", "public", filename);
+  const fullPath = resolveFilePath(join("..", "public", filename));
   const targetPath = join("public", filename);
   return promises.writeFile(fullPath, data).then(() => targetPath);
 };
@@ -45,4 +46,13 @@ export const deletePublicImage = async ({ filename }: { filename: string }) => {
   }
 
   return Promise.reject("no file found");
+};
+
+export const resolveFilePath = (filePath: string) => {
+  const root = resolve(parse(bun.main).dir);
+  const fullPath = resolve(root, filePath);
+  if (!fullPath.startsWith(root + sep)) {
+    throw new Error("Invalid file path");
+  }
+  return fullPath;
 };

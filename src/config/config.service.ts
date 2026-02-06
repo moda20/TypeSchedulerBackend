@@ -129,6 +129,11 @@ export const getConfigWithDBEncryptionStatus = async () => {
     if (configList[cnfKey].is_encrypted) {
       configList[cnfKey].value = "*******************";
     }
+    // deleting Notification configs to force them to be updated on the dedicated UI, might change this in the future
+    // depending on the evolution of the backend
+    if (cnfKey.match(/^notifications_(.+)_(.+)/g)) {
+      delete configList[cnfKey];
+    }
   }
   return configList;
 };
@@ -226,6 +231,11 @@ export const updateMultiConfig = async (config: any, userId: string) => {
     config.map((cnf: any) => {
       if (cnf.key.match(/_/g)?.length) {
         throw new Error(`Keys: ${cnf.key} should not contain underscores`);
+      }
+      if (cnf.key.match(/^notifications.(.+).(.+)/g)?.length) {
+        throw new Error(
+          `Keys: notification keys are not updatable via this API ${cnf.key} `,
+        );
       }
       const schemaConfig = configList[cnf.key];
       if (schemaConfig) {

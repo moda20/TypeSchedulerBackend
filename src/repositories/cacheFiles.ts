@@ -2,6 +2,7 @@ import config from "@config/config";
 import { prisma } from "@initialization/index";
 import { newCacheFileConfig } from "@typesDef/models/outputFiles";
 import dayjs from "@utils/dayJs";
+import { resolveFilePath } from "@utils/fileUtils";
 import logger from "@utils/loggers";
 import bun from "bun";
 import { join, parse } from "path";
@@ -15,12 +16,13 @@ export const saveCacheFile = async ({
   ttl,
   newFile = false,
 }: newCacheFileConfig) => {
-  const filePath = join(
-    parse(bun.main).dir,
-    "outputs",
-    "files",
-    config.get("files.cacheFilesRootPath"),
-    `${newFile ? "_" + new Date().getTime().toString() + "_" : ""}${fileName}`,
+  const filePath = resolveFilePath(
+    join(
+      "outputs",
+      "files",
+      config.get("files.cacheFilesRootPath"),
+      `${newFile ? "_" + new Date().getTime().toString() + "_" : ""}${fileName}`,
+    ),
   );
   await bun.write(filePath, data);
   const dataBuffer = Buffer.from(data);

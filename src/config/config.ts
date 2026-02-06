@@ -191,59 +191,59 @@ const config = convict({
       default: "gotify",
       env: "DEFAULT_NOTIFICATION_SERVICE",
     },
-  },
-  ntfy: {
-    url: {
-      doc: "The ntfy url.",
-      format: String,
-      default: null,
-      env: "NTFY_URL",
-      nullable: true,
+    ntfy: {
+      url: {
+        doc: "The ntfy url.",
+        format: String,
+        default: null,
+        env: "NTFY_URL",
+        nullable: true,
+      },
+      token: {
+        doc: "The ntfy token.",
+        format: String,
+        default: "token",
+        env: "NTFY_TOKEN",
+        sensitive: true,
+      },
+      topic: {
+        doc: "the default ntfy topic",
+        format: String,
+        default: "scheduler_backend",
+        env: "NTFY_TOPIC",
+      },
     },
-    token: {
-      doc: "The ntfy token.",
-      format: String,
-      default: "token",
-      env: "NTFY_TOKEN",
-      sensitive: true,
-    },
-    topic: {
-      doc: "the default ntfy topic",
-      format: String,
-      default: "scheduler_backend",
-      env: "NTFY_TOPIC",
-    },
-  },
-  gotify: {
-    url: {
-      doc: "The gotify url.",
-      format: String,
-      default: null,
-      env: "GOTIFY_URL",
-      nullable: true,
-    },
-    token: {
-      doc: "The gotify token.",
-      format: String,
-      default: "token",
-      env: "GOTIFY_TOKEN",
-      sensitive: true,
-    },
-    appToken: {
-      doc: "The gotify app token.",
-      format: String,
-      default: null,
-      env: "GOTIFY_APP_TOKEN",
-      nullable: true,
-      sensitive: true,
-    },
-    appErrorChannelToken: {
-      doc: "The gotify app error channel token.",
-      format: String,
-      default: null,
-      env: "GOTIFY_ERROR_APP_TOKEN",
-      nullable: true,
-      sensitive: true,
+    gotify: {
+      url: {
+        doc: "The gotify url.",
+        format: String,
+        default: null,
+        env: "GOTIFY_URL",
+        nullable: true,
+      },
+      token: {
+        doc: "The gotify token.",
+        format: String,
+        default: "token",
+        env: "GOTIFY_TOKEN",
+        sensitive: true,
+      },
+      appToken: {
+        doc: "The gotify app token.",
+        format: String,
+        default: null,
+        env: "GOTIFY_APP_TOKEN",
+        nullable: true,
+        sensitive: true,
+      },
+      appErrorChannelToken: {
+        doc: "The gotify app error channel token.",
+        format: String,
+        default: null,
+        env: "GOTIFY_ERROR_APP_TOKEN",
+        nullable: true,
+        sensitive: true,
+      },
     },
   },
   grafana: {
@@ -285,6 +285,7 @@ const config = convict({
 
 type extendedConvict = typeof config & {
   removeKey: (key: string) => void;
+  safeGet: (key: string, defaultValue: any) => any;
   _instance: any;
 };
 
@@ -297,6 +298,20 @@ extendedConfig.removeKey = function (key: string) {
   if (targetKey) {
     const targetObject = walk(this._instance, targetPath, false);
     delete targetObject[targetKey];
+  }
+};
+
+extendedConfig.safeGet = function (key: string, defaultValue: any) {
+  try {
+    const keySplit = key.split(".");
+    const targetKey = keySplit.pop();
+    const targetPath = keySplit.join(".");
+    if (targetKey) {
+      const targetObject = walk(this._instance, targetPath, false);
+      return targetObject[targetKey];
+    }
+  } catch (err) {
+    return defaultValue;
   }
 };
 
