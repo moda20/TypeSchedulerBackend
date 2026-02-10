@@ -44,9 +44,11 @@
     "prisma": "^6.17.1",
     "qs": "^6.14.0",
     "schedule-manager": "github:moda20/node-schedule-manager#Feature/typescript_rewrite",
+    "uuid": "^13.0.0",
     "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0",
-    "winston-loki": "github:moda20/winston-loki#development"
+    "winston-loki": "github:moda20/winston-loki#development",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

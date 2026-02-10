@@ -1,9 +1,10 @@
 import config from "@config/config";
 import { prisma } from "@initialization/index";
 import { newOutputFileConfig } from "@typesDef/models/outputFiles";
+import { resolveFilePath } from "@utils/fileUtils";
 import logger from "@utils/loggers";
 import * as bun from "bun";
-import { join, parse } from "path";
+import { join } from "path";
 
 export const saveNewFile = async ({
   fileName,
@@ -13,12 +14,13 @@ export const saveNewFile = async ({
   jobLogId,
   newFile = false,
 }: newOutputFileConfig) => {
-  const filePath = join(
-    parse(bun.main).dir,
-    "outputs",
-    "files",
-    config.get("files.outputFilesRootPath"),
-    `${newFile ? "_" + new Date().getTime().toString() + "_" : ""}${fileName}`,
+  const filePath = resolveFilePath(
+    join(
+      "outputs",
+      "files",
+      config.get("files.outputFilesRootPath"),
+      `${newFile ? "_" + new Date().getTime().toString() + "_" : ""}${fileName}`,
+    ),
   );
   await bun.write(filePath, data);
   const dataBuffer = Buffer.from(data);

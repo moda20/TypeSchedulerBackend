@@ -1,12 +1,15 @@
 import { notificationServices } from "@generated/prisma_base";
 import { JobDTO, JobLogDTO } from "@typesDef/models/job";
 import { IScheduleJobLog } from "schedule-manager";
+import { v4 as uuidv4 } from "uuid";
+import { z } from "zod";
 
 export interface Notifications {
-  init?(
+  init?<T extends configType>(
     job: JobDTO,
     jobLogDTO: JobLogDTO | IScheduleJobLog,
     serviceDbObject: notificationServices,
+    config: T,
   ): Notifications;
   name?: string;
   description?: string;
@@ -15,11 +18,14 @@ export interface Notifications {
   sendMessage(message: string, title?: string): Promise<any>;
 }
 
+export type configType = object;
+
 export interface DefaultNotificationService extends Notifications {
-  init(
+  init<T>(
     job: JobDTO,
     jobLogDTO: JobLogDTO | IScheduleJobLog,
     serviceDbObject: notificationServices,
+    config: T,
   ): DefaultNotificationService;
 
   sendJobFinishNotification(
@@ -48,6 +54,10 @@ export interface DefaultNotificationService extends Notifications {
   sendBaseMessage(body: any, extraHeaders?: NtfyExtraHeaders): Promise<any>;
 }
 
+export type extractedServiceConfiguration = Record<
+  string,
+  { type?: string; comment?: string; meta?: any; value?: any }
+>;
 export interface NtfyExtraHeaders {
   /** Main body of the message as shown in the notification */
   "X-Message"?: string;
@@ -103,3 +113,28 @@ export interface NtfyExtraHeaders {
   /** Internal parameter, used for iOS push notifications */
   "X-Poll-ID"?: string;
 }
+
+export const notificationCreationSchema = z.object({
+  image: z.file().optional(),
+  imageName: z.string().default(uuidv4()),
+  name: z.string({ error: "Service name is required" }),
+  description: z.string().optional().default(""),
+  entryPoint: z.string({ error: "Entry point is required" }),
+  jobs: z
+    .string()
+    .transform((e) => e.split(",").map(Number))
+    .refine((arr) => arr.every((n) => Number.isFinite(n)), {
+      message: "All values must be valid numbers",
+    })
+    .optional(),
+});
+
+export const notificationUpdateSchema = notificationCreationSchema.extend({
+  id: z
+    .string({ error: "service id is required" })
+    .transform(Number)
+    .refine((n) => Number.isFinite(n), {
+      message: "service id must be valid numbers",
+    }),
+  imageName: z.string().optional(),
+});

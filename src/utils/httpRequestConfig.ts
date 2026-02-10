@@ -10,22 +10,22 @@ export const lokiHttpService = axios.create({
 });
 
 export const GotifyHttpService = axios.create({
-  baseURL: config.get("gotify.url") || "",
+  baseURL: config.get("notifications.gotify.url") || "",
   adapter: "fetch",
   headers: {
-    Authorization: `Bearer ${config.get("gotify.token")}`,
+    Authorization: `Bearer ${config.get("notifications.gotify.token")}`,
   },
   params: {
-    token: config.get("gotify.appToken"),
+    token: config.get("notifications.gotify.appToken"),
   },
   timeout: 60000,
 });
 
 export const NtfyHttpService = axios.create({
-  baseURL: config.get("ntfy.url") || "",
+  baseURL: config.get("notifications.ntfy.url") || "",
   adapter: "fetch",
   headers: {
-    Authorization: `Bearer ${config.get("ntfy.token")}`,
+    Authorization: `Bearer ${config.get("notifications.ntfy.token")}`,
   },
   timeout: 60000,
 });

@@ -1,11 +1,11 @@
 import config from "@config/config";
 import { basePrisma, prisma } from "@initialization/index";
 import { PrismaClient } from "@prisma/client";
+import { resolveFilePath } from "@utils/fileUtils";
 import logger from "@utils/loggers";
-import bun from "bun";
 import mysqldump from "mysqldump";
 import { mkdir } from "node:fs/promises";
-import { join, parse } from "path";
+import { join } from "path";
 
 const getDbSizeQuery = (dbName: string) => {
   return `SELECT table_schema AS database_name, 
@@ -59,11 +59,8 @@ const mysqldumpDbDump = async ({
   database: string;
   port: number;
 }) => {
-  const pathToFile = join(
-    parse(bun.main).dir,
-    "outputs",
-    "files",
-    config.get("files.databaseBackupRootPath"),
+  const pathToFile = resolveFilePath(
+    join("outputs", "files", config.get("files.databaseBackupRootPath")),
   );
   const fileName = `${database}_backup_${new Date().toISOString()}.sql`;
   await mkdir(pathToFile, {

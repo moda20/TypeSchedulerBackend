@@ -10,6 +10,7 @@ import { auth } from "@auth/auth.controller";
 import { jwtAccessSetup, jwtRefreshSetup } from "@auth/guards/setup.jwt";
 import config from "@config/config";
 import logger from "@utils/loggers";
+import bun from "bun";
 
 import { initialize } from "./initialization";
 
@@ -18,7 +19,6 @@ const api = new Elysia();
 // Setup
 
 api.use(jwtAccessSetup).use(jwtRefreshSetup).use(cookie());
-
 //Security;
 api.use(
   cors({
