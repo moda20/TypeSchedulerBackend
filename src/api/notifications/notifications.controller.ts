@@ -1,6 +1,7 @@
 import { t } from "elysia";
 
 import { ObjectifyFlattenedProperties } from "@config/config.service";
+import { basePrisma } from "@initialization/index";
 import { getAllConfigs } from "@repositories/configs";
 import {
   addNotificationService,
@@ -16,6 +17,10 @@ import {
   updateNotificationService,
   validateInputConfigAgainstSchema,
 } from "@repositories/notificationServices";
+import {
+  notificationCreationSchema,
+  notificationUpdateSchema,
+} from "@typesDef/notifications";
 import { createElysia } from "@utils/createElysia";
 import { deletePublicImage, savePublicImage } from "@utils/fileUtils";
 import qs from "qs";
@@ -51,28 +56,47 @@ export const notificationsController = createElysia({
   })
   .post("/addNotificationService", async ({ request, set }) => {
     const formData = await request.formData();
-    const image = formData.get("image") as File;
-    const imageName = formData.get("imageName");
-    const name = formData.get("name");
-    const description = formData.get("description");
-    const entryPoint = formData.get("entryPoint");
     const userId = set.headers["x-user-id"];
-    const jobs = formData.get("jobs")?.toString()?.split(",")?.map(Number);
-    return savePublicImage({
-      filename: imageName,
-      data: await image.arrayBuffer(),
-      unique: true,
-    })
-      .then((fullSavedImagePath) => {
-        return addNotificationService({
-          name,
-          description,
-          entryPoint,
-          image: fullSavedImagePath,
-        });
+    const inputValues = notificationCreationSchema.parse(
+      Object.fromEntries(formData.entries()),
+    );
+    const existingNotificationService = await getNotificationService(
+      0,
+      inputValues.name,
+    );
+    return basePrisma.$transaction(async (tx) => {
+      if (existingNotificationService) {
+        throw new Error(`Service ${inputValues.name} already exists`);
+      }
+      return savePublicImage({
+        filename: inputValues.imageName,
+        data: await inputValues.image?.arrayBuffer(),
+        unique: true,
       })
-      .then((savedData) => attachAServiceToJob(jobs, savedData.id))
-      .then(() => InitializeServiceConfig(name, entryPoint, userId));
+        .then((fullSavedImagePath) =>
+          addNotificationService(
+            {
+              name: inputValues.name,
+              description: inputValues.description,
+              entryPoint: inputValues.entryPoint,
+              image: fullSavedImagePath,
+            },
+            tx,
+          ),
+        )
+        .then((savedData) => {
+          if (inputValues.jobs?.length) {
+            return attachAServiceToJob(inputValues.jobs, savedData.id, tx);
+          }
+        })
+        .then(() =>
+          InitializeServiceConfig(
+            inputValues.name,
+            inputValues.entryPoint,
+            Number(userId),
+          ),
+        );
+    });
   })
   .put(
     "/updateNotificationServiceConfig",
@@ -161,29 +185,25 @@ export const notificationsController = createElysia({
   )
   .put("/updateNotificationService", async ({ request }) => {
     const formData = await request.formData();
-    const image = formData.get("image") as File;
-    const id = formData.get("id");
-    const imageName = formData.get("imageName");
-    const name = formData.get("name");
-    const description = formData.get("description");
-    const entryPoint = formData.get("entryPoint");
-    const jobs = formData.get("jobs")?.split(",")?.map(Number);
+    const inputValues = notificationUpdateSchema.parse(
+      Object.fromEntries(formData.entries()),
+    );
 
-    if (!id) {
+    if (!inputValues.id) {
       throw new Error("service id is required");
     }
     const updateObject = {} as any;
-    updateObject["name"] = name;
-    updateObject["id"] = Number(id);
-    updateObject["description"] = description;
-    updateObject["entryPoint"] = entryPoint;
+    updateObject["name"] = inputValues.name;
+    updateObject["id"] = inputValues.id;
+    updateObject["description"] = inputValues.description;
+    updateObject["entryPoint"] = inputValues.entryPoint;
 
-    if (image) {
+    if (inputValues.image) {
       updateObject["image"] = await savePublicImage({
-        filename: imageName,
-        data: await image.arrayBuffer(),
+        filename: inputValues.imageName,
+        data: await inputValues.image?.arrayBuffer(),
       });
-      const targetService = await getNotificationService(Number(id));
+      const targetService = await getNotificationService(inputValues.id);
       if (targetService?.image) {
         await deletePublicImage({
           filename: targetService.image,
@@ -192,8 +212,8 @@ export const notificationsController = createElysia({
     }
 
     return updateNotificationService(updateObject).then((savedData) => {
-      if (jobs?.length) {
-        return attachAServiceToJob(jobs, savedData.id);
+      if (inputValues?.jobs?.length) {
+        return attachAServiceToJob(inputValues.jobs, savedData.id);
       }
     });
   })
@@ -206,7 +226,7 @@ export const notificationsController = createElysia({
     },
     {
       query: t.Object({
-        id: t.String(),
+        id: t.Number(),
       }),
     },
   )

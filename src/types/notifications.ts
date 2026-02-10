@@ -1,6 +1,7 @@
 import { notificationServices } from "@generated/prisma_base";
 import { JobDTO, JobLogDTO } from "@typesDef/models/job";
 import { IScheduleJobLog } from "schedule-manager";
+import { z } from "zod";
 
 export interface Notifications {
   init?<T extends configType>(
@@ -111,3 +112,23 @@ export interface NtfyExtraHeaders {
   /** Internal parameter, used for iOS push notifications */
   "X-Poll-ID"?: string;
 }
+
+export const notificationCreationSchema = z.object({
+  image: z.file().optional(),
+  imageName: z.string(),
+  name: z.string({ error: "Service name is required" }),
+  description: z.string().optional().default(""),
+  entryPoint: z.string({ error: "Entry point is required" }),
+  jobs: z
+    .string()
+    .transform((e) => e.split(",").map(Number))
+    .refine((arr) => arr.every((n) => Number.isFinite(n)), {
+      message: "All values must be valid numbers",
+    })
+    .optional(),
+});
+
+export const notificationUpdateSchema = notificationCreationSchema.extend({
+  id: z.string({ error: "service id is required" }).transform(Number),
+  imageName: z.string().optional(),
+});

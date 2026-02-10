@@ -1,6 +1,7 @@
 import config from "@config/config";
 import { updateConfig } from "@config/config.service";
 import { basePrisma, prisma } from "@initialization/index";
+import { PrismaClient } from "@prisma/client";
 import { getAllJobs } from "@repositories/jobs";
 import { NewNotificationService } from "@typesDef/models/notificationService";
 import { extractedServiceConfiguration } from "@typesDef/notifications";
@@ -66,13 +67,12 @@ export const getNotificationService = (id: number, name?: string) => {
   });
 };
 
-export const addNotificationService = async ({
-  name,
-  description,
-  entryPoint,
-  image,
-}: NewNotificationService) => {
-  return basePrisma.notificationServices.create({
+export const addNotificationService = async (
+  { name, description, entryPoint, image }: NewNotificationService,
+  prismaClient?: PrismaClient,
+) => {
+  const client = prismaClient ?? basePrisma;
+  return client.notificationServices.create({
     data: {
       name,
       description,
@@ -121,6 +121,7 @@ export const getAvailableExternalServices = async () => {
 export const attachAServiceToJob = async (
   jobId: number | number[],
   serviceId: number | number[],
+  basePrismaClient?: PrismaClient,
 ) => {
   const jobsArray = Array.isArray(jobId) ? jobId : [jobId];
   const jobs = await prisma.schedule_job.findMany({
@@ -132,7 +133,9 @@ export const attachAServiceToJob = async (
   });
   if (!jobs.length) throw new Error("Jobs not found");
   const serviceArray = Array.isArray(serviceId) ? serviceId : [serviceId];
-  const existingServices = await basePrisma.notificationServices.findMany({
+  const existingServices = await (
+    basePrismaClient ?? basePrisma
+  ).notificationServices.findMany({
     where: {
       id: {
         in: serviceArray,
@@ -307,7 +310,7 @@ export const InitializeServiceConfig = async (
   entryPoint: string,
   userId: number,
 ) => {
-  const existingConfig = config.get<any>(`notifications.${name}`);
+  const existingConfig = config.safeGet(`notifications.${name}`, null);
   if (existingConfig) {
     throw new Error(
       `Service ${name} already exists choose a different name or delete the existing config`,
