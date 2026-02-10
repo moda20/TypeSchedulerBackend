@@ -49,8 +49,9 @@ export const deletePublicImage = async ({ filename }: { filename: string }) => {
 };
 
 export const resolveFilePath = (filePath: string) => {
-  const root = resolve(parse(bun.main).dir);
-  const fullPath = resolve(root, filePath);
+  const srcRoot = resolve(parse(bun.main).dir);
+  const root = join(srcRoot, "..");
+  const fullPath = resolve(srcRoot, filePath);
   if (!fullPath.startsWith(root + sep)) {
     throw new Error("Invalid file path");
   }
