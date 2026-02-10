@@ -68,22 +68,23 @@ export const notificationsController = createElysia({
       if (existingNotificationService) {
         throw new Error(`Service ${inputValues.name} already exists`);
       }
-      return savePublicImage({
-        filename: inputValues.imageName,
-        data: await inputValues.image?.arrayBuffer(),
-        unique: true,
-      })
-        .then((fullSavedImagePath) =>
-          addNotificationService(
-            {
-              name: inputValues.name,
-              description: inputValues.description,
-              entryPoint: inputValues.entryPoint,
-              image: fullSavedImagePath,
-            },
-            tx,
-          ),
-        )
+      const fullSavedImagePath = inputValues.image
+        ? await savePublicImage({
+            filename: inputValues.imageName,
+            data: await inputValues.image?.arrayBuffer(),
+            unique: true,
+          })
+        : undefined;
+
+      return addNotificationService(
+        {
+          name: inputValues.name,
+          description: inputValues.description,
+          entryPoint: inputValues.entryPoint,
+          image: fullSavedImagePath,
+        },
+        tx,
+      )
         .then((savedData) => {
           if (inputValues.jobs?.length) {
             return attachAServiceToJob(inputValues.jobs, savedData.id, tx);

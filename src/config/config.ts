@@ -308,7 +308,7 @@ extendedConfig.safeGet = function (key: string, defaultValue: any) {
     const targetPath = keySplit.join(".");
     if (targetKey) {
       const targetObject = walk(this._instance, targetPath, false);
-      return targetObject[targetKey];
+      return targetObject[targetKey] ?? defaultValue;
     }
   } catch (err) {
     return defaultValue;

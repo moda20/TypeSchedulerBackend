@@ -1,6 +1,7 @@
 import { notificationServices } from "@generated/prisma_base";
 import { JobDTO, JobLogDTO } from "@typesDef/models/job";
 import { IScheduleJobLog } from "schedule-manager";
+import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
 export interface Notifications {
@@ -115,7 +116,7 @@ export interface NtfyExtraHeaders {
 
 export const notificationCreationSchema = z.object({
   image: z.file().optional(),
-  imageName: z.string(),
+  imageName: z.string().default(uuidv4()),
   name: z.string({ error: "Service name is required" }),
   description: z.string().optional().default(""),
   entryPoint: z.string({ error: "Entry point is required" }),
@@ -129,6 +130,11 @@ export const notificationCreationSchema = z.object({
 });
 
 export const notificationUpdateSchema = notificationCreationSchema.extend({
-  id: z.string({ error: "service id is required" }).transform(Number),
+  id: z
+    .string({ error: "service id is required" })
+    .transform(Number)
+    .refine((n) => Number.isFinite(n), {
+      message: "service id must be valid numbers",
+    }),
   imageName: z.string().optional(),
 });
