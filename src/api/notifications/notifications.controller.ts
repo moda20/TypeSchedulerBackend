@@ -60,11 +60,11 @@ export const notificationsController = createElysia({
     const inputValues = notificationCreationSchema.parse(
       Object.fromEntries(formData.entries()),
     );
+    const existingNotificationService = await getNotificationService(
+      0,
+      inputValues.name,
+    );
     return basePrisma.$transaction(async (tx) => {
-      const existingNotificationService = await getNotificationService(
-        0,
-        inputValues.name,
-      );
       if (existingNotificationService) {
         throw new Error(`Service ${inputValues.name} already exists`);
       }
@@ -73,8 +73,8 @@ export const notificationsController = createElysia({
         data: await inputValues.image?.arrayBuffer(),
         unique: true,
       })
-        .then((fullSavedImagePath) => {
-          return addNotificationService(
+        .then((fullSavedImagePath) =>
+          addNotificationService(
             {
               name: inputValues.name,
               description: inputValues.description,
@@ -82,8 +82,8 @@ export const notificationsController = createElysia({
               image: fullSavedImagePath,
             },
             tx,
-          );
-        })
+          ),
+        )
         .then((savedData) => {
           if (inputValues.jobs?.length) {
             return attachAServiceToJob(inputValues.jobs, savedData.id, tx);

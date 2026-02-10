@@ -122,6 +122,9 @@ export const notificationCreationSchema = z.object({
   jobs: z
     .string()
     .transform((e) => e.split(",").map(Number))
+    .refine((arr) => arr.every((n) => Number.isFinite(n)), {
+      message: "All values must be valid numbers",
+    })
     .optional(),
 });
 
