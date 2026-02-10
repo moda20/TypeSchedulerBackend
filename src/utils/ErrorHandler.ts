@@ -8,8 +8,8 @@ export class APIError extends Error {
   constructor(
     message: string,
     name?: string,
-    options?: ErrorOptions,
     httpCode?: StatusCodes,
+    options?: ErrorOptions,
   ) {
     super(message, options);
 
