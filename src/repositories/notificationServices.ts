@@ -245,7 +245,11 @@ export const extractServiceType = (entryPoint: string) => {
     }
   });
 
-  if (!targetNode) throw new APIError(`Type ${typeName} not found`, REPO_NAME);
+  if (!targetNode)
+    throw new APIError(
+      `Type ${typeName} not found in the specified entry point`,
+      REPO_NAME,
+    );
 
   const result: extractedServiceConfiguration = {};
 
