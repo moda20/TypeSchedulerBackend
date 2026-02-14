@@ -22,6 +22,7 @@ import {
   notificationUpdateSchema,
 } from "@typesDef/notifications";
 import { createElysia } from "@utils/createElysia";
+import { APIError } from "@utils/ErrorHandler";
 import { deletePublicImage, savePublicImage } from "@utils/fileUtils";
 import qs from "qs";
 import { z } from "zod";
@@ -66,7 +67,7 @@ export const notificationsController = createElysia({
     );
     return basePrisma.$transaction(async (tx) => {
       if (existingNotificationService) {
-        throw new Error(`Service ${inputValues.name} already exists`);
+        throw new APIError(`Service ${inputValues.name} already exists`);
       }
       const fullSavedImagePath = inputValues.image
         ? await savePublicImage({

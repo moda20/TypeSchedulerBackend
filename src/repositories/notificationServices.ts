@@ -5,6 +5,7 @@ import { PrismaClient } from "@prisma/client";
 import { getAllJobs } from "@repositories/jobs";
 import { NewNotificationService } from "@typesDef/models/notificationService";
 import { extractedServiceConfiguration } from "@typesDef/notifications";
+import { APIError } from "@utils/ErrorHandler";
 import { deletePublicImage, resolveFilePath } from "@utils/fileUtils";
 import { findFiles } from "@utils/jobUtils";
 import logger from "@utils/loggers";
@@ -13,6 +14,7 @@ import { join } from "path";
 import ts from "typescript";
 import { z } from "zod";
 
+export const REPO_NAME = "Notification services";
 export const getAllNotificationServices = async ({
   limit,
   offset,
@@ -203,7 +205,7 @@ export const getAllJobsForAService = async (serviceId: number) => {
           job_id: j.job_id,
         };
       } catch (err) {
-        console.log(err);
+        logger.error(err);
         return { notificationServices: [], job_id: j.job_id };
       }
     })
@@ -233,7 +235,7 @@ export const extractServiceType = (entryPoint: string) => {
   const source = program.getSourceFile(fullPath);
 
   if (!source) {
-    throw new Error(`Could not find source file ${fullPath}`);
+    throw new APIError(`Could not find source file ${fullPath}`, REPO_NAME);
   }
   let targetNode: ts.TypeAliasDeclaration | undefined;
 
@@ -243,7 +245,11 @@ export const extractServiceType = (entryPoint: string) => {
     }
   });
 
-  if (!targetNode) throw new Error(`Type ${typeName} not found`);
+  if (!targetNode)
+    throw new APIError(
+      `Type ${typeName} not found in the specified entry point`,
+      REPO_NAME,
+    );
 
   const result: extractedServiceConfiguration = {};
 
@@ -283,7 +289,7 @@ export const safeUpdateServiceConfig = async (
   for (const [key, value] of Object.entries(inputConfig)) {
     if (
       skipExistingEntries
-        ? !config.get<any>(`notifications.${name}.${key}`)
+        ? !config.safeGet(`notifications.${name}.${key}`, null)
         : true
     ) {
       const updateRes = await updateConfig(
@@ -312,8 +318,9 @@ export const InitializeServiceConfig = async (
 ) => {
   const existingConfig = config.safeGet(`notifications.${name}`, null);
   if (existingConfig) {
-    throw new Error(
+    throw new APIError(
       `Service ${name} already exists choose a different name or delete the existing config`,
+      REPO_NAME,
     );
   }
   const typeConfig = extractServiceType(entryPoint);

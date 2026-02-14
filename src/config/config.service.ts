@@ -232,7 +232,7 @@ export const updateMultiConfig = async (config: any, userId: string) => {
       if (cnf.key.match(/_/g)?.length) {
         throw new Error(`Keys: ${cnf.key} should not contain underscores`);
       }
-      if (cnf.key.match(/^notifications.(.+).(.+)/g)?.length) {
+      if (cnf.key.match(/^notifications\.(.+)\.(.+)/g)?.length) {
         throw new Error(
           `Keys: notification keys are not updatable via this API ${cnf.key} `,
         );
