@@ -86,8 +86,13 @@ function coerce(k: string, v: any, schema: any, instance?: any) {
         v = v.split(",");
         break;
       case "object":
-        v = JSON.parse(v);
+        try {
+          v = JSON.parse(v);
+        } catch (err) {
+          throw new Error(`Invalid JSON object in ${k} key`);
+        }
         break;
+      // TODO : Check recheck and safe-regex for a full app regex validation
       case "regexp":
         v = new RegExp(v);
         break;

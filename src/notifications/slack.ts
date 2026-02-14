@@ -67,7 +67,7 @@ export default class SlackNotification implements DefaultNotificationService {
       })
       .catch((err) => {
         logger.error(err.message);
-        this.syslog?.error(`gotify error: ${err.message}`, {
+        this.syslog?.error(`slack error: ${err.message}`, {
           eventName: "NOTIF_SERVICE_ERROR",
         });
       });
@@ -99,7 +99,7 @@ export default class SlackNotification implements DefaultNotificationService {
     const webhookExtraConfig: IncomingWebhookDefaultArguments = {};
     if (ti.config?.proxyUrl) {
       const parsedUrl = new URL(ti.config?.proxyUrl);
-      const proxyUrl = `${parsedUrl.protocol}//${ti.config?.proxyUsername ? ti.config?.proxyUsername + ":" + ti.config?.proxyPassword + "@" : ""}${parsedUrl.hostname}:${parsedUrl.port}`;
+      const proxyUrl = `${parsedUrl.protocol}//${ti.config?.proxyUsername ? encodeURIComponent(ti.config?.proxyUsername) + ":" + encodeURIComponent(ti.config?.proxyPassword) + "@" : ""}${parsedUrl.hostname}:${parsedUrl.port}`;
       webhookExtraConfig.agent = new HttpsProxyAgent(proxyUrl);
     }
     ti.slackWebhook = new IncomingWebhook(ti.config.url, webhookExtraConfig);
