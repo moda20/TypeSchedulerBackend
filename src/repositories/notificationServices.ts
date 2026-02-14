@@ -289,7 +289,7 @@ export const safeUpdateServiceConfig = async (
   for (const [key, value] of Object.entries(inputConfig)) {
     if (
       skipExistingEntries
-        ? !config.get<any>(`notifications.${name}.${key}`)
+        ? !config.safeGet(`notifications.${name}.${key}`, null)
         : true
     ) {
       const updateRes = await updateConfig(
