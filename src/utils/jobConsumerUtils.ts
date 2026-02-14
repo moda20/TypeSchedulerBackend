@@ -2,6 +2,7 @@ import mainSocketService from "@api/websocket/mainSocket.service";
 import config from "@config/config";
 import GotifyService from "@notifications/gotify";
 import NtfyService from "@notifications/ntfy";
+import SlackNotification from "@notifications/slack";
 import { addEventLog } from "@repositories/events";
 import { LogEventNames } from "@typesDef/api/jobs";
 import { JobEventTypes } from "@typesDef/models/job";
@@ -76,6 +77,8 @@ export function getDefaultNotificationService(): new () => DefaultNotificationSe
       return GotifyService;
     case "ntfy":
       return NtfyService;
+    case "slack":
+      return SlackNotification;
     default:
       return GotifyService;
   }
