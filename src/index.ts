@@ -1,5 +1,4 @@
 import { Elysia } from "elysia";
-import { helmet } from "elysia-helmet";
 import cookie from "@elysiajs/cookie";
 import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
@@ -9,6 +8,7 @@ import { apiRoutes } from "@api/index";
 import { auth } from "@auth/auth.controller";
 import { jwtAccessSetup, jwtRefreshSetup } from "@auth/guards/setup.jwt";
 import config from "@config/config";
+import { helmetPlugin } from "@utils/helmetplugin";
 import logger from "@utils/loggers";
 
 import { initialize } from "./initialization";
@@ -29,7 +29,7 @@ api.use(
     methods: ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"],
   }),
 );
-api.use(helmet());
+api.use(helmetPlugin);
 
 // swagger
 if (config.get("swaggerServer")) {

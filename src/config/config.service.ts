@@ -172,7 +172,7 @@ export const syncConfigWithDB = async () => {
     );
   }
   const finalDbConfig = await loadConfigsFromDB();
-  config.load(finalDbConfig);
+  config.loadObjectConfig(finalDbConfig);
 };
 
 const loadConfigsFromDB = async () => {
