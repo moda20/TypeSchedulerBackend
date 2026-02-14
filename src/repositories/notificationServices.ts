@@ -245,7 +245,11 @@ export const extractServiceType = (entryPoint: string) => {
     }
   });
 
-  if (!targetNode) throw new APIError(`Type ${typeName} not found`, REPO_NAME);
+  if (!targetNode)
+    throw new APIError(
+      `Type ${typeName} not found in the specified entry point`,
+      REPO_NAME,
+    );
 
   const result: extractedServiceConfiguration = {};
 
@@ -285,7 +289,7 @@ export const safeUpdateServiceConfig = async (
   for (const [key, value] of Object.entries(inputConfig)) {
     if (
       skipExistingEntries
-        ? !config.get<any>(`notifications.${name}.${key}`)
+        ? !config.safeGet(`notifications.${name}.${key}`, null)
         : true
     ) {
       const updateRes = await updateConfig(
