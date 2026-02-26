@@ -25,8 +25,21 @@ export const getAllApiKeysForaUser = (userId: number, isPublic?: boolean) => {
 };
 
 export const extractIdsFromTokens = (token: string) => {
-  const [prefix, hToken] = token.split(".");
-  const [tokenName, id] = prefix.split("_");
+  // TODO : See if this can be better done using a library
+  const firstDotIndex = token.indexOf(".");
+  if (firstDotIndex === -1) {
+    return {};
+  }
+
+  const prefix = token.slice(0, firstDotIndex);
+  const hToken = token.slice(firstDotIndex + 1);
+  const tokenNameUnderscoreIndex = prefix.indexOf("_");
+  if (tokenNameUnderscoreIndex === -1) {
+    return {};
+  }
+  const tokenName = prefix.slice(0, tokenNameUnderscoreIndex);
+  const id = prefix.slice(tokenNameUnderscoreIndex + 1);
+
   return {
     id,
     token: hToken,

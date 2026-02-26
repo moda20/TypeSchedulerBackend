@@ -7758,17 +7758,18 @@ export namespace Prisma {
 
   export type apiKeysWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    name?: string
     key?: string
+    createdById_name?: apiKeysCreatedByIdNameCompoundUniqueInput
     AND?: apiKeysWhereInput | apiKeysWhereInput[]
     OR?: apiKeysWhereInput[]
     NOT?: apiKeysWhereInput | apiKeysWhereInput[]
+    name?: StringFilter<"apiKeys"> | string
     createdById?: IntFilter<"apiKeys"> | number
     lastUsedAt?: DateTimeNullableFilter<"apiKeys"> | Date | string | null
     created_at?: DateTimeFilter<"apiKeys"> | Date | string
     updated_at?: DateTimeFilter<"apiKeys"> | Date | string
     createdBy?: XOR<UserScalarRelationFilter, userWhereInput>
-  }, "id" | "id" | "name" | "key">
+  }, "id" | "id" | "key" | "createdById_name">
 
   export type apiKeysOrderByWithAggregationInput = {
     id?: SortOrder
@@ -8654,6 +8655,11 @@ export namespace Prisma {
     fields: apiKeysOrderByRelevanceFieldEnum | apiKeysOrderByRelevanceFieldEnum[]
     sort: SortOrder
     search: string
+  }
+
+  export type apiKeysCreatedByIdNameCompoundUniqueInput = {
+    createdById: number
+    name: string
   }
 
   export type apiKeysCountOrderByAggregateInput = {

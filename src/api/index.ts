@@ -48,6 +48,7 @@ export const apiRoutes = createElysia()
             errors: isAuth.errors,
           };
         }
+        set.headers["x-user-id"] = isAuth.data.id;
       } else {
         const isAuth = await isAuthenticated(jwtAccess, cookie);
         if (!isAuth.success) {
