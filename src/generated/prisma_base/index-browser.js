@@ -129,6 +129,16 @@ exports.Prisma.UserScalarFieldEnum = {
   password: 'password'
 };
 
+exports.Prisma.ApiKeysScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  key: 'key',
+  createdById: 'createdById',
+  lastUsedAt: 'lastUsedAt',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
 exports.Prisma.AppConfigScalarFieldEnum = {
   id: 'id',
   key: 'key',
@@ -190,6 +200,12 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 
+exports.Prisma.apiKeysOrderByRelevanceFieldEnum = {
+  id: 'id',
+  name: 'name',
+  key: 'key'
+};
+
 exports.Prisma.appConfigOrderByRelevanceFieldEnum = {
   key: 'key',
   value: 'value'
@@ -226,6 +242,7 @@ exports.Prisma.notificationOrderByRelevanceFieldEnum = {
 
 exports.Prisma.ModelName = {
   user: 'user',
+  apiKeys: 'apiKeys',
   appConfig: 'appConfig',
   appConfigAudit: 'appConfigAudit',
   notificationServices: 'notificationServices',
