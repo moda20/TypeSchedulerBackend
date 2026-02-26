@@ -7,7 +7,11 @@ import { proxiesController } from "@api/proxies/proxies.controller";
 import { configController } from "@api/system/config.controller";
 import { systemController } from "@api/system/system.controller";
 import { websocketController } from "@api/websocket/mainSocket.controller";
-import { isAuthenticated } from "@auth/guards/authenticated.guard";
+import {
+  isAuthenticated,
+  isTokenAuthenticated,
+} from "@auth/guards/authenticated.guard";
+import { keysController } from "@auth/keys.controller";
 import { createElysia } from "@utils/createElysia";
 import { APIError } from "@utils/ErrorHandler";
 import logger from "@utils/loggers";
@@ -33,17 +37,29 @@ export const apiRoutes = createElysia()
     );
   })
   .guard({
-    async beforeHandle({ set, jwtAccess, cookie }) {
-      const isAuth = await isAuthenticated(jwtAccess, cookie);
-      if (!isAuth.success) {
-        set.status = 401;
-        return {
-          success: false,
-          message: isAuth.message,
-          errors: isAuth.errors,
-        };
+    async beforeHandle({ set, jwtAccess, cookie, headers }) {
+      if (headers && headers["authorization"]) {
+        const isAuth = await isTokenAuthenticated(headers["authorization"]);
+        if (!isAuth.success) {
+          set.status = 401;
+          return {
+            success: false,
+            message: isAuth.message,
+            errors: isAuth.errors,
+          };
+        }
+      } else {
+        const isAuth = await isAuthenticated(jwtAccess, cookie);
+        if (!isAuth.success) {
+          set.status = 401;
+          return {
+            success: false,
+            message: isAuth.message,
+            errors: isAuth.errors,
+          };
+        }
+        set.headers["x-user-id"] = isAuth.data.id;
       }
-      set.headers["x-user-id"] = isAuth.data.id;
     },
   });
 
@@ -78,3 +94,4 @@ apiRoutes.use(websocketController);
 apiRoutes.use(configController);
 apiRoutes.use(notificationsController);
 apiRoutes.use(JobEventsController);
+apiRoutes.use(keysController);

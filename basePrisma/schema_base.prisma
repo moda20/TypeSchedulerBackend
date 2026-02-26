@@ -20,6 +20,18 @@ model user {
   password        String   @db.VarChar(255)
 
   configChanges appConfigAudit[]
+  apiKeys apiKeys[]
+}
+
+model apiKeys {
+  id              String    @id @unique(map: "id") @default(nanoid(10)) @db.VarChar(255)
+  name            String    @db.VarChar(255) @unique
+  key             String    @db.VarChar(255) @unique
+  createdBy       user      @relation(fields: [createdById], references: [id])
+  createdById     Int
+  lastUsedAt      DateTime?
+  created_at      DateTime  @default(now()) @db.DateTime(0)
+  updated_at      DateTime  @default(now()) @db.DateTime(0)
 }
 
 model appConfig {
