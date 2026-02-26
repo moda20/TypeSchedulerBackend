@@ -18,6 +18,13 @@ export const seedBaseDatabase = async () => {
         "Default ntfy notification service, see implementation in the code base",
       entryPoint: "src/notifications/ntfy.ts",
     },
+    {
+      image: "/public/images/slack.jpg",
+      name: "slack",
+      description:
+        "Default Slack webhook notification service, see implementation in the code base",
+      entryPoint: "src/notifications/slack.ts",
+    },
   ];
 
   return basePrisma.notificationServices

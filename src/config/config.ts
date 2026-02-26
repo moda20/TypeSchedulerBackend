@@ -1,4 +1,4 @@
-import { walk } from "@utils/convictUtils";
+import { overlay, walk } from "@utils/convictUtils";
 import convict from "convict";
 import { ipaddress } from "convict-format-with-validator";
 
@@ -245,6 +245,37 @@ const config = convict({
         sensitive: true,
       },
     },
+    slack: {
+      url: {
+        doc: "The slack webhook url",
+        format: String,
+        default: null,
+        env: "SLACK_WEBHOOK_URL",
+        nullable: true,
+      },
+      proxyUrl: {
+        doc: "The proxy url.",
+        format: String,
+        default: null,
+        env: "SLACK_PROXY_URL",
+        nullable: true,
+      },
+      proxyUsername: {
+        doc: "The proxy username.",
+        format: String,
+        default: null,
+        env: "SLACK_PROXY_USERNAME",
+        nullable: true,
+      },
+      proxyPassword: {
+        doc: "The slack proxy password.",
+        format: String,
+        default: null,
+        env: "SLACK_PROXY_PASSWORD",
+        nullable: true,
+        sensitive: true,
+      },
+    },
   },
   grafana: {
     lokiUrl: {
@@ -286,7 +317,9 @@ const config = convict({
 type extendedConvict = typeof config & {
   removeKey: (key: string) => void;
   safeGet: (key: string, defaultValue: any) => any;
+  loadObjectConfig: (conf: any) => any;
   _instance: any;
+  _schema: any;
 };
 
 const extendedConfig = config as extendedConvict;
@@ -313,6 +346,10 @@ extendedConfig.safeGet = function (key: string, defaultValue: any) {
   } catch (err) {
     return defaultValue;
   }
+};
+
+extendedConfig.loadObjectConfig = function (conf: any) {
+  overlay(conf, this._instance, this._schema);
 };
 
 export default extendedConfig;
