@@ -1,19 +1,10 @@
 import { t } from "elysia";
 
-import { isAuthenticated } from "@auth/guards/authenticated.guard";
 import {
   getConfigWithDBEncryptionStatus,
-  getConvictSchemaProperties,
   ObjectifyFlattenedProperties,
   updateMultiConfig,
 } from "@config/config.service";
-import {
-  backupBaseDB,
-  backupSchedulerDB,
-  getBaseDatabaseInfo,
-  getSchedulerDatabaseInfo,
-} from "@repositories/systemRepository";
-import { FlattenedProperties } from "@typesDef/models/config";
 import { createElysia } from "@utils/createElysia";
 import qs from "qs";
 

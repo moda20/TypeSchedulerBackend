@@ -19,6 +19,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type user = $Result.DefaultSelection<Prisma.$userPayload>
 /**
+ * Model apiKeys
+ * 
+ */
+export type apiKeys = $Result.DefaultSelection<Prisma.$apiKeysPayload>
+/**
  * Model appConfig
  * 
  */
@@ -166,6 +171,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.userDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.apiKeys`: Exposes CRUD operations for the **apiKeys** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ApiKeys
+    * const apiKeys = await prisma.apiKeys.findMany()
+    * ```
+    */
+  get apiKeys(): Prisma.apiKeysDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.appConfig`: Exposes CRUD operations for the **appConfig** model.
@@ -647,6 +662,7 @@ export namespace Prisma {
 
   export const ModelName: {
     user: 'user',
+    apiKeys: 'apiKeys',
     appConfig: 'appConfig',
     appConfigAudit: 'appConfigAudit',
     notificationServices: 'notificationServices',
@@ -669,7 +685,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "appConfig" | "appConfigAudit" | "notificationServices" | "notification"
+      modelProps: "user" | "apiKeys" | "appConfig" | "appConfigAudit" | "notificationServices" | "notification"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -736,6 +752,72 @@ export namespace Prisma {
           count: {
             args: Prisma.userCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
+          }
+        }
+      }
+      apiKeys: {
+        payload: Prisma.$apiKeysPayload<ExtArgs>
+        fields: Prisma.apiKeysFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.apiKeysFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$apiKeysPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.apiKeysFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$apiKeysPayload>
+          }
+          findFirst: {
+            args: Prisma.apiKeysFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$apiKeysPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.apiKeysFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$apiKeysPayload>
+          }
+          findMany: {
+            args: Prisma.apiKeysFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$apiKeysPayload>[]
+          }
+          create: {
+            args: Prisma.apiKeysCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$apiKeysPayload>
+          }
+          createMany: {
+            args: Prisma.apiKeysCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.apiKeysDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$apiKeysPayload>
+          }
+          update: {
+            args: Prisma.apiKeysUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$apiKeysPayload>
+          }
+          deleteMany: {
+            args: Prisma.apiKeysDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.apiKeysUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.apiKeysUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$apiKeysPayload>
+          }
+          aggregate: {
+            args: Prisma.ApiKeysAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateApiKeys>
+          }
+          groupBy: {
+            args: Prisma.apiKeysGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ApiKeysGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.apiKeysCountArgs<ExtArgs>
+            result: $Utils.Optional<ApiKeysCountAggregateOutputType> | number
           }
         }
       }
@@ -1100,6 +1182,7 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     user?: userOmit
+    apiKeys?: apiKeysOmit
     appConfig?: appConfigOmit
     appConfigAudit?: appConfigAuditOmit
     notificationServices?: notificationServicesOmit
@@ -1185,10 +1268,12 @@ export namespace Prisma {
 
   export type UserCountOutputType = {
     configChanges: number
+    apiKeys: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     configChanges?: boolean | UserCountOutputTypeCountConfigChangesArgs
+    apiKeys?: boolean | UserCountOutputTypeCountApiKeysArgs
   }
 
   // Custom InputTypes
@@ -1207,6 +1292,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountConfigChangesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: appConfigAuditWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountApiKeysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: apiKeysWhereInput
   }
 
 
@@ -1483,6 +1575,7 @@ export namespace Prisma {
     username?: boolean
     password?: boolean
     configChanges?: boolean | user$configChangesArgs<ExtArgs>
+    apiKeys?: boolean | user$apiKeysArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -1500,6 +1593,7 @@ export namespace Prisma {
   export type userOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "created_at" | "updated_at" | "username" | "password", ExtArgs["result"]["user"]>
   export type userInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     configChanges?: boolean | user$configChangesArgs<ExtArgs>
+    apiKeys?: boolean | user$apiKeysArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -1507,6 +1601,7 @@ export namespace Prisma {
     name: "user"
     objects: {
       configChanges: Prisma.$appConfigAuditPayload<ExtArgs>[]
+      apiKeys: Prisma.$apiKeysPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -1856,6 +1951,7 @@ export namespace Prisma {
   export interface Prisma__userClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     configChanges<T extends user$configChangesArgs<ExtArgs> = {}>(args?: Subset<T, user$configChangesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$appConfigAuditPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    apiKeys<T extends user$apiKeysArgs<ExtArgs> = {}>(args?: Subset<T, user$apiKeysArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$apiKeysPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2258,6 +2354,30 @@ export namespace Prisma {
   }
 
   /**
+   * user.apiKeys
+   */
+  export type user$apiKeysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the apiKeys
+     */
+    select?: apiKeysSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the apiKeys
+     */
+    omit?: apiKeysOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: apiKeysInclude<ExtArgs> | null
+    where?: apiKeysWhereInput
+    orderBy?: apiKeysOrderByWithRelationInput | apiKeysOrderByWithRelationInput[]
+    cursor?: apiKeysWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ApiKeysScalarFieldEnum | ApiKeysScalarFieldEnum[]
+  }
+
+  /**
    * user without action
    */
   export type userDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2273,6 +2393,991 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: userInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model apiKeys
+   */
+
+  export type AggregateApiKeys = {
+    _count: ApiKeysCountAggregateOutputType | null
+    _avg: ApiKeysAvgAggregateOutputType | null
+    _sum: ApiKeysSumAggregateOutputType | null
+    _min: ApiKeysMinAggregateOutputType | null
+    _max: ApiKeysMaxAggregateOutputType | null
+  }
+
+  export type ApiKeysAvgAggregateOutputType = {
+    createdById: number | null
+  }
+
+  export type ApiKeysSumAggregateOutputType = {
+    createdById: number | null
+  }
+
+  export type ApiKeysMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    key: string | null
+    createdById: number | null
+    lastUsedAt: Date | null
+    created_at: Date | null
+    updated_at: Date | null
+  }
+
+  export type ApiKeysMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    key: string | null
+    createdById: number | null
+    lastUsedAt: Date | null
+    created_at: Date | null
+    updated_at: Date | null
+  }
+
+  export type ApiKeysCountAggregateOutputType = {
+    id: number
+    name: number
+    key: number
+    createdById: number
+    lastUsedAt: number
+    created_at: number
+    updated_at: number
+    _all: number
+  }
+
+
+  export type ApiKeysAvgAggregateInputType = {
+    createdById?: true
+  }
+
+  export type ApiKeysSumAggregateInputType = {
+    createdById?: true
+  }
+
+  export type ApiKeysMinAggregateInputType = {
+    id?: true
+    name?: true
+    key?: true
+    createdById?: true
+    lastUsedAt?: true
+    created_at?: true
+    updated_at?: true
+  }
+
+  export type ApiKeysMaxAggregateInputType = {
+    id?: true
+    name?: true
+    key?: true
+    createdById?: true
+    lastUsedAt?: true
+    created_at?: true
+    updated_at?: true
+  }
+
+  export type ApiKeysCountAggregateInputType = {
+    id?: true
+    name?: true
+    key?: true
+    createdById?: true
+    lastUsedAt?: true
+    created_at?: true
+    updated_at?: true
+    _all?: true
+  }
+
+  export type ApiKeysAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which apiKeys to aggregate.
+     */
+    where?: apiKeysWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of apiKeys to fetch.
+     */
+    orderBy?: apiKeysOrderByWithRelationInput | apiKeysOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: apiKeysWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` apiKeys from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` apiKeys.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned apiKeys
+    **/
+    _count?: true | ApiKeysCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ApiKeysAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ApiKeysSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ApiKeysMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ApiKeysMaxAggregateInputType
+  }
+
+  export type GetApiKeysAggregateType<T extends ApiKeysAggregateArgs> = {
+        [P in keyof T & keyof AggregateApiKeys]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateApiKeys[P]>
+      : GetScalarType<T[P], AggregateApiKeys[P]>
+  }
+
+
+
+
+  export type apiKeysGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: apiKeysWhereInput
+    orderBy?: apiKeysOrderByWithAggregationInput | apiKeysOrderByWithAggregationInput[]
+    by: ApiKeysScalarFieldEnum[] | ApiKeysScalarFieldEnum
+    having?: apiKeysScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ApiKeysCountAggregateInputType | true
+    _avg?: ApiKeysAvgAggregateInputType
+    _sum?: ApiKeysSumAggregateInputType
+    _min?: ApiKeysMinAggregateInputType
+    _max?: ApiKeysMaxAggregateInputType
+  }
+
+  export type ApiKeysGroupByOutputType = {
+    id: string
+    name: string
+    key: string
+    createdById: number
+    lastUsedAt: Date | null
+    created_at: Date
+    updated_at: Date
+    _count: ApiKeysCountAggregateOutputType | null
+    _avg: ApiKeysAvgAggregateOutputType | null
+    _sum: ApiKeysSumAggregateOutputType | null
+    _min: ApiKeysMinAggregateOutputType | null
+    _max: ApiKeysMaxAggregateOutputType | null
+  }
+
+  type GetApiKeysGroupByPayload<T extends apiKeysGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ApiKeysGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ApiKeysGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ApiKeysGroupByOutputType[P]>
+            : GetScalarType<T[P], ApiKeysGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type apiKeysSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    key?: boolean
+    createdById?: boolean
+    lastUsedAt?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+    createdBy?: boolean | userDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["apiKeys"]>
+
+
+
+  export type apiKeysSelectScalar = {
+    id?: boolean
+    name?: boolean
+    key?: boolean
+    createdById?: boolean
+    lastUsedAt?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+  }
+
+  export type apiKeysOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "key" | "createdById" | "lastUsedAt" | "created_at" | "updated_at", ExtArgs["result"]["apiKeys"]>
+  export type apiKeysInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    createdBy?: boolean | userDefaultArgs<ExtArgs>
+  }
+
+  export type $apiKeysPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "apiKeys"
+    objects: {
+      createdBy: Prisma.$userPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      key: string
+      createdById: number
+      lastUsedAt: Date | null
+      created_at: Date
+      updated_at: Date
+    }, ExtArgs["result"]["apiKeys"]>
+    composites: {}
+  }
+
+  type apiKeysGetPayload<S extends boolean | null | undefined | apiKeysDefaultArgs> = $Result.GetResult<Prisma.$apiKeysPayload, S>
+
+  type apiKeysCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<apiKeysFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ApiKeysCountAggregateInputType | true
+    }
+
+  export interface apiKeysDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['apiKeys'], meta: { name: 'apiKeys' } }
+    /**
+     * Find zero or one ApiKeys that matches the filter.
+     * @param {apiKeysFindUniqueArgs} args - Arguments to find a ApiKeys
+     * @example
+     * // Get one ApiKeys
+     * const apiKeys = await prisma.apiKeys.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends apiKeysFindUniqueArgs>(args: SelectSubset<T, apiKeysFindUniqueArgs<ExtArgs>>): Prisma__apiKeysClient<$Result.GetResult<Prisma.$apiKeysPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ApiKeys that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {apiKeysFindUniqueOrThrowArgs} args - Arguments to find a ApiKeys
+     * @example
+     * // Get one ApiKeys
+     * const apiKeys = await prisma.apiKeys.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends apiKeysFindUniqueOrThrowArgs>(args: SelectSubset<T, apiKeysFindUniqueOrThrowArgs<ExtArgs>>): Prisma__apiKeysClient<$Result.GetResult<Prisma.$apiKeysPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ApiKeys that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {apiKeysFindFirstArgs} args - Arguments to find a ApiKeys
+     * @example
+     * // Get one ApiKeys
+     * const apiKeys = await prisma.apiKeys.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends apiKeysFindFirstArgs>(args?: SelectSubset<T, apiKeysFindFirstArgs<ExtArgs>>): Prisma__apiKeysClient<$Result.GetResult<Prisma.$apiKeysPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ApiKeys that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {apiKeysFindFirstOrThrowArgs} args - Arguments to find a ApiKeys
+     * @example
+     * // Get one ApiKeys
+     * const apiKeys = await prisma.apiKeys.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends apiKeysFindFirstOrThrowArgs>(args?: SelectSubset<T, apiKeysFindFirstOrThrowArgs<ExtArgs>>): Prisma__apiKeysClient<$Result.GetResult<Prisma.$apiKeysPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ApiKeys that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {apiKeysFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ApiKeys
+     * const apiKeys = await prisma.apiKeys.findMany()
+     * 
+     * // Get first 10 ApiKeys
+     * const apiKeys = await prisma.apiKeys.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const apiKeysWithIdOnly = await prisma.apiKeys.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends apiKeysFindManyArgs>(args?: SelectSubset<T, apiKeysFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$apiKeysPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ApiKeys.
+     * @param {apiKeysCreateArgs} args - Arguments to create a ApiKeys.
+     * @example
+     * // Create one ApiKeys
+     * const ApiKeys = await prisma.apiKeys.create({
+     *   data: {
+     *     // ... data to create a ApiKeys
+     *   }
+     * })
+     * 
+     */
+    create<T extends apiKeysCreateArgs>(args: SelectSubset<T, apiKeysCreateArgs<ExtArgs>>): Prisma__apiKeysClient<$Result.GetResult<Prisma.$apiKeysPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ApiKeys.
+     * @param {apiKeysCreateManyArgs} args - Arguments to create many ApiKeys.
+     * @example
+     * // Create many ApiKeys
+     * const apiKeys = await prisma.apiKeys.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends apiKeysCreateManyArgs>(args?: SelectSubset<T, apiKeysCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a ApiKeys.
+     * @param {apiKeysDeleteArgs} args - Arguments to delete one ApiKeys.
+     * @example
+     * // Delete one ApiKeys
+     * const ApiKeys = await prisma.apiKeys.delete({
+     *   where: {
+     *     // ... filter to delete one ApiKeys
+     *   }
+     * })
+     * 
+     */
+    delete<T extends apiKeysDeleteArgs>(args: SelectSubset<T, apiKeysDeleteArgs<ExtArgs>>): Prisma__apiKeysClient<$Result.GetResult<Prisma.$apiKeysPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ApiKeys.
+     * @param {apiKeysUpdateArgs} args - Arguments to update one ApiKeys.
+     * @example
+     * // Update one ApiKeys
+     * const apiKeys = await prisma.apiKeys.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends apiKeysUpdateArgs>(args: SelectSubset<T, apiKeysUpdateArgs<ExtArgs>>): Prisma__apiKeysClient<$Result.GetResult<Prisma.$apiKeysPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ApiKeys.
+     * @param {apiKeysDeleteManyArgs} args - Arguments to filter ApiKeys to delete.
+     * @example
+     * // Delete a few ApiKeys
+     * const { count } = await prisma.apiKeys.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends apiKeysDeleteManyArgs>(args?: SelectSubset<T, apiKeysDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ApiKeys.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {apiKeysUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ApiKeys
+     * const apiKeys = await prisma.apiKeys.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends apiKeysUpdateManyArgs>(args: SelectSubset<T, apiKeysUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ApiKeys.
+     * @param {apiKeysUpsertArgs} args - Arguments to update or create a ApiKeys.
+     * @example
+     * // Update or create a ApiKeys
+     * const apiKeys = await prisma.apiKeys.upsert({
+     *   create: {
+     *     // ... data to create a ApiKeys
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ApiKeys we want to update
+     *   }
+     * })
+     */
+    upsert<T extends apiKeysUpsertArgs>(args: SelectSubset<T, apiKeysUpsertArgs<ExtArgs>>): Prisma__apiKeysClient<$Result.GetResult<Prisma.$apiKeysPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ApiKeys.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {apiKeysCountArgs} args - Arguments to filter ApiKeys to count.
+     * @example
+     * // Count the number of ApiKeys
+     * const count = await prisma.apiKeys.count({
+     *   where: {
+     *     // ... the filter for the ApiKeys we want to count
+     *   }
+     * })
+    **/
+    count<T extends apiKeysCountArgs>(
+      args?: Subset<T, apiKeysCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ApiKeysCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ApiKeys.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ApiKeysAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ApiKeysAggregateArgs>(args: Subset<T, ApiKeysAggregateArgs>): Prisma.PrismaPromise<GetApiKeysAggregateType<T>>
+
+    /**
+     * Group by ApiKeys.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {apiKeysGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends apiKeysGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: apiKeysGroupByArgs['orderBy'] }
+        : { orderBy?: apiKeysGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, apiKeysGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetApiKeysGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the apiKeys model
+   */
+  readonly fields: apiKeysFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for apiKeys.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__apiKeysClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    createdBy<T extends userDefaultArgs<ExtArgs> = {}>(args?: Subset<T, userDefaultArgs<ExtArgs>>): Prisma__userClient<$Result.GetResult<Prisma.$userPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the apiKeys model
+   */
+  interface apiKeysFieldRefs {
+    readonly id: FieldRef<"apiKeys", 'String'>
+    readonly name: FieldRef<"apiKeys", 'String'>
+    readonly key: FieldRef<"apiKeys", 'String'>
+    readonly createdById: FieldRef<"apiKeys", 'Int'>
+    readonly lastUsedAt: FieldRef<"apiKeys", 'DateTime'>
+    readonly created_at: FieldRef<"apiKeys", 'DateTime'>
+    readonly updated_at: FieldRef<"apiKeys", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * apiKeys findUnique
+   */
+  export type apiKeysFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the apiKeys
+     */
+    select?: apiKeysSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the apiKeys
+     */
+    omit?: apiKeysOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: apiKeysInclude<ExtArgs> | null
+    /**
+     * Filter, which apiKeys to fetch.
+     */
+    where: apiKeysWhereUniqueInput
+  }
+
+  /**
+   * apiKeys findUniqueOrThrow
+   */
+  export type apiKeysFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the apiKeys
+     */
+    select?: apiKeysSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the apiKeys
+     */
+    omit?: apiKeysOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: apiKeysInclude<ExtArgs> | null
+    /**
+     * Filter, which apiKeys to fetch.
+     */
+    where: apiKeysWhereUniqueInput
+  }
+
+  /**
+   * apiKeys findFirst
+   */
+  export type apiKeysFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the apiKeys
+     */
+    select?: apiKeysSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the apiKeys
+     */
+    omit?: apiKeysOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: apiKeysInclude<ExtArgs> | null
+    /**
+     * Filter, which apiKeys to fetch.
+     */
+    where?: apiKeysWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of apiKeys to fetch.
+     */
+    orderBy?: apiKeysOrderByWithRelationInput | apiKeysOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for apiKeys.
+     */
+    cursor?: apiKeysWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` apiKeys from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` apiKeys.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of apiKeys.
+     */
+    distinct?: ApiKeysScalarFieldEnum | ApiKeysScalarFieldEnum[]
+  }
+
+  /**
+   * apiKeys findFirstOrThrow
+   */
+  export type apiKeysFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the apiKeys
+     */
+    select?: apiKeysSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the apiKeys
+     */
+    omit?: apiKeysOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: apiKeysInclude<ExtArgs> | null
+    /**
+     * Filter, which apiKeys to fetch.
+     */
+    where?: apiKeysWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of apiKeys to fetch.
+     */
+    orderBy?: apiKeysOrderByWithRelationInput | apiKeysOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for apiKeys.
+     */
+    cursor?: apiKeysWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` apiKeys from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` apiKeys.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of apiKeys.
+     */
+    distinct?: ApiKeysScalarFieldEnum | ApiKeysScalarFieldEnum[]
+  }
+
+  /**
+   * apiKeys findMany
+   */
+  export type apiKeysFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the apiKeys
+     */
+    select?: apiKeysSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the apiKeys
+     */
+    omit?: apiKeysOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: apiKeysInclude<ExtArgs> | null
+    /**
+     * Filter, which apiKeys to fetch.
+     */
+    where?: apiKeysWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of apiKeys to fetch.
+     */
+    orderBy?: apiKeysOrderByWithRelationInput | apiKeysOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing apiKeys.
+     */
+    cursor?: apiKeysWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` apiKeys from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` apiKeys.
+     */
+    skip?: number
+    distinct?: ApiKeysScalarFieldEnum | ApiKeysScalarFieldEnum[]
+  }
+
+  /**
+   * apiKeys create
+   */
+  export type apiKeysCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the apiKeys
+     */
+    select?: apiKeysSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the apiKeys
+     */
+    omit?: apiKeysOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: apiKeysInclude<ExtArgs> | null
+    /**
+     * The data needed to create a apiKeys.
+     */
+    data: XOR<apiKeysCreateInput, apiKeysUncheckedCreateInput>
+  }
+
+  /**
+   * apiKeys createMany
+   */
+  export type apiKeysCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many apiKeys.
+     */
+    data: apiKeysCreateManyInput | apiKeysCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * apiKeys update
+   */
+  export type apiKeysUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the apiKeys
+     */
+    select?: apiKeysSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the apiKeys
+     */
+    omit?: apiKeysOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: apiKeysInclude<ExtArgs> | null
+    /**
+     * The data needed to update a apiKeys.
+     */
+    data: XOR<apiKeysUpdateInput, apiKeysUncheckedUpdateInput>
+    /**
+     * Choose, which apiKeys to update.
+     */
+    where: apiKeysWhereUniqueInput
+  }
+
+  /**
+   * apiKeys updateMany
+   */
+  export type apiKeysUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update apiKeys.
+     */
+    data: XOR<apiKeysUpdateManyMutationInput, apiKeysUncheckedUpdateManyInput>
+    /**
+     * Filter which apiKeys to update
+     */
+    where?: apiKeysWhereInput
+    /**
+     * Limit how many apiKeys to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * apiKeys upsert
+   */
+  export type apiKeysUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the apiKeys
+     */
+    select?: apiKeysSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the apiKeys
+     */
+    omit?: apiKeysOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: apiKeysInclude<ExtArgs> | null
+    /**
+     * The filter to search for the apiKeys to update in case it exists.
+     */
+    where: apiKeysWhereUniqueInput
+    /**
+     * In case the apiKeys found by the `where` argument doesn't exist, create a new apiKeys with this data.
+     */
+    create: XOR<apiKeysCreateInput, apiKeysUncheckedCreateInput>
+    /**
+     * In case the apiKeys was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<apiKeysUpdateInput, apiKeysUncheckedUpdateInput>
+  }
+
+  /**
+   * apiKeys delete
+   */
+  export type apiKeysDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the apiKeys
+     */
+    select?: apiKeysSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the apiKeys
+     */
+    omit?: apiKeysOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: apiKeysInclude<ExtArgs> | null
+    /**
+     * Filter which apiKeys to delete.
+     */
+    where: apiKeysWhereUniqueInput
+  }
+
+  /**
+   * apiKeys deleteMany
+   */
+  export type apiKeysDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which apiKeys to delete
+     */
+    where?: apiKeysWhereInput
+    /**
+     * Limit how many apiKeys to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * apiKeys without action
+   */
+  export type apiKeysDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the apiKeys
+     */
+    select?: apiKeysSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the apiKeys
+     */
+    omit?: apiKeysOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: apiKeysInclude<ExtArgs> | null
   }
 
 
@@ -6344,6 +7449,19 @@ export namespace Prisma {
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+  export const ApiKeysScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    key: 'key',
+    createdById: 'createdById',
+    lastUsedAt: 'lastUsedAt',
+    created_at: 'created_at',
+    updated_at: 'updated_at'
+  };
+
+  export type ApiKeysScalarFieldEnum = (typeof ApiKeysScalarFieldEnum)[keyof typeof ApiKeysScalarFieldEnum]
+
+
   export const AppConfigScalarFieldEnum: {
     id: 'id',
     key: 'key',
@@ -6427,6 +7545,15 @@ export namespace Prisma {
   };
 
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  export const apiKeysOrderByRelevanceFieldEnum: {
+    id: 'id',
+    name: 'name',
+    key: 'key'
+  };
+
+  export type apiKeysOrderByRelevanceFieldEnum = (typeof apiKeysOrderByRelevanceFieldEnum)[keyof typeof apiKeysOrderByRelevanceFieldEnum]
 
 
   export const appConfigOrderByRelevanceFieldEnum: {
@@ -6548,6 +7675,7 @@ export namespace Prisma {
     username?: StringFilter<"user"> | string
     password?: StringFilter<"user"> | string
     configChanges?: AppConfigAuditListRelationFilter
+    apiKeys?: ApiKeysListRelationFilter
   }
 
   export type userOrderByWithRelationInput = {
@@ -6558,6 +7686,7 @@ export namespace Prisma {
     username?: SortOrder
     password?: SortOrder
     configChanges?: appConfigAuditOrderByRelationAggregateInput
+    apiKeys?: apiKeysOrderByRelationAggregateInput
     _relevance?: userOrderByRelevanceInput
   }
 
@@ -6572,6 +7701,7 @@ export namespace Prisma {
     username?: StringFilter<"user"> | string
     password?: StringFilter<"user"> | string
     configChanges?: AppConfigAuditListRelationFilter
+    apiKeys?: ApiKeysListRelationFilter
   }, "id" | "id" | "email">
 
   export type userOrderByWithAggregationInput = {
@@ -6598,6 +7728,75 @@ export namespace Prisma {
     updated_at?: DateTimeWithAggregatesFilter<"user"> | Date | string
     username?: StringWithAggregatesFilter<"user"> | string
     password?: StringWithAggregatesFilter<"user"> | string
+  }
+
+  export type apiKeysWhereInput = {
+    AND?: apiKeysWhereInput | apiKeysWhereInput[]
+    OR?: apiKeysWhereInput[]
+    NOT?: apiKeysWhereInput | apiKeysWhereInput[]
+    id?: StringFilter<"apiKeys"> | string
+    name?: StringFilter<"apiKeys"> | string
+    key?: StringFilter<"apiKeys"> | string
+    createdById?: IntFilter<"apiKeys"> | number
+    lastUsedAt?: DateTimeNullableFilter<"apiKeys"> | Date | string | null
+    created_at?: DateTimeFilter<"apiKeys"> | Date | string
+    updated_at?: DateTimeFilter<"apiKeys"> | Date | string
+    createdBy?: XOR<UserScalarRelationFilter, userWhereInput>
+  }
+
+  export type apiKeysOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    key?: SortOrder
+    createdById?: SortOrder
+    lastUsedAt?: SortOrderInput | SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+    createdBy?: userOrderByWithRelationInput
+    _relevance?: apiKeysOrderByRelevanceInput
+  }
+
+  export type apiKeysWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    key?: string
+    createdById_name?: apiKeysCreatedByIdNameCompoundUniqueInput
+    AND?: apiKeysWhereInput | apiKeysWhereInput[]
+    OR?: apiKeysWhereInput[]
+    NOT?: apiKeysWhereInput | apiKeysWhereInput[]
+    name?: StringFilter<"apiKeys"> | string
+    createdById?: IntFilter<"apiKeys"> | number
+    lastUsedAt?: DateTimeNullableFilter<"apiKeys"> | Date | string | null
+    created_at?: DateTimeFilter<"apiKeys"> | Date | string
+    updated_at?: DateTimeFilter<"apiKeys"> | Date | string
+    createdBy?: XOR<UserScalarRelationFilter, userWhereInput>
+  }, "id" | "id" | "key" | "createdById_name">
+
+  export type apiKeysOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    key?: SortOrder
+    createdById?: SortOrder
+    lastUsedAt?: SortOrderInput | SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+    _count?: apiKeysCountOrderByAggregateInput
+    _avg?: apiKeysAvgOrderByAggregateInput
+    _max?: apiKeysMaxOrderByAggregateInput
+    _min?: apiKeysMinOrderByAggregateInput
+    _sum?: apiKeysSumOrderByAggregateInput
+  }
+
+  export type apiKeysScalarWhereWithAggregatesInput = {
+    AND?: apiKeysScalarWhereWithAggregatesInput | apiKeysScalarWhereWithAggregatesInput[]
+    OR?: apiKeysScalarWhereWithAggregatesInput[]
+    NOT?: apiKeysScalarWhereWithAggregatesInput | apiKeysScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"apiKeys"> | string
+    name?: StringWithAggregatesFilter<"apiKeys"> | string
+    key?: StringWithAggregatesFilter<"apiKeys"> | string
+    createdById?: IntWithAggregatesFilter<"apiKeys"> | number
+    lastUsedAt?: DateTimeNullableWithAggregatesFilter<"apiKeys"> | Date | string | null
+    created_at?: DateTimeWithAggregatesFilter<"apiKeys"> | Date | string
+    updated_at?: DateTimeWithAggregatesFilter<"apiKeys"> | Date | string
   }
 
   export type appConfigWhereInput = {
@@ -6882,6 +8081,7 @@ export namespace Prisma {
     username: string
     password: string
     configChanges?: appConfigAuditCreateNestedManyWithoutChangedByInput
+    apiKeys?: apiKeysCreateNestedManyWithoutCreatedByInput
   }
 
   export type userUncheckedCreateInput = {
@@ -6892,6 +8092,7 @@ export namespace Prisma {
     username: string
     password: string
     configChanges?: appConfigAuditUncheckedCreateNestedManyWithoutChangedByInput
+    apiKeys?: apiKeysUncheckedCreateNestedManyWithoutCreatedByInput
   }
 
   export type userUpdateInput = {
@@ -6901,6 +8102,7 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     configChanges?: appConfigAuditUpdateManyWithoutChangedByNestedInput
+    apiKeys?: apiKeysUpdateManyWithoutCreatedByNestedInput
   }
 
   export type userUncheckedUpdateInput = {
@@ -6911,6 +8113,7 @@ export namespace Prisma {
     username?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     configChanges?: appConfigAuditUncheckedUpdateManyWithoutChangedByNestedInput
+    apiKeys?: apiKeysUncheckedUpdateManyWithoutCreatedByNestedInput
   }
 
   export type userCreateManyInput = {
@@ -6937,6 +8140,75 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     username?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type apiKeysCreateInput = {
+    id?: string
+    name: string
+    key: string
+    lastUsedAt?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    createdBy: userCreateNestedOneWithoutApiKeysInput
+  }
+
+  export type apiKeysUncheckedCreateInput = {
+    id?: string
+    name: string
+    key: string
+    createdById: number
+    lastUsedAt?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type apiKeysUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdBy?: userUpdateOneRequiredWithoutApiKeysNestedInput
+  }
+
+  export type apiKeysUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    createdById?: IntFieldUpdateOperationsInput | number
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type apiKeysCreateManyInput = {
+    id?: string
+    name: string
+    key: string
+    createdById: number
+    lastUsedAt?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type apiKeysUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type apiKeysUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    createdById?: IntFieldUpdateOperationsInput | number
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type appConfigCreateInput = {
@@ -7255,7 +8527,17 @@ export namespace Prisma {
     none?: appConfigAuditWhereInput
   }
 
+  export type ApiKeysListRelationFilter = {
+    every?: apiKeysWhereInput
+    some?: apiKeysWhereInput
+    none?: apiKeysWhereInput
+  }
+
   export type appConfigAuditOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type apiKeysOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -7348,6 +8630,90 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type UserScalarRelationFilter = {
+    is?: userWhereInput
+    isNot?: userWhereInput
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
+  export type apiKeysOrderByRelevanceInput = {
+    fields: apiKeysOrderByRelevanceFieldEnum | apiKeysOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type apiKeysCreatedByIdNameCompoundUniqueInput = {
+    createdById: number
+    name: string
+  }
+
+  export type apiKeysCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    key?: SortOrder
+    createdById?: SortOrder
+    lastUsedAt?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type apiKeysAvgOrderByAggregateInput = {
+    createdById?: SortOrder
+  }
+
+  export type apiKeysMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    key?: SortOrder
+    createdById?: SortOrder
+    lastUsedAt?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type apiKeysMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    key?: SortOrder
+    createdById?: SortOrder
+    lastUsedAt?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type apiKeysSumOrderByAggregateInput = {
+    createdById?: SortOrder
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type StringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | null
@@ -7366,11 +8732,6 @@ export namespace Prisma {
   export type BoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
   }
 
   export type appConfigOrderByRelevanceInput = {
@@ -7454,11 +8815,6 @@ export namespace Prisma {
   export type AppConfigNullableScalarRelationFilter = {
     is?: appConfigWhereInput | null
     isNot?: appConfigWhereInput | null
-  }
-
-  export type UserScalarRelationFilter = {
-    is?: userWhereInput
-    isNot?: userWhereInput
   }
 
   export type appConfigAuditOrderByRelevanceInput = {
@@ -7687,11 +9043,25 @@ export namespace Prisma {
     connect?: appConfigAuditWhereUniqueInput | appConfigAuditWhereUniqueInput[]
   }
 
+  export type apiKeysCreateNestedManyWithoutCreatedByInput = {
+    create?: XOR<apiKeysCreateWithoutCreatedByInput, apiKeysUncheckedCreateWithoutCreatedByInput> | apiKeysCreateWithoutCreatedByInput[] | apiKeysUncheckedCreateWithoutCreatedByInput[]
+    connectOrCreate?: apiKeysCreateOrConnectWithoutCreatedByInput | apiKeysCreateOrConnectWithoutCreatedByInput[]
+    createMany?: apiKeysCreateManyCreatedByInputEnvelope
+    connect?: apiKeysWhereUniqueInput | apiKeysWhereUniqueInput[]
+  }
+
   export type appConfigAuditUncheckedCreateNestedManyWithoutChangedByInput = {
     create?: XOR<appConfigAuditCreateWithoutChangedByInput, appConfigAuditUncheckedCreateWithoutChangedByInput> | appConfigAuditCreateWithoutChangedByInput[] | appConfigAuditUncheckedCreateWithoutChangedByInput[]
     connectOrCreate?: appConfigAuditCreateOrConnectWithoutChangedByInput | appConfigAuditCreateOrConnectWithoutChangedByInput[]
     createMany?: appConfigAuditCreateManyChangedByInputEnvelope
     connect?: appConfigAuditWhereUniqueInput | appConfigAuditWhereUniqueInput[]
+  }
+
+  export type apiKeysUncheckedCreateNestedManyWithoutCreatedByInput = {
+    create?: XOR<apiKeysCreateWithoutCreatedByInput, apiKeysUncheckedCreateWithoutCreatedByInput> | apiKeysCreateWithoutCreatedByInput[] | apiKeysUncheckedCreateWithoutCreatedByInput[]
+    connectOrCreate?: apiKeysCreateOrConnectWithoutCreatedByInput | apiKeysCreateOrConnectWithoutCreatedByInput[]
+    createMany?: apiKeysCreateManyCreatedByInputEnvelope
+    connect?: apiKeysWhereUniqueInput | apiKeysWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -7716,6 +9086,20 @@ export namespace Prisma {
     deleteMany?: appConfigAuditScalarWhereInput | appConfigAuditScalarWhereInput[]
   }
 
+  export type apiKeysUpdateManyWithoutCreatedByNestedInput = {
+    create?: XOR<apiKeysCreateWithoutCreatedByInput, apiKeysUncheckedCreateWithoutCreatedByInput> | apiKeysCreateWithoutCreatedByInput[] | apiKeysUncheckedCreateWithoutCreatedByInput[]
+    connectOrCreate?: apiKeysCreateOrConnectWithoutCreatedByInput | apiKeysCreateOrConnectWithoutCreatedByInput[]
+    upsert?: apiKeysUpsertWithWhereUniqueWithoutCreatedByInput | apiKeysUpsertWithWhereUniqueWithoutCreatedByInput[]
+    createMany?: apiKeysCreateManyCreatedByInputEnvelope
+    set?: apiKeysWhereUniqueInput | apiKeysWhereUniqueInput[]
+    disconnect?: apiKeysWhereUniqueInput | apiKeysWhereUniqueInput[]
+    delete?: apiKeysWhereUniqueInput | apiKeysWhereUniqueInput[]
+    connect?: apiKeysWhereUniqueInput | apiKeysWhereUniqueInput[]
+    update?: apiKeysUpdateWithWhereUniqueWithoutCreatedByInput | apiKeysUpdateWithWhereUniqueWithoutCreatedByInput[]
+    updateMany?: apiKeysUpdateManyWithWhereWithoutCreatedByInput | apiKeysUpdateManyWithWhereWithoutCreatedByInput[]
+    deleteMany?: apiKeysScalarWhereInput | apiKeysScalarWhereInput[]
+  }
+
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -7736,6 +9120,38 @@ export namespace Prisma {
     update?: appConfigAuditUpdateWithWhereUniqueWithoutChangedByInput | appConfigAuditUpdateWithWhereUniqueWithoutChangedByInput[]
     updateMany?: appConfigAuditUpdateManyWithWhereWithoutChangedByInput | appConfigAuditUpdateManyWithWhereWithoutChangedByInput[]
     deleteMany?: appConfigAuditScalarWhereInput | appConfigAuditScalarWhereInput[]
+  }
+
+  export type apiKeysUncheckedUpdateManyWithoutCreatedByNestedInput = {
+    create?: XOR<apiKeysCreateWithoutCreatedByInput, apiKeysUncheckedCreateWithoutCreatedByInput> | apiKeysCreateWithoutCreatedByInput[] | apiKeysUncheckedCreateWithoutCreatedByInput[]
+    connectOrCreate?: apiKeysCreateOrConnectWithoutCreatedByInput | apiKeysCreateOrConnectWithoutCreatedByInput[]
+    upsert?: apiKeysUpsertWithWhereUniqueWithoutCreatedByInput | apiKeysUpsertWithWhereUniqueWithoutCreatedByInput[]
+    createMany?: apiKeysCreateManyCreatedByInputEnvelope
+    set?: apiKeysWhereUniqueInput | apiKeysWhereUniqueInput[]
+    disconnect?: apiKeysWhereUniqueInput | apiKeysWhereUniqueInput[]
+    delete?: apiKeysWhereUniqueInput | apiKeysWhereUniqueInput[]
+    connect?: apiKeysWhereUniqueInput | apiKeysWhereUniqueInput[]
+    update?: apiKeysUpdateWithWhereUniqueWithoutCreatedByInput | apiKeysUpdateWithWhereUniqueWithoutCreatedByInput[]
+    updateMany?: apiKeysUpdateManyWithWhereWithoutCreatedByInput | apiKeysUpdateManyWithWhereWithoutCreatedByInput[]
+    deleteMany?: apiKeysScalarWhereInput | apiKeysScalarWhereInput[]
+  }
+
+  export type userCreateNestedOneWithoutApiKeysInput = {
+    create?: XOR<userCreateWithoutApiKeysInput, userUncheckedCreateWithoutApiKeysInput>
+    connectOrCreate?: userCreateOrConnectWithoutApiKeysInput
+    connect?: userWhereUniqueInput
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
+  export type userUpdateOneRequiredWithoutApiKeysNestedInput = {
+    create?: XOR<userCreateWithoutApiKeysInput, userUncheckedCreateWithoutApiKeysInput>
+    connectOrCreate?: userCreateOrConnectWithoutApiKeysInput
+    upsert?: userUpsertWithoutApiKeysInput
+    connect?: userWhereUniqueInput
+    update?: XOR<XOR<userUpdateToOneWithWhereWithoutApiKeysInput, userUpdateWithoutApiKeysInput>, userUncheckedUpdateWithoutApiKeysInput>
   }
 
   export type appConfigAuditCreateNestedManyWithoutConfigInput = {
@@ -7980,6 +9396,42 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedStringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | null
@@ -8016,17 +9468,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
@@ -8114,6 +9555,34 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type apiKeysCreateWithoutCreatedByInput = {
+    id?: string
+    name: string
+    key: string
+    lastUsedAt?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type apiKeysUncheckedCreateWithoutCreatedByInput = {
+    id?: string
+    name: string
+    key: string
+    lastUsedAt?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type apiKeysCreateOrConnectWithoutCreatedByInput = {
+    where: apiKeysWhereUniqueInput
+    create: XOR<apiKeysCreateWithoutCreatedByInput, apiKeysUncheckedCreateWithoutCreatedByInput>
+  }
+
+  export type apiKeysCreateManyCreatedByInputEnvelope = {
+    data: apiKeysCreateManyCreatedByInput | apiKeysCreateManyCreatedByInput[]
+    skipDuplicates?: boolean
+  }
+
   export type appConfigAuditUpsertWithWhereUniqueWithoutChangedByInput = {
     where: appConfigAuditWhereUniqueInput
     update: XOR<appConfigAuditUpdateWithoutChangedByInput, appConfigAuditUncheckedUpdateWithoutChangedByInput>
@@ -8141,6 +9610,89 @@ export namespace Prisma {
     changedUserId?: IntFilter<"appConfigAudit"> | number
     created_at?: DateTimeFilter<"appConfigAudit"> | Date | string
     updated_at?: DateTimeFilter<"appConfigAudit"> | Date | string
+  }
+
+  export type apiKeysUpsertWithWhereUniqueWithoutCreatedByInput = {
+    where: apiKeysWhereUniqueInput
+    update: XOR<apiKeysUpdateWithoutCreatedByInput, apiKeysUncheckedUpdateWithoutCreatedByInput>
+    create: XOR<apiKeysCreateWithoutCreatedByInput, apiKeysUncheckedCreateWithoutCreatedByInput>
+  }
+
+  export type apiKeysUpdateWithWhereUniqueWithoutCreatedByInput = {
+    where: apiKeysWhereUniqueInput
+    data: XOR<apiKeysUpdateWithoutCreatedByInput, apiKeysUncheckedUpdateWithoutCreatedByInput>
+  }
+
+  export type apiKeysUpdateManyWithWhereWithoutCreatedByInput = {
+    where: apiKeysScalarWhereInput
+    data: XOR<apiKeysUpdateManyMutationInput, apiKeysUncheckedUpdateManyWithoutCreatedByInput>
+  }
+
+  export type apiKeysScalarWhereInput = {
+    AND?: apiKeysScalarWhereInput | apiKeysScalarWhereInput[]
+    OR?: apiKeysScalarWhereInput[]
+    NOT?: apiKeysScalarWhereInput | apiKeysScalarWhereInput[]
+    id?: StringFilter<"apiKeys"> | string
+    name?: StringFilter<"apiKeys"> | string
+    key?: StringFilter<"apiKeys"> | string
+    createdById?: IntFilter<"apiKeys"> | number
+    lastUsedAt?: DateTimeNullableFilter<"apiKeys"> | Date | string | null
+    created_at?: DateTimeFilter<"apiKeys"> | Date | string
+    updated_at?: DateTimeFilter<"apiKeys"> | Date | string
+  }
+
+  export type userCreateWithoutApiKeysInput = {
+    email: string
+    created_at?: Date | string
+    updated_at?: Date | string
+    username: string
+    password: string
+    configChanges?: appConfigAuditCreateNestedManyWithoutChangedByInput
+  }
+
+  export type userUncheckedCreateWithoutApiKeysInput = {
+    id?: number
+    email: string
+    created_at?: Date | string
+    updated_at?: Date | string
+    username: string
+    password: string
+    configChanges?: appConfigAuditUncheckedCreateNestedManyWithoutChangedByInput
+  }
+
+  export type userCreateOrConnectWithoutApiKeysInput = {
+    where: userWhereUniqueInput
+    create: XOR<userCreateWithoutApiKeysInput, userUncheckedCreateWithoutApiKeysInput>
+  }
+
+  export type userUpsertWithoutApiKeysInput = {
+    update: XOR<userUpdateWithoutApiKeysInput, userUncheckedUpdateWithoutApiKeysInput>
+    create: XOR<userCreateWithoutApiKeysInput, userUncheckedCreateWithoutApiKeysInput>
+    where?: userWhereInput
+  }
+
+  export type userUpdateToOneWithWhereWithoutApiKeysInput = {
+    where?: userWhereInput
+    data: XOR<userUpdateWithoutApiKeysInput, userUncheckedUpdateWithoutApiKeysInput>
+  }
+
+  export type userUpdateWithoutApiKeysInput = {
+    email?: StringFieldUpdateOperationsInput | string
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    username?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    configChanges?: appConfigAuditUpdateManyWithoutChangedByNestedInput
+  }
+
+  export type userUncheckedUpdateWithoutApiKeysInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    email?: StringFieldUpdateOperationsInput | string
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    username?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    configChanges?: appConfigAuditUncheckedUpdateManyWithoutChangedByNestedInput
   }
 
   export type appConfigAuditCreateWithoutConfigInput = {
@@ -8214,6 +9766,7 @@ export namespace Prisma {
     updated_at?: Date | string
     username: string
     password: string
+    apiKeys?: apiKeysCreateNestedManyWithoutCreatedByInput
   }
 
   export type userUncheckedCreateWithoutConfigChangesInput = {
@@ -8223,6 +9776,7 @@ export namespace Prisma {
     updated_at?: Date | string
     username: string
     password: string
+    apiKeys?: apiKeysUncheckedCreateNestedManyWithoutCreatedByInput
   }
 
   export type userCreateOrConnectWithoutConfigChangesInput = {
@@ -8275,6 +9829,7 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     username?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
+    apiKeys?: apiKeysUpdateManyWithoutCreatedByNestedInput
   }
 
   export type userUncheckedUpdateWithoutConfigChangesInput = {
@@ -8284,6 +9839,7 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     username?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
+    apiKeys?: apiKeysUncheckedUpdateManyWithoutCreatedByNestedInput
   }
 
   export type notificationCreateWithoutServiceInput = {
@@ -8408,6 +9964,15 @@ export namespace Prisma {
     updated_at?: Date | string
   }
 
+  export type apiKeysCreateManyCreatedByInput = {
+    id?: string
+    name: string
+    key: string
+    lastUsedAt?: Date | string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
   export type appConfigAuditUpdateWithoutChangedByInput = {
     oldValue?: NullableStringFieldUpdateOperationsInput | string | null
     newValue?: NullableStringFieldUpdateOperationsInput | string | null
@@ -8430,6 +9995,33 @@ export namespace Prisma {
     configId?: NullableIntFieldUpdateOperationsInput | number | null
     oldValue?: NullableStringFieldUpdateOperationsInput | string | null
     newValue?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type apiKeysUpdateWithoutCreatedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type apiKeysUncheckedUpdateWithoutCreatedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type apiKeysUncheckedUpdateManyWithoutCreatedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
