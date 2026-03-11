@@ -6,6 +6,7 @@ import { getNotificationService } from "@repositories/notificationServices";
 import { saveNewFile } from "@repositories/outputFiles";
 import { TypedFilter } from "@typesDef/api/jobs";
 import { JobDTO, JobLogDTO } from "@typesDef/models/job";
+import { Notifications } from "@typesDef/notifications";
 import dayjs from "@utils/dayJs";
 import logger from "@utils/loggers";
 import cronParser from "cron-parser";
@@ -237,15 +238,19 @@ export const injectNotificationServices = async (
             name: service.name,
             service: targetService,
           };
+        } else {
+          logger(`Service with id : ${serviceId} not found`);
         }
       }),
     );
     return initiatedServices.reduce(
       (p, c: any) => {
-        p[c.name] = c.service;
+        if (c) {
+          p[c.name] = c.service;
+        }
         return p;
       },
-      {} as { [key: string]: any },
+      {} as { [key: string]: Notifications },
     );
   } catch (err: any) {
     logger("error initiating notification services");

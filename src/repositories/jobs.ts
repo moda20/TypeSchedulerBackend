@@ -211,17 +211,22 @@ export const updateJobConfig = async (
 ) => {
   const { job } = await ScheduleJobManager.getJobById(Number(id));
   if (job) {
-    const cronSettingChanged = newConfig?.cronSetting !== job?.getCronSetting();
+    const cronSettingChanged =
+      newConfig?.cronSetting &&
+      newConfig?.cronSetting !== job?.getCronSetting();
     job.setCronSetting(newConfig?.cronSetting ?? job?.getCronSetting());
     job.setName(newConfig?.name ?? job?.getName());
     job.setParam(newConfig?.param ?? job?.getParam());
     job.setConsumer(newConfig?.consumer ?? job?.getConsumer());
-    return await ScheduleJobManager.updateJob(Number(id), job).then(() => {
-      if (cronSettingChanged) {
-        refreshJobRegistration(Number(id));
-      }
-      return { success: true };
-    });
+    return await ScheduleJobManager.updateJob(Number(id), job)
+      .then((updateResult) => {
+        if (cronSettingChanged) {
+          return refreshJobRegistration(Number(id)).then(() => updateResult);
+        } else {
+          return updateResult;
+        }
+      })
+      .then((results) => results);
   }
 };
 

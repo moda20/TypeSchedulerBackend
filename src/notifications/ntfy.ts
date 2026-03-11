@@ -85,6 +85,7 @@ export default class NtfyService implements DefaultNotificationService {
       "X-Title": title,
       ...extraHeaders,
     };
+    NtfyHttpService.defaults.baseURL = this.config?.url;
     return NtfyHttpService.post(`/${this.config?.topic}`, message, {
       headers: headers,
     }) as Promise<any>;

@@ -2,16 +2,27 @@ import config from "@config/config";
 import { updateConfig } from "@config/config.service";
 import { basePrisma, prisma } from "@initialization/index";
 import { PrismaClient } from "@prisma/client";
-import { getAllJobs } from "@repositories/jobs";
+import { getAllJobs, isJobRunning, updateJobConfig } from "@repositories/jobs";
+import { jobUpdateConfig } from "@typesDef/models/job";
 import { NewNotificationService } from "@typesDef/models/notificationService";
-import { extractedServiceConfiguration } from "@typesDef/notifications";
+import {
+  extractedServiceConfiguration,
+  JobEventNotificationConfigAPISchemaType,
+} from "@typesDef/notifications";
 import { APIError } from "@utils/ErrorHandler";
-import { deletePublicImage, resolveFilePath } from "@utils/fileUtils";
+import {
+  deletePublicImage,
+  resolveFilePath,
+  savePublicImage,
+} from "@utils/fileUtils";
 import { findFiles } from "@utils/jobUtils";
 import logger from "@utils/loggers";
 import { parseJsDoc } from "@utils/typeUtils";
-import { join } from "path";
+import { join, parse } from "path";
+import safe from "safe-regex";
+import { ScheduleJobManager } from "schedule-manager";
 import ts from "typescript";
+import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
 export const REPO_NAME = "Notification services";
@@ -19,41 +30,38 @@ export const getAllNotificationServices = async ({
   limit,
   offset,
   searchQuery,
+  inputIds,
 }: {
   limit?: number;
   offset?: number;
   searchQuery?: string;
+  inputIds?: number[];
 }) => {
+  const searchConfig: any = {};
+
+  if (searchQuery) {
+    searchConfig.OR = [
+      {
+        name: { contains: searchQuery },
+      },
+      {
+        description: { contains: searchQuery },
+      },
+    ];
+  }
+  if (inputIds) {
+    searchConfig.id = {
+      in: inputIds,
+    };
+  }
   const [data, count] = await Promise.all([
     basePrisma.notificationServices.findMany({
       take: limit,
       skip: offset,
-      where: {
-        ...(searchQuery && {
-          OR: [
-            {
-              name: { contains: searchQuery },
-            },
-            {
-              description: { contains: searchQuery },
-            },
-          ],
-        }),
-      },
+      where: searchConfig,
     }),
     basePrisma.notificationServices.count({
-      where: {
-        ...(searchQuery && {
-          OR: [
-            {
-              name: { contains: searchQuery },
-            },
-            {
-              description: { contains: searchQuery },
-            },
-          ],
-        }),
-      },
+      where: searchConfig,
     }),
   ]);
   return {
@@ -98,6 +106,17 @@ export const updateNotificationService = async ({
   });
 };
 
+export const verifyIfNotificationServiceCanBeDeleted = async (id: number) => {
+  const targetService = await getNotificationService(Number(id));
+  if (!targetService) throw new APIError("Service not found", REPO_NAME);
+  const defaultService = config.get("notifications.defaultService");
+  if (targetService.name === defaultService)
+    throw new APIError(
+      "Cannot delete default service. Change the default service via the config API",
+      REPO_NAME,
+    );
+  return true;
+};
 export const deleteNotificationService = async (id: number) => {
   const targetService = await getNotificationService(Number(id));
   if (targetService?.image) {
@@ -173,6 +192,15 @@ export const attachAServiceToJob = async (
 
 export const detachServiceFromAllJobs = async (serviceId: number) => {
   const allJobs = await getAllJobsForAService(serviceId);
+  const runningJobs = await Promise.all(
+    allJobs.map(async (j) => await isJobRunning(j.id!)),
+  );
+  if (runningJobs.some((e) => e)) {
+    throw new APIError(
+      "Cannot detach service while some attached jobs are running",
+      REPO_NAME,
+    );
+  }
   return await Promise.all(
     allJobs.map((job) => {
       const parsedParams = JSON.parse(job.param || "{}");
@@ -363,4 +391,152 @@ export const validateInputConfigAgainstSchema = (
   }
 
   return validationResult;
+};
+
+export const cloneNotificationService = async (
+  serviceId: number,
+  name: string,
+  userId: number,
+) => {
+  const existingService = await getNotificationService(serviceId);
+  if (!existingService) {
+    throw new APIError(`Service ${serviceId} not found`, REPO_NAME);
+  }
+  const safeName = name.replace(/\s/g, "_");
+  return basePrisma.$transaction(async (tx) => {
+    let newImagePath = existingService.image || undefined;
+
+    if (existingService.image) {
+      const existingImage = Bun.file(
+        resolveFilePath(join("..", existingService.image)),
+      );
+      newImagePath = await savePublicImage({
+        filename: `${safeName}_${parse(existingService.image).base}`,
+        data: await existingImage.arrayBuffer(),
+        unique: true,
+      });
+    }
+
+    return addNotificationService(
+      {
+        name: safeName,
+        description: existingService.description,
+        entryPoint: existingService.entryPoint,
+        image: newImagePath,
+      },
+      tx,
+    ).then((newService) => {
+      return InitializeServiceConfig(
+        safeName,
+        existingService.entryPoint,
+        Number(userId),
+      ).then(() => newService);
+    });
+  });
+};
+
+export const addOrUpdateJobEventHandler = async ({
+  jobId,
+  handler,
+}: {
+  handler: JobEventNotificationConfigAPISchemaType;
+  jobId: number;
+}) => {
+  const { job } = await ScheduleJobManager.getJobById(jobId);
+  if (!job) {
+    throw new APIError("Job not found", REPO_NAME);
+  }
+  const service = await getNotificationService(handler.notification_service_id);
+  if (!service) {
+    throw new APIError("Service not found", REPO_NAME);
+  }
+  if (handler.regex) {
+    if (!safe(handler.regex)) {
+      throw new APIError("Provided RegEx is not valid or not safe", REPO_NAME);
+    }
+  }
+  const jobParams = JSON.parse(job.param || "{}");
+  if (typeof jobParams !== "object") {
+    throw new APIError(
+      "Job param is not an object, update the params first to be an object in order to save event handlers",
+      REPO_NAME,
+    );
+  }
+  if (handler.config_id) {
+    const existingService = jobParams.eventHandlers?.findIndex(
+      (e: any) => String(e.config_id) === String(handler.config_id),
+    );
+    if (existingService === undefined || existingService === -1) {
+      throw new APIError("Event handler not found", REPO_NAME);
+    } else {
+      jobParams.eventHandlers[existingService] = handler;
+    }
+  } else {
+    handler.config_id = uuidv4();
+    if (jobParams.eventHandlers) {
+      jobParams.eventHandlers.push(handler);
+    } else {
+      jobParams.eventHandlers = [handler];
+    }
+  }
+
+  return updateJobConfig(String(job.id), {
+    param: JSON.stringify(jobParams),
+  } as jobUpdateConfig)
+    .then((jobUpdated) => {
+      if (!jobUpdated || !jobUpdated.success) {
+        logger.error(jobUpdated);
+        throw jobUpdated?.err;
+      }
+    })
+    .catch((err) => {
+      logger.error(`Job event handler update failed for job ${job.id}`);
+      logger.error(err);
+      throw new APIError(
+        "Job event handler update failed, check logs for more info",
+        REPO_NAME,
+      );
+    });
+};
+
+export const deleteJobEventHandler = async ({
+  jobId,
+  configId,
+}: {
+  jobId: number;
+  configId: string;
+}) => {
+  const { job } = await ScheduleJobManager.getJobById(jobId);
+  if (!job) {
+    throw new APIError("Job not found", REPO_NAME);
+  }
+  const jobParams = JSON.parse(job.param || "{}");
+  const targetHandler = jobParams.eventHandlers?.findIndex(
+    (e: any) => e.config_id === configId,
+  );
+
+  if (targetHandler === undefined || targetHandler === -1) {
+    throw new APIError("Event handler not found", REPO_NAME);
+  }
+
+  // deletion is just removing from the array
+  jobParams.eventHandlers.splice(targetHandler, 1);
+
+  return updateJobConfig(String(job.id), {
+    param: JSON.stringify(jobParams),
+  } as jobUpdateConfig)
+    .then((jobUpdated) => {
+      if (!jobUpdated || !jobUpdated.success) {
+        logger.error(jobUpdated);
+        throw jobUpdated?.err;
+      }
+    })
+    .catch((err) => {
+      logger.error(`Job event handler update failed for job ${job.id}`);
+      logger.error(err);
+      throw new APIError(
+        "Job event handler update failed, check logs for more info",
+        REPO_NAME,
+      );
+    });
 };

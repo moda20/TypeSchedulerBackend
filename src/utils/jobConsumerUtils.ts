@@ -4,9 +4,13 @@ import GotifyService from "@notifications/gotify";
 import NtfyService from "@notifications/ntfy";
 import SlackNotification from "@notifications/slack";
 import { addEventLog } from "@repositories/events";
+import { handleEvent } from "@repositories/notification";
 import { LogEventNames } from "@typesDef/api/jobs";
 import { JobEventTypes } from "@typesDef/models/job";
-import { DefaultNotificationService } from "@typesDef/notifications";
+import {
+  DefaultNotificationService,
+  JobEventHandlerConfig,
+} from "@typesDef/notifications";
 import {
   exportCacheFiles,
   exportResultsToFile,
@@ -21,6 +25,7 @@ export const emitJobEvent = async (
   type: JobEventTypes,
   jobLogId: string,
   jobId: number,
+  extraHandlers: JobEventHandlerConfig[] = [],
 ) => {
   const eventLogger = eventLog("JobEvents");
   await addEventLog({
@@ -69,6 +74,11 @@ export const emitJobEvent = async (
       eventName: "STATUS_VIA_SOCKET_FAILED",
     });
   });
+  if (extraHandlers?.length) {
+    extraHandlers.forEach((evh) => {
+      handleEvent(evh, message);
+    });
+  }
 };
 
 export function getDefaultNotificationService(): new () => DefaultNotificationService {
