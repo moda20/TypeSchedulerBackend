@@ -7,6 +7,7 @@ import {
 import dayJs from "@utils/dayJs";
 import { injectNotificationServices } from "@utils/jobUtils";
 import logger from "@utils/loggers";
+import safe from "safe-regex";
 
 export const addNotifications = async (
   notificationData: NotificationInput | NotificationInput[],
@@ -64,7 +65,7 @@ export const handleEvent = async (
             : "";
       const title = `${messageTag} Duration Delta ${handlerConfig.job.name} job event`;
       const message = `${messageTag} Duration delta ${handlerConfig.job.name} job event
-      - Duration : ${dayJs.duration(3665, "seconds").humanize()}
+      - Duration : ${dayJs.duration(finalDuration, "seconds").humanize()}
       `;
       return handleEventNotification(handlerConfig, message, title);
     }
@@ -85,7 +86,10 @@ export const handleEvent = async (
     }
 
     case JobNotificationTriggers.REGEX_MESSAGE_MATCH: {
-      if (!event) return;
+      if (!event || !handlerConfig.regex) return;
+      if (!safe(handlerConfig.regex)) {
+        logger.error("Regex provided for teh notification handler is invalid");
+      }
       const rxp = new RegExp(handlerConfig.regex!);
       const match = event.match(rxp);
       if (match) {

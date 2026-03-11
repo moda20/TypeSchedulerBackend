@@ -238,12 +238,16 @@ export const injectNotificationServices = async (
             name: service.name,
             service: targetService,
           };
+        } else {
+          logger(`Service with id : ${serviceId} not found`);
         }
       }),
     );
     return initiatedServices.reduce(
       (p, c: any) => {
-        p[c.name] = c.service;
+        if (c) {
+          p[c.name] = c.service;
+        }
         return p;
       },
       {} as { [key: string]: Notifications },

@@ -411,7 +411,7 @@ export const cloneNotificationService = async (
         resolveFilePath(join("..", existingService.image)),
       );
       newImagePath = await savePublicImage({
-        filename: `${safeName}${parse(existingService.image).base}`,
+        filename: `${safeName}_${parse(existingService.image).base}`,
         data: await existingImage.arrayBuffer(),
         unique: true,
       });
@@ -511,11 +511,11 @@ export const deleteJobEventHandler = async ({
     throw new APIError("Job not found", REPO_NAME);
   }
   const jobParams = JSON.parse(job.param || "{}");
-  const targetHandler = jobParams.eventHandlers.findIndex(
+  const targetHandler = jobParams.eventHandlers?.findIndex(
     (e: any) => e.config_id === configId,
   );
 
-  if (targetHandler === -1) {
+  if (targetHandler === undefined || targetHandler === -1) {
     throw new APIError("Event handler not found", REPO_NAME);
   }
 

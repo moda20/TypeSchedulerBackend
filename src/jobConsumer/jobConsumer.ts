@@ -185,7 +185,7 @@ export class JobConsumer extends Consumer {
 
   injectEventHandlers(job: JobDTO, jobLog: JobLogDTO) {
     const handlerConfigs = job.param?.eventHandlers;
-    if (handlerConfigs.length) {
+    if (Array.isArray(handlerConfigs) && handlerConfigs?.length) {
       const configs = handlerConfigs.map((cfg: any) => {
         const parsedConfig = jobEventNotificationConfigSchema.parse(cfg);
         return {
@@ -212,6 +212,8 @@ export class JobConsumer extends Consumer {
         },
         {} as { [key: string]: JobEventHandlerConfig[] },
       );
+    } else {
+      this.logEvent("No event handlers found for this job, skipping injection");
     }
   }
 
