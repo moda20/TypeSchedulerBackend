@@ -5,7 +5,10 @@ import { basePrisma } from "@initialization/index";
 import { getAllConfigs } from "@repositories/configs";
 import {
   addNotificationService,
+  addOrUpdateJobEventHandler,
   attachAServiceToJob,
+  cloneNotificationService,
+  deleteJobEventHandler,
   deleteNotificationService,
   detachServiceFromAllJobs,
   getAllJobsForAService,
@@ -16,8 +19,10 @@ import {
   safeUpdateServiceConfig,
   updateNotificationService,
   validateInputConfigAgainstSchema,
+  verifyIfNotificationServiceCanBeDeleted,
 } from "@repositories/notificationServices";
 import {
+  jobEventNotificationConfigAPISchema,
   notificationCreationSchema,
   notificationUpdateSchema,
 } from "@typesDef/notifications";
@@ -42,13 +47,14 @@ export const notificationsController = createElysia({
   .get(
     "/allNotifications",
     ({ query }) => {
-      const { limit, offset } = query;
-      return getAllNotificationServices({ limit, offset });
+      const { limit, offset, inputIds } = query;
+      return getAllNotificationServices({ limit, offset, inputIds });
     },
     {
       query: t.Object({
         limit: t.Optional(t.Number()),
         offset: t.Optional(t.Number()),
+        inputIds: t.Optional(t.Array(t.Number())),
       }),
     },
   )
@@ -100,6 +106,20 @@ export const notificationsController = createElysia({
         );
     });
   })
+  .post(
+    "/cloneNotificationService",
+    async ({ body, set }) => {
+      const { serviceId, name } = body;
+      const userId = set.headers["x-user-id"];
+      return cloneNotificationService(serviceId, name, Number(userId));
+    },
+    {
+      body: t.Object({
+        serviceId: t.Number(),
+        name: t.String(),
+      }),
+    },
+  )
   .put(
     "/updateNotificationServiceConfig",
     async ({ body, set }) => {
@@ -204,6 +224,7 @@ export const notificationsController = createElysia({
       updateObject["image"] = await savePublicImage({
         filename: inputValues.imageName,
         data: await inputValues.image?.arrayBuffer(),
+        unique: true,
       });
       const targetService = await getNotificationService(inputValues.id);
       if (targetService?.image) {
@@ -223,6 +244,7 @@ export const notificationsController = createElysia({
     "/deleteNotificationService",
     async ({ query }) => {
       const { id } = query;
+      await verifyIfNotificationServiceCanBeDeleted(Number(id));
       await detachServiceFromAllJobs(Number(id));
       return deleteNotificationService(Number(id));
     },
@@ -255,6 +277,37 @@ export const notificationsController = createElysia({
     {
       query: t.Object({
         serviceId: t.Number(),
+      }),
+    },
+  )
+  .post(
+    "/updateJobEventHandlers",
+    ({ body }) => {
+      return addOrUpdateJobEventHandler({
+        handler: body.handler,
+        jobId: body.jobId,
+      });
+    },
+    {
+      body: z.object({
+        handler: jobEventNotificationConfigAPISchema,
+        jobId: z.number({ message: "job id is required" }),
+      }),
+    },
+  )
+  .delete(
+    "/deleteJobEventHandler",
+    ({ query }) => {
+      const { jobId, configId } = query;
+      return deleteJobEventHandler({
+        configId,
+        jobId,
+      });
+    },
+    {
+      query: z.object({
+        jobId: z.coerce.number({ message: "job id is required" }),
+        configId: z.string({ message: "config id is required" }),
       }),
     },
   );
