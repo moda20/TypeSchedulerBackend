@@ -166,15 +166,16 @@ export const notificationUpdateSchema = notificationCreationSchema.extend({
   imageName: z.string().optional(),
 });
 
+// TODO : see is a specific validation for notif_type relation to regex and duration threshold is needed
 export const jobEventNotificationConfigSchema = z.object({
   config_id: z.string({ error: "config id is required" }),
   notification_type: z.array(z.enum(jobNotificationTypes), {
     error: "notification type is required and must be an array",
   }),
   trigger: z.enum(JobNotificationTriggers),
-  notification_service_id: z.number({ error: "service id is required" }),
+  notification_service_id: z.coerce.number({ error: "service id is required" }),
   regex: z.string().optional(),
-  durationThreshold: z.number().optional(),
+  durationThreshold: z.coerce.number().optional(),
 });
 
 export const jobEventNotificationConfigAPISchema =

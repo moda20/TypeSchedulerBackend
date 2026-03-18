@@ -1,6 +1,9 @@
 import config from "@config/config";
 import { handleEvent } from "@repositories/notification";
-import { getNotificationService } from "@repositories/notificationServices";
+import {
+  getAllGlobalEventHandlers,
+  getNotificationService,
+} from "@repositories/notificationServices";
 import {
   JobDTO,
   JobEventTypes,
@@ -185,8 +188,21 @@ export class JobConsumer extends Consumer {
 
   injectEventHandlers(job: JobDTO, jobLog: JobLogDTO) {
     const handlerConfigs = job.param?.eventHandlers;
+    const globalHandlers = getAllGlobalEventHandlers();
+    const allHandlers = [];
+    if (Object.keys(globalHandlers).length) {
+      allHandlers.push(...Object.values(globalHandlers));
+    }
     if (Array.isArray(handlerConfigs) && handlerConfigs?.length) {
-      const configs = handlerConfigs.map((cfg: any) => {
+      allHandlers.push(...handlerConfigs);
+    } else {
+      this.logEvent(
+        "No job event handlers found for this job, skipping injection",
+      );
+    }
+
+    if (allHandlers.length) {
+      const configs = allHandlers.map((cfg: any) => {
         const parsedConfig = jobEventNotificationConfigSchema.parse(cfg);
         return {
           job,
@@ -212,8 +228,6 @@ export class JobConsumer extends Consumer {
         },
         {} as { [key: string]: JobEventHandlerConfig[] },
       );
-    } else {
-      this.logEvent("No event handlers found for this job, skipping injection");
     }
   }
 

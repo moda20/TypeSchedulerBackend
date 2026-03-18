@@ -1,5 +1,5 @@
 import config from "@config/config";
-import { updateConfig } from "@config/config.service";
+import { updateConfig, updateObjectConfig } from "@config/config.service";
 import { basePrisma, prisma } from "@initialization/index";
 import { PrismaClient } from "@prisma/client";
 import { getAllJobs, isJobRunning, updateJobConfig } from "@repositories/jobs";
@@ -17,6 +17,7 @@ import {
 } from "@utils/fileUtils";
 import { findFiles } from "@utils/jobUtils";
 import logger from "@utils/loggers";
+import { forceToArray } from "@utils/socketUtils";
 import { parseJsDoc } from "@utils/typeUtils";
 import { join, parse } from "path";
 import safe from "safe-regex";
@@ -402,7 +403,7 @@ export const cloneNotificationService = async (
   if (!existingService) {
     throw new APIError(`Service ${serviceId} not found`, REPO_NAME);
   }
-  const safeName = name.replace(/\s/g, "_");
+  const safeName = name.replace(/\s/g, "-");
   return basePrisma.$transaction(async (tx) => {
     let newImagePath = existingService.image || undefined;
 
@@ -539,4 +540,102 @@ export const deleteJobEventHandler = async ({
         REPO_NAME,
       );
     });
+};
+
+export const getAllGlobalEventHandlers = () => {
+  const configs: any = config.safeGet("notifications.eventHandlers", {});
+  return Object.values(configs)
+    .filter((e: any) => e["config-id"])
+    .map((cfg: any) => {
+      return {
+        config_id: cfg["config-id"],
+        notification_type: forceToArray(cfg["notification-type"]),
+        trigger: cfg.trigger,
+        notification_service_id: cfg["notification-service-id"],
+        regex: cfg.regex,
+        durationThreshold: cfg.durationThreshold,
+      };
+    });
+};
+
+export const addOrUpdateGlobalEventHandler = async ({
+  configId,
+  handler,
+  userId,
+}: {
+  handler: JobEventNotificationConfigAPISchemaType;
+  configId?: string;
+  userId: number;
+}) => {
+  try {
+    const service = await getNotificationService(
+      handler.notification_service_id,
+    );
+    if (!service) {
+      throw new APIError("Service not found", REPO_NAME);
+    }
+    if (handler.regex) {
+      if (!safe(handler.regex)) {
+        throw new APIError(
+          "Provided RegEx is not valid or not safe",
+          REPO_NAME,
+        );
+      }
+    }
+    if (configId) {
+      const existingService = config.safeGet(
+        `notifications.eventHandlers.${configId}`,
+        null,
+      );
+      if (!existingService) {
+        throw new APIError("Event handler not found", REPO_NAME);
+      } else {
+        return await updateObjectConfig(
+          `notifications.eventHandlers.${configId}`,
+          {
+            "config-id": handler.config_id,
+            "notification-type": handler.notification_type,
+            trigger: handler.trigger,
+            "notification-service-id": handler.notification_service_id,
+            regex: handler.regex,
+            durationThreshold: handler.durationThreshold,
+          },
+          userId,
+        );
+      }
+    } else {
+      handler.config_id = uuidv4();
+      // switching to - for attributes keys to not confused the DB config key separator
+      return await updateObjectConfig(
+        `notifications.eventHandlers.${handler.config_id}`,
+        {
+          "config-id": handler.config_id,
+          "notification-type": handler.notification_type,
+          trigger: handler.trigger,
+          "notification-service-id": handler.notification_service_id,
+          regex: handler.regex,
+          durationThreshold: handler.durationThreshold,
+        },
+        userId,
+      );
+    }
+  } catch (err) {
+    logger.error(err);
+    throw new APIError("Error while updating global event handler", REPO_NAME);
+  }
+};
+
+// TODO: validate the choice where deleted eventHandlers should or shouldn't be used by running jobs
+export const deleteGlobalEventHandler = async ({
+  configId,
+}: {
+  configId: string;
+}) => {
+  try {
+    config.removeKey(`notifications.eventHandlers.${configId}`);
+    return true;
+  } catch (err) {
+    logger.error(err);
+    throw new APIError("Error while deleting global event handler", REPO_NAME);
+  }
 };

@@ -120,7 +120,7 @@ export const overlay = (from: any, to: any, schema: any) => {
       if (!isObj(to[k])) {
         to[k] = {};
       }
-      overlay(from[k], to[k], schema._cvtProperties[k]);
+      overlay(from[k], to[k], schema?._cvtProperties?.[k]);
     }
   });
 };

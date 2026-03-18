@@ -5,12 +5,15 @@ import { basePrisma } from "@initialization/index";
 import { getAllConfigs } from "@repositories/configs";
 import {
   addNotificationService,
+  addOrUpdateGlobalEventHandler,
   addOrUpdateJobEventHandler,
   attachAServiceToJob,
   cloneNotificationService,
+  deleteGlobalEventHandler,
   deleteJobEventHandler,
   deleteNotificationService,
   detachServiceFromAllJobs,
+  getAllGlobalEventHandlers,
   getAllJobsForAService,
   getAllNotificationServices,
   getAvailableExternalServices,
@@ -307,6 +310,38 @@ export const notificationsController = createElysia({
     {
       query: z.object({
         jobId: z.coerce.number({ message: "job id is required" }),
+        configId: z.string({ message: "config id is required" }),
+      }),
+    },
+  )
+  .get("/globalEventHandlers", () => {
+    return getAllGlobalEventHandlers();
+  })
+  .put(
+    "/updateGlobalHandlers",
+    ({ body, set }) => {
+      const { configId, handler } = body;
+      const userId = set.headers["x-user-id"];
+      return addOrUpdateGlobalEventHandler({
+        configId,
+        handler,
+        userId: Number(userId),
+      });
+    },
+    {
+      body: z.object({
+        configId: z.string().optional(),
+        handler: jobEventNotificationConfigAPISchema,
+      }),
+    },
+  )
+  .delete(
+    "/deleteGlobalHandlers",
+    ({ query }) => {
+      return deleteGlobalEventHandler(query);
+    },
+    {
+      query: z.object({
         configId: z.string({ message: "config id is required" }),
       }),
     },

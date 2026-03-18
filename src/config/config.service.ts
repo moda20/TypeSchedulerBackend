@@ -217,6 +217,28 @@ export const updateConfig = async (
   return true;
 };
 
+export const updateObjectConfig = async (
+  key: string,
+  value: any,
+  userId?: number,
+  is_encrypted?: boolean,
+) => {
+  if (typeof value !== "object") {
+    throw new Error("input value must be an object");
+  }
+  // this is not recursive as that is out of scope for now
+  return Promise.all(
+    Object.keys(value).map((k) => {
+      return updateConfig(
+        `${key}.${k}`,
+        value[k] ? String(value[k]) : "",
+        userId,
+        is_encrypted,
+      );
+    }),
+  );
+};
+
 export const removeConfig = async (key: string, userId?: number) => {
   const usKey = key.replace(/\./g, "_");
   await deleteConfig(usKey, userId);
