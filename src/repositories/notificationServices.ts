@@ -1,5 +1,9 @@
 import config from "@config/config";
-import { updateConfig, updateObjectConfig } from "@config/config.service";
+import {
+  removeConfig,
+  updateConfig,
+  updateObjectConfig,
+} from "@config/config.service";
 import { basePrisma, prisma } from "@initialization/index";
 import { PrismaClient } from "@prisma/client";
 import { getAllJobs, isJobRunning, updateJobConfig } from "@repositories/jobs";
@@ -583,6 +587,9 @@ export const addOrUpdateGlobalEventHandler = async ({
       }
     }
     if (configId) {
+      if (configId !== handler.config_id) {
+        throw new APIError("Config ids does not match", REPO_NAME);
+      }
       const existingService = config.safeGet(
         `notifications.eventHandlers.${configId}`,
         null,
@@ -628,11 +635,27 @@ export const addOrUpdateGlobalEventHandler = async ({
 // TODO: validate the choice where deleted eventHandlers should or shouldn't be used by running jobs
 export const deleteGlobalEventHandler = async ({
   configId,
+  userId,
 }: {
   configId: string;
+  userId: number;
 }) => {
   try {
-    config.removeKey(`notifications.eventHandlers.${configId}`);
+    const targetConfig = config.safeGet(
+      `notifications.eventHandlers.${configId}`,
+      null,
+    );
+    if (!targetConfig) throw new APIError("Event handler not found", REPO_NAME);
+
+    // TODO see if this warrants a prisma transaction
+    await Promise.all(
+      Object.keys(targetConfig).map((key) => {
+        return removeConfig(
+          `notifications.eventHandlers.${configId}.${key}`,
+          userId,
+        );
+      }),
+    );
     return true;
   } catch (err) {
     logger.error(err);

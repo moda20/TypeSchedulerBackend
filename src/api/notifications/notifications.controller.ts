@@ -337,8 +337,10 @@ export const notificationsController = createElysia({
   )
   .delete(
     "/deleteGlobalHandlers",
-    ({ query }) => {
-      return deleteGlobalEventHandler(query);
+    ({ query, set }) => {
+      const { configId } = query;
+      const userId = set.headers["x-user-id"];
+      return deleteGlobalEventHandler({ configId, userId: Number(userId) });
     },
     {
       query: z.object({

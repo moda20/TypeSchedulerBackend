@@ -1,6 +1,7 @@
 import config from "@config/config";
 import { deleteConfig, getAllConfigs, saveConfig } from "@repositories/configs";
 import { FlattenedProperties } from "@typesDef/models/config";
+import { toSafeString } from "@utils/convictUtils";
 import logger from "@utils/loggers";
 
 const flattenedProperties = (inputObj: any) => {
@@ -231,7 +232,7 @@ export const updateObjectConfig = async (
     Object.keys(value).map((k) => {
       return updateConfig(
         `${key}.${k}`,
-        value[k] ? String(value[k]) : "",
+        toSafeString(value[k]),
         userId,
         is_encrypted,
       );
