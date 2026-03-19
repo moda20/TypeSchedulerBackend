@@ -191,6 +191,7 @@ const config = convict({
       default: "gotify",
       env: "DEFAULT_NOTIFICATION_SERVICE",
     },
+    eventHandlers: {},
     ntfy: {
       url: {
         doc: "The ntfy url.",

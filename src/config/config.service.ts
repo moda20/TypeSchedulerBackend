@@ -1,6 +1,7 @@
 import config from "@config/config";
 import { deleteConfig, getAllConfigs, saveConfig } from "@repositories/configs";
 import { FlattenedProperties } from "@typesDef/models/config";
+import { toSafeString } from "@utils/convictUtils";
 import logger from "@utils/loggers";
 
 const flattenedProperties = (inputObj: any) => {
@@ -215,6 +216,28 @@ export const updateConfig = async (
   config.set(key, value);
   logger.debug(`Config ${key} updated`);
   return true;
+};
+
+export const updateObjectConfig = async (
+  key: string,
+  value: any,
+  userId?: number,
+  is_encrypted?: boolean,
+) => {
+  if (typeof value !== "object") {
+    throw new Error("input value must be an object");
+  }
+  // this is not recursive as that is out of scope for now
+  return Promise.all(
+    Object.keys(value).map((k) => {
+      return updateConfig(
+        `${key}.${k}`,
+        toSafeString(value[k]),
+        userId,
+        is_encrypted,
+      );
+    }),
+  );
 };
 
 export const removeConfig = async (key: string, userId?: number) => {

@@ -1,6 +1,7 @@
 import config from "@config/config";
 import { PrismaClient } from "@generated/prisma";
 import { PrismaClient as BasePrismaClient } from "@generated/prisma_base";
+import { PrismaClient as GenericPrismaClient } from "@prisma/client";
 import logger from "@utils/loggers";
 import { execSync } from "child_process";
 
@@ -125,7 +126,7 @@ const runBaseMigrations = () => {
   }
 };
 
-const tableExists = async (tableName: string, prisma: PrismaClient) => {
+const tableExists = async (tableName: string, prisma: GenericPrismaClient) => {
   const result: any = await prisma.$queryRaw`
       SELECT COUNT(*) as count
       FROM information_schema.tables
@@ -134,7 +135,7 @@ const tableExists = async (tableName: string, prisma: PrismaClient) => {
   return result[0].count > 0;
 };
 export const configTableExists = async () => {
-  return tableExists("appConfig", prisma);
+  return tableExists("appConfig", basePrisma);
 };
 
 // @ts-ignore
