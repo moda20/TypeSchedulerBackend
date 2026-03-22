@@ -1,3 +1,4 @@
+import { Prisma } from "@generated/prisma";
 import { basePrisma, prisma } from "@initialization/index";
 import { JobEventTypes } from "@typesDef/models/job";
 import { NotificationInput } from "@typesDef/models/notificationService";
@@ -51,6 +52,15 @@ const getEventOccurrences = async (
   eventType?: JobEventTypes,
 ) => {
   if (occurrenceThreshold === 0) return 0;
+  if (!handlerConfig.updatedAt) {
+    logger.info(
+      "updatedAt is null, will use current time instead => the event will fire immediately",
+    );
+  }
+  if (handlerConfig.regex && !safe(handlerConfig.regex)) {
+    logger.error("Regex provided for the notification handler is invalid");
+    return 0;
+  }
   const targetTime = dayJs(handlerConfig.updatedAt).format(
     "YYYY-MM-DD HH:mm:ss",
   );
@@ -60,24 +70,26 @@ const getEventOccurrences = async (
     }
     case JobNotificationTriggers.DURATION_THRESHOLD: {
       const query = `SELECT count(*) as occ
-                     from schedule_job_log
-                     WHERE job_id = '${handlerConfig.job.id}'
-                       AND end_time IS NOT NULL
-                       AND end_time >= '${targetTime}'
-                       AND (CASE WHEN end_time IS NOT NULL THEN TIMESTAMPDIFF(SECOND, start_time, end_time) ELSE 0 END) > '${handlerConfig.durationThreshold ?? 0}'
-                     LIMIT ${occurrenceThreshold}`;
+                     FROM (SELECT job_log_id FROM schedule_job_log
+                             WHERE job_id = ${handlerConfig.job.id}
+                             AND end_time IS NOT NULL
+                             AND end_time >= '${targetTime}'
+                             AND (CASE WHEN end_time IS NOT NULL THEN TIMESTAMPDIFF(SECOND, start_time, end_time) ELSE 0 END) > '${handlerConfig.durationThreshold ?? 0}'
+                             LIMIT ${occurrenceThreshold}) as sub`;
+      // TODO : Find a fix for prisma's issues with dynamic queries to avoid using the Unsafe calls
       const previousOccurrences =
         await prisma.$queryRawUnsafe<{ occ: number }[]>(query);
       return previousOccurrences[0]?.occ;
     }
     case JobNotificationTriggers.REGEX_MESSAGE_MATCH: {
       if (!handlerConfig.regex) return;
-      const query = `SELECT count(*) as occ from job_event_log
-                      WHERE event_message REGEXP '${handlerConfig.regex}'
+      const query = `SELECT count(*) as occ 
+                     FROM (SELECT job_log_id FROM job_event_log
+                           WHERE event_message REGEXP '${handlerConfig.regex}'
                         AND type = '${eventType}'
                         AND job_log_id LIKE '${handlerConfig.job.id}-%'
                         AND created_at >= '${targetTime}'
-                        LIMIT ${occurrenceThreshold}`;
+                        LIMIT ${occurrenceThreshold}}) as sub`;
       const previousOccurrences =
         await prisma.$queryRawUnsafe<{ occ: number }[]>(query);
       return previousOccurrences[0]?.occ;

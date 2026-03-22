@@ -13,7 +13,6 @@ import {
   extractedServiceConfiguration,
   JobEventNotificationConfigAPISchemaType,
 } from "@typesDef/notifications";
-import dayJs from "@utils/dayJs";
 import { APIError } from "@utils/ErrorHandler";
 import {
   deletePublicImage,
