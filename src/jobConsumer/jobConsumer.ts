@@ -207,12 +207,7 @@ export class JobConsumer extends Consumer {
         return {
           job,
           jobLog,
-          config_id: parsedConfig.config_id,
-          notification_type: parsedConfig.notification_type,
-          trigger: parsedConfig.trigger,
-          notification_service_id: parsedConfig.notification_service_id,
-          regex: parsedConfig.regex,
-          durationThreshold: parsedConfig.durationThreshold,
+          ...parsedConfig,
         };
       });
       this.eventHandlers = configs.reduce(

@@ -76,7 +76,7 @@ export const emitJobEvent = async (
   });
   if (extraHandlers?.length) {
     extraHandlers.forEach((evh) => {
-      handleEvent(evh, message);
+      handleEvent(evh, message, undefined, type);
     });
   }
 };

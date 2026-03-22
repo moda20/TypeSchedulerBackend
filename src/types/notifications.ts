@@ -139,6 +139,8 @@ export interface JobEventHandlerConfig {
   notification_service_id: number;
   regex?: string;
   durationThreshold?: number;
+  occurrences?: number;
+  updatedAt?: Date;
 }
 
 export const notificationCreationSchema = z.object({
@@ -176,6 +178,8 @@ export const jobEventNotificationConfigSchema = z.object({
   notification_service_id: z.coerce.number({ error: "service id is required" }),
   regex: z.string().optional(),
   durationThreshold: z.coerce.number().optional(),
+  occurrences: z.coerce.number().optional(),
+  updatedAt: z.coerce.date().optional(),
 });
 
 export const jobEventNotificationConfigAPISchema =
