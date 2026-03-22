@@ -13,6 +13,7 @@ import {
   extractedServiceConfiguration,
   JobEventNotificationConfigAPISchemaType,
 } from "@typesDef/notifications";
+import dayJs from "@utils/dayJs";
 import { APIError } from "@utils/ErrorHandler";
 import {
   deletePublicImage,
@@ -467,6 +468,8 @@ export const addOrUpdateJobEventHandler = async ({
       REPO_NAME,
     );
   }
+  // updating the date of this update or creation
+  handler.updatedAt = new Date();
   if (handler.config_id) {
     const existingService = jobParams.eventHandlers?.findIndex(
       (e: any) => String(e.config_id) === String(handler.config_id),
@@ -524,7 +527,7 @@ export const deleteJobEventHandler = async ({
     throw new APIError("Event handler not found", REPO_NAME);
   }
 
-  // deletion is just removing from the array
+  // deletion is just removing from the job param's "eventHandlers" array
   jobParams.eventHandlers.splice(targetHandler, 1);
 
   return updateJobConfig(String(job.id), {
@@ -558,6 +561,8 @@ export const getAllGlobalEventHandlers = () => {
         notification_service_id: cfg["notification-service-id"],
         regex: cfg.regex,
         durationThreshold: cfg.durationThreshold,
+        occurrences: cfg.occurrences,
+        updatedAt: cfg.updatedAt,
       };
     });
 };
@@ -586,6 +591,9 @@ export const addOrUpdateGlobalEventHandler = async ({
         );
       }
     }
+    // updating the date of this update or creation
+    handler.updatedAt = new Date();
+
     if (configId) {
       if (configId !== handler.config_id) {
         throw new APIError("Config ids does not match", REPO_NAME);
@@ -606,6 +614,8 @@ export const addOrUpdateGlobalEventHandler = async ({
             "notification-service-id": handler.notification_service_id,
             regex: handler.regex,
             durationThreshold: handler.durationThreshold,
+            occurrences: handler.occurrences,
+            updatedAt: handler.updatedAt,
           },
           userId,
         );
@@ -613,6 +623,7 @@ export const addOrUpdateGlobalEventHandler = async ({
     } else {
       handler.config_id = uuidv4();
       // switching to - for attributes keys to not confused the DB config key separator
+      // TODO see if this could be done automatically by the updateConfig helper
       return await updateObjectConfig(
         `notifications.eventHandlers.${handler.config_id}`,
         {
@@ -622,6 +633,8 @@ export const addOrUpdateGlobalEventHandler = async ({
           "notification-service-id": handler.notification_service_id,
           regex: handler.regex,
           durationThreshold: handler.durationThreshold,
+          occurrences: handler.occurrences,
+          updatedAt: handler.updatedAt,
         },
         userId,
       );
@@ -647,7 +660,7 @@ export const deleteGlobalEventHandler = async ({
     );
     if (!targetConfig) throw new APIError("Event handler not found", REPO_NAME);
 
-    // TODO see if this warrants a prisma transaction
+    // TODO see if this warrants a prisma transaction & if this could be a general object deletion helper
     await Promise.all(
       Object.keys(targetConfig).map((key) => {
         return removeConfig(
