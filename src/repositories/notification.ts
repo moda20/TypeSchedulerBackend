@@ -89,7 +89,7 @@ const getEventOccurrences = async (
                         AND type = '${eventType}'
                         AND job_log_id LIKE '${handlerConfig.job.id}-%'
                         AND created_at >= '${targetTime}'
-                        LIMIT ${occurrenceThreshold}}) as sub`;
+                        LIMIT ${occurrenceThreshold}) as sub`;
       const previousOccurrences =
         await prisma.$queryRawUnsafe<{ occ: number }[]>(query);
       return previousOccurrences[0]?.occ;
