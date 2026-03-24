@@ -8,13 +8,22 @@ axios.interceptors.response.use(
 
 export default axios;
 
-export const lokiHttpService = axios.create({
+const createHttpService = (config: any) => {
+  const newService = axios.create(config);
+  newService.interceptors.response.use(
+    (response) => response,
+    (error) => Promise.reject(error),
+  );
+  return newService;
+};
+
+export const lokiHttpService = createHttpService({
   baseURL: config.get("grafana.lokiUrl") || "",
   adapter: "fetch",
   timeout: 60000,
 });
 
-export const GotifyHttpService = axios.create({
+export const GotifyHttpService = createHttpService({
   baseURL: config.get("notifications.gotify.url") || "",
   adapter: "fetch",
   headers: {
@@ -26,7 +35,7 @@ export const GotifyHttpService = axios.create({
   timeout: 60000,
 });
 
-export const NtfyHttpService = axios.create({
+export const NtfyHttpService = createHttpService({
   baseURL: config.get("notifications.ntfy.url") || "",
   adapter: "fetch",
   headers: {
