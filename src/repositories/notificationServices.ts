@@ -7,7 +7,7 @@ import {
 import { basePrisma, prisma } from "@initialization/index";
 import { PrismaClient } from "@prisma/client";
 import { getAllJobs, isJobRunning, updateJobConfig } from "@repositories/jobs";
-import { jobUpdateConfig } from "@typesDef/models/job";
+import { JobDTOClass, jobUpdateConfig } from "@typesDef/models/job";
 import { NewNotificationService } from "@typesDef/models/notificationService";
 import {
   extractedServiceConfiguration,
@@ -109,6 +109,33 @@ export const updateNotificationService = async ({
       ...rest,
     },
   });
+};
+
+export const testNotificationService = async (id: number) => {
+  const targetService = await getNotificationService(Number(id));
+  if (!targetService) throw new APIError("Service not found", REPO_NAME);
+  try {
+    const targetFile = (
+      await import(join(import.meta.dir, "../..", targetService.entryPoint))
+    ).default;
+    const serviceConfig = config.safeGet(
+      `notifications.${targetService.name}`,
+      {},
+    );
+    const serviceObject = targetFile.init(
+      JobDTOClass.mock(),
+      JobDTOClass.mockJobLog(),
+      targetService,
+      serviceConfig,
+    );
+    serviceObject.sendMessage("test message").catch((err: any) => {
+      throw err;
+    });
+    return true;
+  } catch (err: any) {
+    logger.error(err);
+    throw new APIError(`Service test failed : ${err.message}`, REPO_NAME);
+  }
 };
 
 export const verifyIfNotificationServiceCanBeDeleted = async (id: number) => {

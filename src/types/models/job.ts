@@ -2,7 +2,9 @@ import config from "@config/config";
 import { schedule_job } from "@generated/prisma";
 import * as JobConsumerUtils from "@utils/jobConsumerUtils";
 import { IScheduleJob, IScheduleJobLog } from "schedule-manager";
+import { ScheduleJobLog } from "schedule-manager/Classes/Entities/ScheduleJobLog";
 import { ScheduleJobTable } from "schedule-manager/dist/Classes/Entities/ScheduleJob";
+import { ScheduleJobLogTable } from "schedule-manager/dist/Classes/Entities/ScheduleJobLog";
 
 export interface JobDTO extends IScheduleJob {
   // Properties
@@ -103,6 +105,14 @@ export class JobDTOClass implements JobDTO {
     this.initialized = false;
     // @ts-ignore
     this.jobLogs = job.job_logs;
+  }
+
+  static mock(): JobDTO {
+    return new JobDTOClass({} as schedule_job);
+  }
+
+  static mockJobLog(): JobLogDTO {
+    return <JobLogDTO>new ScheduleJobLog({} as ScheduleJobLogTable);
   }
 
   getId(): number | undefined {

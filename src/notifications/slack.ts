@@ -51,16 +51,6 @@ export default class SlackNotification implements DefaultNotificationService {
     this.name = "slack";
   }
   async sendMessage(message: string, title: string): Promise<any> {
-    await addNotifications({
-      message: title,
-      service_id: this.serviceDbId,
-      job_log_id: this.jobLogId,
-      data: message,
-    }).catch((err) => {
-      this.syslog?.error(err, {
-        eventName: "NOTIF_DB_ERROR",
-      });
-    });
     return this.slackWebhook
       ?.send({
         text: message,
@@ -73,7 +63,26 @@ export default class SlackNotification implements DefaultNotificationService {
       });
   }
 
-  async sendBaseMessage() {}
+  async sendBaseMessage(body: any) {
+    await addNotifications({
+      message: body.title,
+      service_id: this.serviceDbId,
+      job_log_id: this.jobLogId,
+      data: body.message,
+    }).catch((err) => {
+      this.syslog?.error(err, {
+        eventName: "NOTIF_DB_ERROR",
+      });
+    });
+
+    return this.sendMessage(body.message, body.title).catch((err: any) => {
+      logger.error("slack error");
+      logger.error(err.message);
+      this.syslog?.error(`slack error: ${err.message}`, {
+        eventName: "NOTIF_SERVICE_ERROR",
+      });
+    }) as Promise<any>;
+  }
 
   init<T>(
     job: JobDTO,

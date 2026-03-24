@@ -1,6 +1,11 @@
 import config from "@config/config";
 import axios from "axios";
 
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => Promise.reject(error),
+);
+
 export default axios;
 
 export const lokiHttpService = axios.create({
