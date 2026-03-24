@@ -88,7 +88,7 @@ export default class NtfyService implements DefaultNotificationService {
     NtfyHttpService.defaults.baseURL = this.config?.url;
     return NtfyHttpService.post(`/${this.config?.topic}`, message, {
       headers: headers,
-    }) as Promise<any>;
+    });
   }
 
   async sendBaseMessage(body: any, extraHeaders?: NtfyExtraHeaders) {
@@ -175,6 +175,6 @@ export default class NtfyService implements DefaultNotificationService {
         "X-Priority": (priority ?? "5").toString(),
         ...rest,
       },
-    ) as Promise<any>;
+    );
   }
 }

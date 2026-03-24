@@ -81,7 +81,7 @@ export default class SlackNotification implements DefaultNotificationService {
       this.syslog?.error(`slack error: ${err.message}`, {
         eventName: "NOTIF_SERVICE_ERROR",
       });
-    }) as Promise<any>;
+    });
   }
 
   init<T>(

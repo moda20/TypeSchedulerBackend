@@ -86,7 +86,7 @@ export default class GotifyService implements DefaultNotificationService {
         title,
       },
       options,
-    ) as Promise<any>;
+    );
   }
 
   async sendBaseMessage(body: any, options?: any) {
