@@ -51,16 +51,6 @@ export default class SlackNotification implements DefaultNotificationService {
     this.name = "slack";
   }
   async sendMessage(message: string, title: string): Promise<any> {
-    await addNotifications({
-      message: title,
-      service_id: this.serviceDbId,
-      job_log_id: this.jobLogId,
-      data: message,
-    }).catch((err) => {
-      this.syslog?.error(err, {
-        eventName: "NOTIF_DB_ERROR",
-      });
-    });
     return this.slackWebhook
       ?.send({
         text: message,
@@ -73,7 +63,26 @@ export default class SlackNotification implements DefaultNotificationService {
       });
   }
 
-  async sendBaseMessage() {}
+  async sendBaseMessage(body: any) {
+    await addNotifications({
+      message: body.title,
+      service_id: this.serviceDbId,
+      job_log_id: this.jobLogId,
+      data: body.message,
+    }).catch((err) => {
+      this.syslog?.error(err, {
+        eventName: "NOTIF_DB_ERROR",
+      });
+    });
+
+    return this.sendMessage(body.message, body.title).catch((err: any) => {
+      logger.error("slack error");
+      logger.error(err.message);
+      this.syslog?.error(`slack error: ${err.message}`, {
+        eventName: "NOTIF_SERVICE_ERROR",
+      });
+    }) as Promise<any>;
+  }
 
   init<T>(
     job: JobDTO,
@@ -133,10 +142,13 @@ export default class SlackNotification implements DefaultNotificationService {
     }
     const envPrefix = config.get("env") === "production" ? "" : "(DEV) ";
     const { title, message } = options ?? {};
-    return this.sendMessage(
-      message ?? `${envPrefix}Job ${jobName} finished with results: ${results}`,
-      title ?? `${envPrefix}Job ${jobName}${jobId && ` ${jobId} `}finished`,
-    );
+    return this.sendBaseMessage({
+      message:
+        message ??
+        `${envPrefix}Job ${jobName} finished with results: ${results}`,
+      title:
+        title ?? `${envPrefix}Job ${jobName}${jobId && ` ${jobId} `} finished`,
+    });
   }
 
   sendJobCrashNotification(
@@ -153,9 +165,11 @@ export default class SlackNotification implements DefaultNotificationService {
     }
     const envPrefix = config.get("env") === "production" ? "" : "(DEV) ";
     const { title, message } = options ?? {};
-    return this.sendMessage(
-      message ?? `${envPrefix}Job ${jobName} crashed with error: ${error}`,
-      title ?? `${envPrefix}Job ${jobName}${jobId && ` ${jobId} `} Crashed`,
-    ) as Promise<any>;
+    return this.sendBaseMessage({
+      message:
+        message ?? `${envPrefix}Job ${jobName} crashed with error: ${error}`,
+      title:
+        title ?? `${envPrefix}Job ${jobName}${jobId && ` ${jobId} `} crashed`,
+    });
   }
 }

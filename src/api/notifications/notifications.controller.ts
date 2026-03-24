@@ -20,6 +20,7 @@ import {
   getNotificationService,
   InitializeServiceConfig,
   safeUpdateServiceConfig,
+  testNotificationService,
   updateNotificationService,
   validateInputConfigAgainstSchema,
   verifyIfNotificationServiceCanBeDeleted,
@@ -254,6 +255,18 @@ export const notificationsController = createElysia({
     {
       query: t.Object({
         id: t.Number(),
+      }),
+    },
+  )
+  .post(
+    "/testNotificationService",
+    async ({ body }) => {
+      const { id } = body;
+      return testNotificationService(id);
+    },
+    {
+      body: z.object({
+        id: z.coerce.number(),
       }),
     },
   )
