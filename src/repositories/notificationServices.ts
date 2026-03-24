@@ -128,10 +128,9 @@ export const testNotificationService = async (id: number) => {
       targetService,
       serviceConfig,
     );
-    serviceObject.sendMessage("test message").catch((err: any) => {
+    return serviceObject.sendMessage("test message").catch((err: any) => {
       throw err;
     });
-    return true;
   } catch (err: any) {
     logger.error(err);
     throw new APIError(`Service test failed : ${err.message}`, REPO_NAME);
