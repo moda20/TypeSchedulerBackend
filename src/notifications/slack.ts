@@ -142,10 +142,13 @@ export default class SlackNotification implements DefaultNotificationService {
     }
     const envPrefix = config.get("env") === "production" ? "" : "(DEV) ";
     const { title, message } = options ?? {};
-    return this.sendMessage(
-      message ?? `${envPrefix}Job ${jobName} finished with results: ${results}`,
-      title ?? `${envPrefix}Job ${jobName}${jobId && ` ${jobId} `}finished`,
-    );
+    return this.sendBaseMessage({
+      message:
+        message ??
+        `${envPrefix}Job ${jobName} finished with results: ${results}`,
+      title:
+        title ?? `${envPrefix}Job ${jobName}${jobId && ` ${jobId} `} finished`,
+    });
   }
 
   sendJobCrashNotification(
@@ -162,9 +165,11 @@ export default class SlackNotification implements DefaultNotificationService {
     }
     const envPrefix = config.get("env") === "production" ? "" : "(DEV) ";
     const { title, message } = options ?? {};
-    return this.sendMessage(
-      message ?? `${envPrefix}Job ${jobName} crashed with error: ${error}`,
-      title ?? `${envPrefix}Job ${jobName}${jobId && ` ${jobId} `} Crashed`,
-    ) as Promise<any>;
+    return this.sendBaseMessage({
+      message:
+        message ?? `${envPrefix}Job ${jobName} crashed with error: ${error}`,
+      title:
+        title ?? `${envPrefix}Job ${jobName}${jobId && ` ${jobId} `} crashed`,
+    });
   }
 }
