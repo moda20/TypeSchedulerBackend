@@ -22,9 +22,9 @@ export const configController = createElysia({ prefix: "/system/config" })
   })
   .post(
     "/updateConfig",
-    async ({ body, set }) => {
-      const userId = set.headers["x-user-id"];
-      return await updateMultiConfig(body, userId);
+    async ({ body, store }) => {
+      const userId = store.userId;
+      return await updateMultiConfig(body, String(userId));
     },
     {
       body: t.Array(

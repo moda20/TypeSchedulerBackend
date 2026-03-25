@@ -48,6 +48,7 @@ export const deletePublicImage = async ({ filename }: { filename: string }) => {
   return Promise.reject("no file found");
 };
 
+// resolve file path from the src folder
 export const resolveFilePath = (filePath: string) => {
   const srcRoot = resolve(parse(bun.main).dir);
   const root = join(srcRoot, "..");

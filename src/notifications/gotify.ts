@@ -77,12 +77,16 @@ export default class GotifyService implements DefaultNotificationService {
     return newService;
   }
 
-  sendMessage(message: string, title?: string): Promise<any> {
-    return GotifyHttpService.post("/message", {
-      message,
-      priority: 1,
-      title,
-    }) as Promise<any>;
+  sendMessage(message: string, title?: string, options?: any): Promise<any> {
+    return GotifyHttpService.post(
+      "/message",
+      {
+        message,
+        priority: 1,
+        title,
+      },
+      options,
+    );
   }
 
   async sendBaseMessage(body: any, options?: any) {
@@ -98,7 +102,7 @@ export default class GotifyService implements DefaultNotificationService {
         eventName: "NOTIF_DB_ERROR",
       });
     });
-    return GotifyHttpService.post("/message", body, options).catch(
+    return this.sendMessage(body.message, body.title, options).catch(
       (err: any) => {
         logger.error("gotify error");
         logger.error(err.message);

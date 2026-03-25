@@ -1,12 +1,22 @@
 import config from "@config/config";
-import { getNotificationService } from "@repositories/notificationServices";
+import { handleEvent } from "@repositories/notification";
+import {
+  getAllGlobalEventHandlers,
+  getNotificationService,
+} from "@repositories/notificationServices";
 import {
   JobDTO,
   JobEventTypes,
   JobLogDTO,
   JobOptions,
 } from "@typesDef/models/job";
-import { DefaultNotificationService } from "@typesDef/notifications";
+import {
+  DefaultNotificationService,
+  JobEventHandlerConfig,
+  jobEventNotificationConfigSchema,
+  jobNotificationTypes,
+  JobNotificationTypesType,
+} from "@typesDef/notifications";
 import defaultAxiosInstance from "@utils/httpRequestConfig";
 import * as jobConsumerUtils from "@utils/jobConsumerUtils";
 import {
@@ -30,6 +40,9 @@ export class JobConsumer extends Consumer {
   notification: DefaultNotificationService;
   onEnd?: (job: IScheduleJob, jobLog: IScheduleJobLog) => Promise<void>;
   notificationServices: { [key: string]: any } = {};
+  eventHandlers: Partial<{
+    [key in JobNotificationTypesType]: JobEventHandlerConfig[];
+  }> = {};
   constructor() {
     super();
     this.axios = defaultAxiosInstance.create();
@@ -131,6 +144,7 @@ export class JobConsumer extends Consumer {
       JobEventTypes.ERROR,
       this.jobLog!.getId()!,
       this.job!.getId()!,
+      this.eventHandlers[jobNotificationTypes.JOB_EVENT_ERROR],
     );
   }
 
@@ -141,6 +155,7 @@ export class JobConsumer extends Consumer {
       JobEventTypes.WARNING,
       this.jobLog!.getId()!,
       this.job!.getId()!,
+      this.eventHandlers[jobNotificationTypes.JOB_EVENT_WARNING],
     );
   }
 
@@ -151,6 +166,7 @@ export class JobConsumer extends Consumer {
       JobEventTypes.INFO,
       this.jobLog!.getId()!,
       this.job!.getId()!,
+      this.eventHandlers[jobNotificationTypes.JOB_EVENT_INFO],
     );
   }
 
@@ -170,6 +186,46 @@ export class JobConsumer extends Consumer {
     };
   }
 
+  injectEventHandlers(job: JobDTO, jobLog: JobLogDTO) {
+    const handlerConfigs = job.param?.eventHandlers;
+    const globalHandlers = getAllGlobalEventHandlers();
+    const allHandlers = [];
+    if (Object.keys(globalHandlers).length) {
+      allHandlers.push(...Object.values(globalHandlers));
+    }
+    if (Array.isArray(handlerConfigs) && handlerConfigs?.length) {
+      allHandlers.push(...handlerConfigs);
+    } else {
+      this.logEvent(
+        "No job event handlers found for this job, skipping injection",
+      );
+    }
+
+    if (allHandlers.length) {
+      const configs = allHandlers.map((cfg: any) => {
+        const parsedConfig = jobEventNotificationConfigSchema.parse(cfg);
+        return {
+          job,
+          jobLog,
+          ...parsedConfig,
+        };
+      });
+      this.eventHandlers = configs.reduce(
+        (p: any, c: JobEventHandlerConfig) => {
+          c.notification_type.forEach((nt_type: string) => {
+            if (p[nt_type]) {
+              p[nt_type].push(c);
+            } else {
+              p[nt_type] = [c];
+            }
+          });
+          return p;
+        },
+        {} as { [key: string]: JobEventHandlerConfig[] },
+      );
+    }
+  }
+
   async preRun(j: JobDTO, jl: JobLogDTO) {
     const { job, jobLog } = this.jobInputParse(j, jl);
     this.job = job;
@@ -185,6 +241,8 @@ export class JobConsumer extends Consumer {
       await this.injectNotificationServices(
         job?.param?.notificationServices || [],
       );
+      // initializing event handlers
+      await this.injectEventHandlers(job, jobLog);
       const completedResults = await this.run(job, jobLog);
       if (!completedResults.success) {
         this.emitError(
@@ -204,6 +262,18 @@ export class JobConsumer extends Consumer {
     if (this.onEnd) {
       await this.onEnd(this.job!, jobLog);
     }
-    return super.complete(jobLog, result, error);
+    const completionResults: any = await super.complete(jobLog, result, error);
+    if (this.eventHandlers) {
+      this.eventHandlers[jobNotificationTypes.JOB_DURATION]?.forEach(
+        (handlerConfig: JobEventHandlerConfig) => {
+          return handleEvent(
+            handlerConfig,
+            undefined,
+            completionResults.newTimeInSeconds,
+          );
+        },
+      );
+    }
+    return completionResults;
   }
 }

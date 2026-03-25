@@ -120,7 +120,19 @@ export const overlay = (from: any, to: any, schema: any) => {
       if (!isObj(to[k])) {
         to[k] = {};
       }
-      overlay(from[k], to[k], schema._cvtProperties[k]);
+      overlay(from[k], to[k], schema?._cvtProperties?.[k]);
     }
   });
+};
+
+export const toSafeString = (input: any) => {
+  if (input === null || input === undefined) return "";
+  if (typeof input === "string") return input;
+  if (input instanceof Date) return input.toISOString();
+  if (["number", "boolean"].includes(typeof input)) return input.toString();
+  try {
+    return JSON.stringify(input);
+  } catch (e) {
+    return input;
+  }
 };

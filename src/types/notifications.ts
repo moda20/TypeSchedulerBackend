@@ -114,6 +114,35 @@ export interface NtfyExtraHeaders {
   "X-Poll-ID"?: string;
 }
 
+export enum jobNotificationTypes {
+  JOB_EVENT = "JOB_EVENT",
+  JOB_EVENT_ERROR = "JOB_EVENT_ERROR",
+  JOB_EVENT_WARNING = "JOB_EVENT_WARNING",
+  JOB_EVENT_INFO = "JOB_EVENT_INFO",
+  JOB_DURATION = "JOB_DURATION",
+}
+export type JobNotificationTypesType = `${jobNotificationTypes}`;
+
+export enum JobNotificationTriggers {
+  REGEX_MESSAGE_MATCH = "REGEX_MESSAGE_MATCH",
+  DURATION_DELTA = "DURATION_DELTA",
+  DURATION_THRESHOLD = "DURATION_THRESHOLD",
+}
+export type JobNotificationTriggerType = `${JobNotificationTriggers}`;
+
+export interface JobEventHandlerConfig {
+  job: JobDTO;
+  jobLog: JobLogDTO;
+  config_id: string;
+  notification_type: jobNotificationTypes[];
+  trigger: JobNotificationTriggers;
+  notification_service_id: number;
+  regex?: string;
+  durationThreshold?: number;
+  occurrences?: number;
+  updatedAt?: Date;
+}
+
 export const notificationCreationSchema = z.object({
   image: z.file().optional(),
   imageName: z.string().default(uuidv4()),
@@ -138,3 +167,30 @@ export const notificationUpdateSchema = notificationCreationSchema.extend({
     }),
   imageName: z.string().optional(),
 });
+
+// TODO : see is a specific validation for notif_type relation to regex and duration threshold is needed
+export const jobEventNotificationConfigSchema = z.object({
+  config_id: z.string({ error: "config id is required" }),
+  notification_type: z.array(z.enum(jobNotificationTypes), {
+    error: "notification type is required and must be an array",
+  }),
+  trigger: z.enum(JobNotificationTriggers),
+  notification_service_id: z.coerce.number({ error: "service id is required" }),
+  regex: z.string().optional(),
+  durationThreshold: z.coerce.number().optional(),
+  occurrences: z.coerce.number().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export const jobEventNotificationConfigAPISchema =
+  jobEventNotificationConfigSchema.extend({
+    config_id: z.string().optional(),
+  });
+
+export type JobEventNotificationConfigSchemaType = z.infer<
+  typeof jobEventNotificationConfigSchema
+>;
+
+export type JobEventNotificationConfigAPISchemaType = z.infer<
+  typeof jobEventNotificationConfigAPISchema
+>;

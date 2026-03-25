@@ -85,19 +85,13 @@ export default class NtfyService implements DefaultNotificationService {
       "X-Title": title,
       ...extraHeaders,
     };
+    NtfyHttpService.defaults.baseURL = this.config?.url;
     return NtfyHttpService.post(`/${this.config?.topic}`, message, {
       headers: headers,
-    }) as Promise<any>;
+    });
   }
 
   async sendBaseMessage(body: any, extraHeaders?: NtfyExtraHeaders) {
-    const headers = {
-      Authorization: `Bearer ${this.config?.token}`,
-      "Content-Type": "application/json",
-      "X-Title": body.title,
-      ...extraHeaders,
-    };
-
     await addNotifications({
       message: body.title,
       service_id: this.serviceDbId,
@@ -111,15 +105,15 @@ export default class NtfyService implements DefaultNotificationService {
       });
     });
 
-    return NtfyHttpService.post(`/${this.config?.topic}`, body.message, {
-      headers: headers,
-    }).catch((err: any) => {
-      logger.error("ntfy error");
-      logger.error(err.message);
-      this.syslog?.error(`gotify error: ${err.message}`, {
-        eventName: "NOTIF_SERVICE_ERROR",
-      });
-    }) as Promise<any>;
+    return this.sendMessage(body.message, body.title, extraHeaders).catch(
+      (err: any) => {
+        logger.error("ntfy error");
+        logger.error(err.message);
+        this.syslog?.error(`ntfy error: ${err.message}`, {
+          eventName: "NOTIF_SERVICE_ERROR",
+        });
+      },
+    );
   }
 
   sendJobFinishNotification(
@@ -181,6 +175,6 @@ export default class NtfyService implements DefaultNotificationService {
         "X-Priority": (priority ?? "5").toString(),
         ...rest,
       },
-    ) as Promise<any>;
+    );
   }
 }

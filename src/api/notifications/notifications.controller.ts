@@ -5,19 +5,28 @@ import { basePrisma } from "@initialization/index";
 import { getAllConfigs } from "@repositories/configs";
 import {
   addNotificationService,
+  addOrUpdateGlobalEventHandler,
+  addOrUpdateJobEventHandler,
   attachAServiceToJob,
+  cloneNotificationService,
+  deleteGlobalEventHandler,
+  deleteJobEventHandler,
   deleteNotificationService,
   detachServiceFromAllJobs,
+  getAllGlobalEventHandlers,
   getAllJobsForAService,
   getAllNotificationServices,
   getAvailableExternalServices,
   getNotificationService,
   InitializeServiceConfig,
   safeUpdateServiceConfig,
+  testNotificationService,
   updateNotificationService,
   validateInputConfigAgainstSchema,
+  verifyIfNotificationServiceCanBeDeleted,
 } from "@repositories/notificationServices";
 import {
+  jobEventNotificationConfigAPISchema,
   notificationCreationSchema,
   notificationUpdateSchema,
 } from "@typesDef/notifications";
@@ -42,22 +51,23 @@ export const notificationsController = createElysia({
   .get(
     "/allNotifications",
     ({ query }) => {
-      const { limit, offset } = query;
-      return getAllNotificationServices({ limit, offset });
+      const { limit, offset, inputIds } = query;
+      return getAllNotificationServices({ limit, offset, inputIds });
     },
     {
       query: t.Object({
         limit: t.Optional(t.Number()),
         offset: t.Optional(t.Number()),
+        inputIds: t.Optional(t.Array(t.Number())),
       }),
     },
   )
   .get("/allExternalFiles", () => {
     return getAvailableExternalServices();
   })
-  .post("/addNotificationService", async ({ request, set }) => {
+  .post("/addNotificationService", async ({ request, store }) => {
     const formData = await request.formData();
-    const userId = set.headers["x-user-id"];
+    const userId = store.userId;
     const inputValues = notificationCreationSchema.parse(
       Object.fromEntries(formData.entries()),
     );
@@ -100,10 +110,24 @@ export const notificationsController = createElysia({
         );
     });
   })
+  .post(
+    "/cloneNotificationService",
+    async ({ body, store }) => {
+      const { serviceId, name } = body;
+      const userId = store.userId;
+      return cloneNotificationService(serviceId, name, Number(userId));
+    },
+    {
+      body: t.Object({
+        serviceId: t.Number(),
+        name: t.String(),
+      }),
+    },
+  )
   .put(
     "/updateNotificationServiceConfig",
-    async ({ body, set }) => {
-      const userId = set.headers["x-user-id"];
+    async ({ body, store }) => {
+      const userId = store.userId;
       const { name, config } = body;
       const service = await getNotificationService(0, name);
       if (!service) {
@@ -204,6 +228,7 @@ export const notificationsController = createElysia({
       updateObject["image"] = await savePublicImage({
         filename: inputValues.imageName,
         data: await inputValues.image?.arrayBuffer(),
+        unique: true,
       });
       const targetService = await getNotificationService(inputValues.id);
       if (targetService?.image) {
@@ -223,12 +248,25 @@ export const notificationsController = createElysia({
     "/deleteNotificationService",
     async ({ query }) => {
       const { id } = query;
+      await verifyIfNotificationServiceCanBeDeleted(Number(id));
       await detachServiceFromAllJobs(Number(id));
       return deleteNotificationService(Number(id));
     },
     {
       query: t.Object({
         id: t.Number(),
+      }),
+    },
+  )
+  .post(
+    "/testNotificationService",
+    async ({ body }) => {
+      const { id } = body;
+      return testNotificationService(id);
+    },
+    {
+      body: z.object({
+        id: z.coerce.number(),
       }),
     },
   )
@@ -255,6 +293,71 @@ export const notificationsController = createElysia({
     {
       query: t.Object({
         serviceId: t.Number(),
+      }),
+    },
+  )
+  .post(
+    "/updateJobEventHandlers",
+    ({ body }) => {
+      return addOrUpdateJobEventHandler({
+        handler: body.handler,
+        jobId: body.jobId,
+      });
+    },
+    {
+      body: z.object({
+        handler: jobEventNotificationConfigAPISchema,
+        jobId: z.number({ message: "job id is required" }),
+      }),
+    },
+  )
+  .delete(
+    "/deleteJobEventHandler",
+    ({ query }) => {
+      const { jobId, configId } = query;
+      return deleteJobEventHandler({
+        configId,
+        jobId,
+      });
+    },
+    {
+      query: z.object({
+        jobId: z.coerce.number({ message: "job id is required" }),
+        configId: z.string({ message: "config id is required" }),
+      }),
+    },
+  )
+  .get("/globalEventHandlers", () => {
+    return getAllGlobalEventHandlers();
+  })
+  .put(
+    "/updateGlobalHandlers",
+    ({ body, store }) => {
+      const { configId, handler } = body;
+      const userId = store.userId;
+      return addOrUpdateGlobalEventHandler({
+        configId,
+        handler,
+        userId: Number(userId),
+      });
+    },
+    {
+      body: z.object({
+        configId: z.string().optional(),
+        handler: jobEventNotificationConfigAPISchema,
+      }),
+    },
+  )
+  .delete(
+    "/deleteGlobalHandlers",
+    ({ query, store }) => {
+      const { configId } = query;
+      const userId = store.userId;
+      return deleteGlobalEventHandler({ configId, userId: Number(userId) });
+    },
+    {
+      query: z.object({
+        configId: z.string({ message: "config id is required" }),
       }),
     },
   );

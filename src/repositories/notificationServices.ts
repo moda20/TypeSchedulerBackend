@@ -1,17 +1,33 @@
 import config from "@config/config";
-import { updateConfig } from "@config/config.service";
+import {
+  removeConfig,
+  updateConfig,
+  updateObjectConfig,
+} from "@config/config.service";
 import { basePrisma, prisma } from "@initialization/index";
 import { PrismaClient } from "@prisma/client";
-import { getAllJobs } from "@repositories/jobs";
+import { getAllJobs, isJobRunning, updateJobConfig } from "@repositories/jobs";
+import { JobDTOClass, jobUpdateConfig } from "@typesDef/models/job";
 import { NewNotificationService } from "@typesDef/models/notificationService";
-import { extractedServiceConfiguration } from "@typesDef/notifications";
+import {
+  extractedServiceConfiguration,
+  JobEventNotificationConfigAPISchemaType,
+} from "@typesDef/notifications";
 import { APIError } from "@utils/ErrorHandler";
-import { deletePublicImage, resolveFilePath } from "@utils/fileUtils";
+import {
+  deletePublicImage,
+  resolveFilePath,
+  savePublicImage,
+} from "@utils/fileUtils";
 import { findFiles } from "@utils/jobUtils";
 import logger from "@utils/loggers";
+import { forceToArray } from "@utils/socketUtils";
 import { parseJsDoc } from "@utils/typeUtils";
-import { join } from "path";
+import { join, parse } from "path";
+import safe from "safe-regex";
+import { ScheduleJobManager } from "schedule-manager";
 import ts from "typescript";
+import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
 export const REPO_NAME = "Notification services";
@@ -19,41 +35,38 @@ export const getAllNotificationServices = async ({
   limit,
   offset,
   searchQuery,
+  inputIds,
 }: {
   limit?: number;
   offset?: number;
   searchQuery?: string;
+  inputIds?: number[];
 }) => {
+  const searchConfig: any = {};
+
+  if (searchQuery) {
+    searchConfig.OR = [
+      {
+        name: { contains: searchQuery },
+      },
+      {
+        description: { contains: searchQuery },
+      },
+    ];
+  }
+  if (inputIds) {
+    searchConfig.id = {
+      in: inputIds,
+    };
+  }
   const [data, count] = await Promise.all([
     basePrisma.notificationServices.findMany({
       take: limit,
       skip: offset,
-      where: {
-        ...(searchQuery && {
-          OR: [
-            {
-              name: { contains: searchQuery },
-            },
-            {
-              description: { contains: searchQuery },
-            },
-          ],
-        }),
-      },
+      where: searchConfig,
     }),
     basePrisma.notificationServices.count({
-      where: {
-        ...(searchQuery && {
-          OR: [
-            {
-              name: { contains: searchQuery },
-            },
-            {
-              description: { contains: searchQuery },
-            },
-          ],
-        }),
-      },
+      where: searchConfig,
     }),
   ]);
   return {
@@ -98,6 +111,43 @@ export const updateNotificationService = async ({
   });
 };
 
+export const testNotificationService = async (id: number) => {
+  const targetService = await getNotificationService(Number(id));
+  if (!targetService) throw new APIError("Service not found", REPO_NAME);
+  try {
+    const targetFile = (
+      await import(join(import.meta.dir, "../..", targetService.entryPoint))
+    ).default;
+    const serviceConfig = config.safeGet(
+      `notifications.${targetService.name}`,
+      {},
+    );
+    const serviceObject = targetFile.init(
+      JobDTOClass.mock(),
+      JobDTOClass.mockJobLog(),
+      targetService,
+      serviceConfig,
+    );
+    return serviceObject.sendMessage("test message").catch((err: any) => {
+      throw err;
+    });
+  } catch (err: any) {
+    logger.error(err);
+    throw new APIError(`Service test failed : ${err.message}`, REPO_NAME);
+  }
+};
+
+export const verifyIfNotificationServiceCanBeDeleted = async (id: number) => {
+  const targetService = await getNotificationService(Number(id));
+  if (!targetService) throw new APIError("Service not found", REPO_NAME);
+  const defaultService = config.get("notifications.defaultService");
+  if (targetService.name === defaultService)
+    throw new APIError(
+      "Cannot delete default service. Change the default service via the config API",
+      REPO_NAME,
+    );
+  return true;
+};
 export const deleteNotificationService = async (id: number) => {
   const targetService = await getNotificationService(Number(id));
   if (targetService?.image) {
@@ -173,6 +223,15 @@ export const attachAServiceToJob = async (
 
 export const detachServiceFromAllJobs = async (serviceId: number) => {
   const allJobs = await getAllJobsForAService(serviceId);
+  const runningJobs = await Promise.all(
+    allJobs.map(async (j) => await isJobRunning(j.id!)),
+  );
+  if (runningJobs.some((e) => e)) {
+    throw new APIError(
+      "Cannot detach service while some attached jobs are running",
+      REPO_NAME,
+    );
+  }
   return await Promise.all(
     allJobs.map((job) => {
       const parsedParams = JSON.parse(job.param || "{}");
@@ -363,4 +422,287 @@ export const validateInputConfigAgainstSchema = (
   }
 
   return validationResult;
+};
+
+export const cloneNotificationService = async (
+  serviceId: number,
+  name: string,
+  userId: number,
+) => {
+  const existingService = await getNotificationService(serviceId);
+  if (!existingService) {
+    throw new APIError(`Service ${serviceId} not found`, REPO_NAME);
+  }
+  const safeName = name.replace(/\s/g, "-");
+  return basePrisma.$transaction(async (tx) => {
+    let newImagePath = existingService.image || undefined;
+
+    if (existingService.image) {
+      const existingImage = Bun.file(
+        resolveFilePath(join("..", existingService.image)),
+      );
+      newImagePath = await savePublicImage({
+        filename: `${safeName}_${parse(existingService.image).base}`,
+        data: await existingImage.arrayBuffer(),
+        unique: true,
+      });
+    }
+
+    return addNotificationService(
+      {
+        name: safeName,
+        description: existingService.description,
+        entryPoint: existingService.entryPoint,
+        image: newImagePath,
+      },
+      tx,
+    )
+      .then((newService) => {
+        return InitializeServiceConfig(
+          safeName,
+          existingService.entryPoint,
+          Number(userId),
+        ).then(() => newService);
+      })
+      .catch((err) => {
+        // TODO: delete the image newImagePath created
+        throw err;
+      });
+  });
+};
+
+export const addOrUpdateJobEventHandler = async ({
+  jobId,
+  handler,
+}: {
+  handler: JobEventNotificationConfigAPISchemaType;
+  jobId: number;
+}) => {
+  const { job } = await ScheduleJobManager.getJobById(jobId);
+  if (!job) {
+    throw new APIError("Job not found", REPO_NAME);
+  }
+  const service = await getNotificationService(handler.notification_service_id);
+  if (!service) {
+    throw new APIError("Service not found", REPO_NAME);
+  }
+  if (handler.regex) {
+    if (!safe(handler.regex)) {
+      throw new APIError("Provided RegEx is not valid or not safe", REPO_NAME);
+    }
+  }
+  const jobParams = JSON.parse(job.param || "{}");
+  if (typeof jobParams !== "object") {
+    throw new APIError(
+      "Job param is not an object, update the params first to be an object in order to save event handlers",
+      REPO_NAME,
+    );
+  }
+  // updating the date of this update or creation
+  handler.updatedAt = new Date();
+  if (handler.config_id) {
+    const existingService = jobParams.eventHandlers?.findIndex(
+      (e: any) => String(e.config_id) === String(handler.config_id),
+    );
+    if (existingService === undefined || existingService === -1) {
+      throw new APIError("Event handler not found", REPO_NAME);
+    } else {
+      jobParams.eventHandlers[existingService] = handler;
+    }
+  } else {
+    handler.config_id = uuidv4();
+    if (jobParams.eventHandlers) {
+      jobParams.eventHandlers.push(handler);
+    } else {
+      jobParams.eventHandlers = [handler];
+    }
+  }
+
+  // TODO Check for solutions to concurrent param updates
+  return updateJobConfig(String(job.id), {
+    param: JSON.stringify(jobParams),
+  } as jobUpdateConfig)
+    .then((jobUpdated) => {
+      if (!jobUpdated || !jobUpdated.success) {
+        logger.error(jobUpdated);
+        throw jobUpdated?.err;
+      }
+    })
+    .catch((err) => {
+      logger.error(`Job event handler update failed for job ${job.id}`);
+      logger.error(err);
+      throw new APIError(
+        "Job event handler update failed, check logs for more info",
+        REPO_NAME,
+      );
+    });
+};
+
+export const deleteJobEventHandler = async ({
+  jobId,
+  configId,
+}: {
+  jobId: number;
+  configId: string;
+}) => {
+  const { job } = await ScheduleJobManager.getJobById(jobId);
+  if (!job) {
+    throw new APIError("Job not found", REPO_NAME);
+  }
+  const jobParams = JSON.parse(job.param || "{}");
+  const targetHandler = jobParams.eventHandlers?.findIndex(
+    (e: any) => e.config_id === configId,
+  );
+
+  if (targetHandler === undefined || targetHandler === -1) {
+    throw new APIError("Event handler not found", REPO_NAME);
+  }
+
+  // deletion is just removing from the job param's "eventHandlers" array
+  jobParams.eventHandlers.splice(targetHandler, 1);
+
+  return updateJobConfig(String(job.id), {
+    param: JSON.stringify(jobParams),
+  } as jobUpdateConfig)
+    .then((jobUpdated) => {
+      if (!jobUpdated || !jobUpdated.success) {
+        logger.error(jobUpdated);
+        throw jobUpdated?.err;
+      }
+    })
+    .catch((err) => {
+      logger.error(`Job event handler update failed for job ${job.id}`);
+      logger.error(err);
+      throw new APIError(
+        "Job event handler update failed, check logs for more info",
+        REPO_NAME,
+      );
+    });
+};
+
+export const getAllGlobalEventHandlers = () => {
+  const configs: any = config.safeGet("notifications.eventHandlers", {});
+  return Object.values(configs)
+    .filter((e: any) => e["config-id"])
+    .map((cfg: any) => {
+      return {
+        config_id: cfg["config-id"],
+        notification_type: forceToArray(cfg["notification-type"]),
+        trigger: cfg.trigger,
+        notification_service_id: cfg["notification-service-id"],
+        regex: cfg.regex,
+        durationThreshold: cfg.durationThreshold,
+        occurrences: cfg.occurrences,
+        updatedAt: cfg.updatedAt,
+      };
+    });
+};
+
+export const addOrUpdateGlobalEventHandler = async ({
+  configId,
+  handler,
+  userId,
+}: {
+  handler: JobEventNotificationConfigAPISchemaType;
+  configId?: string;
+  userId: number;
+}) => {
+  try {
+    const service = await getNotificationService(
+      handler.notification_service_id,
+    );
+    if (!service) {
+      throw new APIError("Service not found", REPO_NAME);
+    }
+    if (handler.regex) {
+      if (!safe(handler.regex)) {
+        throw new APIError(
+          "Provided RegEx is not valid or not safe",
+          REPO_NAME,
+        );
+      }
+    }
+    // updating the date of this update or creation
+    handler.updatedAt = new Date();
+
+    if (configId) {
+      if (configId !== handler.config_id) {
+        throw new APIError("Config ids does not match", REPO_NAME);
+      }
+      const existingService = config.safeGet(
+        `notifications.eventHandlers.${configId}`,
+        null,
+      );
+      if (!existingService) {
+        throw new APIError("Event handler not found", REPO_NAME);
+      } else {
+        return await updateObjectConfig(
+          `notifications.eventHandlers.${configId}`,
+          {
+            "config-id": handler.config_id,
+            "notification-type": handler.notification_type,
+            trigger: handler.trigger,
+            "notification-service-id": handler.notification_service_id,
+            regex: handler.regex,
+            durationThreshold: handler.durationThreshold,
+            occurrences: handler.occurrences,
+            updatedAt: handler.updatedAt,
+          },
+          userId,
+        );
+      }
+    } else {
+      handler.config_id = uuidv4();
+      // switching to - for attributes keys to not confused the DB config key separator
+      // TODO see if this could be done automatically by the updateConfig helper
+      return await updateObjectConfig(
+        `notifications.eventHandlers.${handler.config_id}`,
+        {
+          "config-id": handler.config_id,
+          "notification-type": handler.notification_type,
+          trigger: handler.trigger,
+          "notification-service-id": handler.notification_service_id,
+          regex: handler.regex,
+          durationThreshold: handler.durationThreshold,
+          occurrences: handler.occurrences,
+          updatedAt: handler.updatedAt,
+        },
+        userId,
+      );
+    }
+  } catch (err) {
+    logger.error(err);
+    throw new APIError("Error while updating global event handler", REPO_NAME);
+  }
+};
+
+// TODO: validate the choice where deleted eventHandlers should or shouldn't be used by running jobs
+export const deleteGlobalEventHandler = async ({
+  configId,
+  userId,
+}: {
+  configId: string;
+  userId: number;
+}) => {
+  try {
+    const targetConfig = config.safeGet(
+      `notifications.eventHandlers.${configId}`,
+      null,
+    );
+    if (!targetConfig) throw new APIError("Event handler not found", REPO_NAME);
+
+    // TODO see if this warrants a prisma transaction & if this could be a general object deletion helper
+    await Promise.all(
+      Object.keys(targetConfig).map((key) => {
+        return removeConfig(
+          `notifications.eventHandlers.${configId}.${key}`,
+          userId,
+        );
+      }),
+    );
+    return true;
+  } catch (err) {
+    logger.error(err);
+    throw new APIError("Error while deleting global event handler", REPO_NAME);
+  }
 };

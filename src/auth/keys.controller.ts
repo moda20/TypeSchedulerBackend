@@ -16,14 +16,14 @@ export const keysController = createElysia({ prefix: "/auth/keys" })
     // @ts-ignore
     ctx.query = qs.parse(new URL(ctx.request.url).search.slice(1));
   })
-  .post("/keys", ({ set }) => {
-    const userId = set.headers["x-user-id"];
+  .post("/keys", ({ store }) => {
+    const userId = store.userId;
     return getAllApiKeysForaUser(Number(userId), true);
   })
   .post(
     "/createKey",
-    async ({ body, set }) => {
-      const userId = set.headers["x-user-id"];
+    async ({ body, store }) => {
+      const userId = store.userId;
       return await createApiKey(Number(userId), body.name);
     },
     {
@@ -34,8 +34,8 @@ export const keysController = createElysia({ prefix: "/auth/keys" })
   )
   .delete(
     "/deleteKey",
-    async ({ body, set }) => {
-      const userId = set.headers["x-user-id"];
+    async ({ body, store }) => {
+      const userId = store.userId;
       return await deleteApikey(Number(userId), body.keyId);
     },
     {
