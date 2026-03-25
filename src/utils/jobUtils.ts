@@ -6,7 +6,7 @@ import { getNotificationService } from "@repositories/notificationServices";
 import { saveNewFile } from "@repositories/outputFiles";
 import { TypedFilter } from "@typesDef/api/jobs";
 import { JobDTO, JobLogDTO } from "@typesDef/models/job";
-import { Notifications } from "@typesDef/notifications";
+import type { Notifications } from "@typesDef/notifications";
 import dayjs from "@utils/dayJs";
 import logger from "@utils/loggers";
 import cronParser from "cron-parser";

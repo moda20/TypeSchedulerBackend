@@ -126,7 +126,7 @@ export const overlay = (from: any, to: any, schema: any) => {
 };
 
 export const toSafeString = (input: any) => {
-  if (!input) return "";
+  if (input === null || input === undefined) return "";
   if (typeof input === "string") return input;
   if (input instanceof Date) return input.toISOString();
   if (["number", "boolean"].includes(typeof input)) return input.toString();
