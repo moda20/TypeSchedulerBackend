@@ -456,13 +456,18 @@ export const cloneNotificationService = async (
         image: newImagePath,
       },
       tx,
-    ).then((newService) => {
-      return InitializeServiceConfig(
-        safeName,
-        existingService.entryPoint,
-        Number(userId),
-      ).then(() => newService);
-    });
+    )
+      .then((newService) => {
+        return InitializeServiceConfig(
+          safeName,
+          existingService.entryPoint,
+          Number(userId),
+        ).then(() => newService);
+      })
+      .catch((err) => {
+        // TODO: delete the image newImagePath created
+        throw err;
+      });
   });
 };
 
@@ -513,6 +518,7 @@ export const addOrUpdateJobEventHandler = async ({
     }
   }
 
+  // TODO Check for solutions to concurrent param updates
   return updateJobConfig(String(job.id), {
     param: JSON.stringify(jobParams),
   } as jobUpdateConfig)
