@@ -41,6 +41,12 @@ const handleEventNotification = async (
     (v) => logger.info(v),
   );
   const targetService = Object.values(service)[0];
+  if (!targetService) {
+    logger.error(
+      `target notification service ${handlerConfig.notification_service_id} not found`,
+    );
+    return Promise.resolve();
+  }
   return targetService.sendMessage(message, title).catch((err) => {
     logger.error(err);
   });

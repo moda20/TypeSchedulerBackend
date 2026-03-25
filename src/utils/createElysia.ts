@@ -2,10 +2,12 @@ import { Elysia, t } from "elysia";
 
 import { jwtAccessSetup, jwtRefreshSetup } from "@auth/guards/setup.jwt";
 
+const baseState = new Elysia().state("userId", undefined as unknown as number);
 export const createElysia = (
   config?: ConstructorParameters<typeof Elysia>[0],
 ) =>
   new Elysia({ ...config, aot: process.env.RUNTIME === "bun" })
+    .use(baseState)
     .use(jwtAccessSetup)
     .use(jwtRefreshSetup);
 

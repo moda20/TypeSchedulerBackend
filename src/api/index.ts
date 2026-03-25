@@ -16,7 +16,6 @@ import { createElysia } from "@utils/createElysia";
 import { APIError } from "@utils/ErrorHandler";
 import logger from "@utils/loggers";
 import { StatusCodes } from "http-status-codes";
-
 export const apiRoutes = createElysia()
   .error({ APIError })
   .onError(({ code, error, path }) => {
@@ -37,7 +36,7 @@ export const apiRoutes = createElysia()
     );
   })
   .guard({
-    async beforeHandle({ set, jwtAccess, cookie, headers }) {
+    async beforeHandle({ set, jwtAccess, cookie, headers, store }) {
       if (headers && headers["authorization"]) {
         const isAuth = await isTokenAuthenticated(headers["authorization"]);
         if (!isAuth.success) {
@@ -48,7 +47,7 @@ export const apiRoutes = createElysia()
             errors: isAuth.errors,
           };
         }
-        set.headers["x-user-id"] = isAuth.data.id;
+        store.userId = Number(isAuth.data!.id);
       } else {
         const isAuth = await isAuthenticated(jwtAccess, cookie);
         if (!isAuth.success) {
@@ -59,7 +58,7 @@ export const apiRoutes = createElysia()
             errors: isAuth.errors,
           };
         }
-        set.headers["x-user-id"] = isAuth.data.id;
+        store.userId = Number(isAuth.data.id);
       }
     },
   });

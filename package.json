@@ -32,7 +32,7 @@
     "convict-format-with-validator": "^6.2.0",
     "cron-parser": "^5.4.0",
     "dayjs": "^1.11.18",
-    "elysia": "^1.4.12",
+    "elysia": "^1.4.28",
     "elysia-helmet": "^1.0.2",
     "execSync": "^1.0.2",
     "fs-extra": "^11.3.2",

@@ -65,9 +65,9 @@ export const notificationsController = createElysia({
   .get("/allExternalFiles", () => {
     return getAvailableExternalServices();
   })
-  .post("/addNotificationService", async ({ request, set }) => {
+  .post("/addNotificationService", async ({ request, store }) => {
     const formData = await request.formData();
-    const userId = set.headers["x-user-id"];
+    const userId = store.userId;
     const inputValues = notificationCreationSchema.parse(
       Object.fromEntries(formData.entries()),
     );
@@ -112,9 +112,9 @@ export const notificationsController = createElysia({
   })
   .post(
     "/cloneNotificationService",
-    async ({ body, set }) => {
+    async ({ body, store }) => {
       const { serviceId, name } = body;
-      const userId = set.headers["x-user-id"];
+      const userId = store.userId;
       return cloneNotificationService(serviceId, name, Number(userId));
     },
     {
@@ -126,8 +126,8 @@ export const notificationsController = createElysia({
   )
   .put(
     "/updateNotificationServiceConfig",
-    async ({ body, set }) => {
-      const userId = set.headers["x-user-id"];
+    async ({ body, store }) => {
+      const userId = store.userId;
       const { name, config } = body;
       const service = await getNotificationService(0, name);
       if (!service) {
@@ -332,9 +332,9 @@ export const notificationsController = createElysia({
   })
   .put(
     "/updateGlobalHandlers",
-    ({ body, set }) => {
+    ({ body, store }) => {
       const { configId, handler } = body;
-      const userId = set.headers["x-user-id"];
+      const userId = store.userId;
       return addOrUpdateGlobalEventHandler({
         configId,
         handler,
@@ -350,9 +350,9 @@ export const notificationsController = createElysia({
   )
   .delete(
     "/deleteGlobalHandlers",
-    ({ query, set }) => {
+    ({ query, store }) => {
       const { configId } = query;
-      const userId = set.headers["x-user-id"];
+      const userId = store.userId;
       return deleteGlobalEventHandler({ configId, userId: Number(userId) });
     },
     {
