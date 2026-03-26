@@ -274,7 +274,7 @@ We welcome contributions! Here's how you can help:
 This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
 
 ```
-Copyright (c) 2024 Lucas
+Copyright (c) 2026 Moda20
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
