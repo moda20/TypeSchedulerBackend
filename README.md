@@ -2,7 +2,10 @@
 
 # 📅 TypeScheduler backend
 
-**A powerful task management and authentication server built with Bun, Elysia, and Prisma**
+<img src=".github/assets/images/TypeSchedulerLogo.png" alt="Type Scheduler UI Logo" width="200" />
+
+
+**A powerful task management for Typescript coded tasks. Built with Bun, Elysia, and Prisma. Built for developers first**
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 [![Bun](https://img.shields.io/badge/Bun-1.0+-ff69b4)](https://bun.sh/)
