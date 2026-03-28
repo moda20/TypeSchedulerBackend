@@ -8,7 +8,7 @@ To report a vulnerability, please follow these steps:
 
 1. **Confidentiality**: Please do not disclose the vulnerability publicly until we have had a chance to review and address it.
 
-2. **Notification**: Send a direct message (DM) to [@ImJustLucas](https://github.com/ImJustLucas) with the subject "Security Vulnerability Report".
+2. **Notification**: Send a direct message (DM) to [@moda20](https://github.com/moda20) with the subject "Security Vulnerability Report".
 
 3. **Information**: In your message, please include detailed information about the vulnerability, including steps to reproduce it and any potential impact.
 

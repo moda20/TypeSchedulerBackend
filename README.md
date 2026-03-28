@@ -1,8 +1,11 @@
 <div align="center">
 
-# 📅 Scheduler Backend
+# 📅 TypeScheduler backend
 
-**A powerful task management and authentication server built with Bun, Elysia, and Prisma**
+<img src=".github/assets/images/TypeSchedulerLogo.png" alt="Type Scheduler UI Logo" width="200" />
+
+
+**A powerful task management for Typescript coded tasks. Built with Bun, Elysia, and Prisma. Built for developers first**
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 [![Bun](https://img.shields.io/badge/Bun-1.0+-ff69b4)](https://bun.sh/)
@@ -16,7 +19,7 @@
 
 ## 📖 About
 
-**Scheduler Backend** is a robust task management and authentication server that provides:
+**TypeScheduler backend** is a robust task management and authentication server that provides:
 
 - ✅ **Task Scheduling**: CRON-based job scheduling with flexible configuration
 - 🔐 **Authentication & Authorization**: Secure user authentication with role-based access control
@@ -33,14 +36,14 @@
 
 ### Docker Installation (Recommended)
 
-The recommended way to run Scheduler Backend is via Docker. Create a `docker-compose.yml`:
+The recommended way to run TypeScheduler backend is via Docker. Create a `docker-compose.yml`:
 
 ```yaml
 services:
   scheduler_backend:
-    image: ghcr.io/moda20/scheduler_backend:latest
+    image: ghcr.io/moda20/type_scheduler_backend:latest
     #image: ghcr.io/moda20/scheduler_backend:dev # dev for latest development, but unstable
-    container_name: scheduler_backend
+    container_name: type_scheduler_backend
     restart: always
     env_file:
       - .env
@@ -146,10 +149,10 @@ Configuration is managed through a `.env` file. Copy `.env.example` and customiz
 
 ### API Configuration
 
-| Variable                | Description                  | Default             |
-| ----------------------- | ---------------------------- | ------------------- |
-| `ENABLE_SWAGGER_SERVER` | Enable Swagger documentation | `true`              |
-| `APP_NAME`              | Application name             | `scheduler_backend` |
+| Variable                | Description                  | Default                  |
+| ----------------------- | ---------------------------- |--------------------------|
+| `ENABLE_SWAGGER_SERVER` | Enable Swagger documentation | `true`                   |
+| `APP_NAME`              | Application name             | `type_scheduler_backend` |
 
 ---
 
@@ -274,7 +277,7 @@ We welcome contributions! Here's how you can help:
 This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
 
 ```
-Copyright (c) 2024 Lucas
+Copyright (c) 2026 Moda20
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -319,6 +322,5 @@ Built with:
 
 **Made with ❤️ by [Moda20](https://github.com/moda20)**
 
-[⬆ Back to top](#-scheduler-backend)
 
 </div>

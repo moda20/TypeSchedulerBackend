@@ -63,12 +63,6 @@ const config = convict({
       nullable: false,
     },
   },
-  exportOutputFiles: {
-    doc: "Whether to export output files.",
-    format: Boolean,
-    default: false,
-    env: "EXPORT_OUTPUT_FILE",
-  },
   files: {
     exportOutputFiles: {
       doc: "Whether to export output files.",
