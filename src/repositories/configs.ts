@@ -1,6 +1,7 @@
 import { basePrisma } from "@initialization/index";
+import { LogEventNames } from "@typesDef/api/jobs";
 import encryptionUtils from "@utils/encryptionUtils";
-
+import logger, { eventLog } from "@utils/loggers";
 export const getAllConfigs = (
   limit?: number,
   offset?: number,
@@ -67,6 +68,14 @@ export const saveConfig = async (
       key: key,
     },
   });
+  if (existingConfig?.is_encrypted !== is_encrypted) {
+    const sysLog = eventLog(LogEventNames.SysLogEvent);
+    const message = `config ${key} has changed encryption status from ${existingConfig?.is_encrypted} to ${is_encrypted}`;
+    sysLog.warn(message, {
+      eventName: "CONFIG_ENCRYPTION_STATUS_CHANGED",
+    });
+    logger.warn(message);
+  }
   const finalValue = is_encrypted
     ? encryptionUtils.encryptWithMasterKey(value)
     : value;
@@ -78,6 +87,7 @@ export const saveConfig = async (
         },
         data: {
           value: finalValue,
+          is_encrypted: is_encrypted ?? existingConfig.is_encrypted,
           appConfigAudit: {
             create: {
               changedBy: {
@@ -85,7 +95,7 @@ export const saveConfig = async (
                   id: userId,
                 },
               },
-              newValue: value,
+              newValue: finalValue,
               oldValue: existingConfig.value,
             },
           },
@@ -108,7 +118,7 @@ export const saveConfig = async (
                         id: userId,
                       },
                     },
-                    newValue: value,
+                    newValue: finalValue,
                     oldValue: null,
                   },
                 },
