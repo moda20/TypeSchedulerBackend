@@ -143,16 +143,18 @@ const categoriesMap: any = {
   logging: ["files"],
   notifications: ["notifications", "grafana"],
 };
+
+const transposedConfigMap = Object.keys(categoriesMap).reduce(
+  (p: any, c: string) => {
+    categoriesMap[c].forEach((e: any) => {
+      p[e] = c;
+    });
+    return p;
+  },
+  {},
+);
+
 export const categorizeConfig = (inputConfigObject: any) => {
-  const transposedConfigMap = Object.keys(categoriesMap).reduce(
-    (p: any, c: string) => {
-      categoriesMap[c].forEach((e: any) => {
-        p[e] = c;
-      });
-      return p;
-    },
-    {},
-  );
   return Object.keys(inputConfigObject).reduce((p: any, c: string) => {
     const categoryName = transposedConfigMap[c] ?? "custom";
     if (p[categoryName]) {
