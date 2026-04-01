@@ -144,7 +144,7 @@ const categoriesMap: any = {
   notifications: ["notifications", "grafana"],
 };
 
-const transposedConfigMap = Object.keys(categoriesMap).reduce(
+export const transposedConfigMap = Object.keys(categoriesMap).reduce(
   (p: any, c: string) => {
     categoriesMap[c].forEach((e: any) => {
       p[e] = c;
