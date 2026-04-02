@@ -136,3 +136,32 @@ export const toSafeString = (input: any) => {
     return input;
   }
 };
+
+// A human-readable map of config categories, might change to the convict schema if possible
+const categoriesMap: any = {
+  system: ["DB", "baseDB", "env", "appName", "server", "jobs", "swaggerServer"],
+  logging: ["files"],
+  notifications: ["notifications", "grafana"],
+};
+
+export const transposedConfigMap = Object.keys(categoriesMap).reduce(
+  (p: any, c: string) => {
+    categoriesMap[c].forEach((e: any) => {
+      p[e] = c;
+    });
+    return p;
+  },
+  {},
+);
+
+export const categorizeConfig = (inputConfigObject: any) => {
+  return Object.keys(inputConfigObject).reduce((p: any, c: string) => {
+    const categoryName = transposedConfigMap[c] ?? "custom";
+    if (p[categoryName]) {
+      p[categoryName][c] = inputConfigObject[c];
+    } else {
+      p[categoryName] = { [c]: inputConfigObject[c] };
+    }
+    return p;
+  }, {});
+};

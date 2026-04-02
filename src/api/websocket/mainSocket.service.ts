@@ -103,8 +103,8 @@ export default {
     }
   },
   unsubscribeFromTopics(userId: string, topics: string[]) {
-    this.topicsSubscriptions[userId] = this.topicsSubscriptions[userId].filter(
-      (e) => !topics.includes(e),
-    );
+    this.topicsSubscriptions[userId] =
+      this.topicsSubscriptions[userId]?.filter((e) => !topics.includes(e)) ??
+      [];
   },
 };

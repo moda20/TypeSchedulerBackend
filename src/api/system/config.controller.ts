@@ -5,6 +5,7 @@ import {
   ObjectifyFlattenedProperties,
   updateMultiConfig,
 } from "@config/config.service";
+import { categorizeConfig, transposedConfigMap } from "@utils/convictUtils";
 import { createElysia } from "@utils/createElysia";
 import qs from "qs";
 
@@ -18,7 +19,14 @@ export const configController = createElysia({ prefix: "/system/config" })
   })
   .get("/getConfig", async () => {
     const config = await getConfigWithDBEncryptionStatus();
-    return ObjectifyFlattenedProperties(config);
+    return {
+      configArray: ObjectifyFlattenedProperties(config),
+      categoriesMap: transposedConfigMap,
+    };
+  })
+  .get("/getCategorizedConfig", async () => {
+    const config = await getConfigWithDBEncryptionStatus();
+    return categorizeConfig(ObjectifyFlattenedProperties(config));
   })
   .post(
     "/updateConfig",
