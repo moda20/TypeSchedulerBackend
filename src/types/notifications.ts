@@ -165,7 +165,7 @@ export const notificationUpdateSchema = notificationCreationSchema.extend({
     .refine((n) => Number.isFinite(n), {
       message: "service id must be valid numbers",
     }),
-  imageName: z.string().optional(),
+  imageName: z.string().optional().default(`${uuidv4()}.jpg`),
 });
 
 // TODO : see is a specific validation for notif_type relation to regex and duration threshold is needed

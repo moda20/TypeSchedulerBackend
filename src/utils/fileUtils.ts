@@ -36,19 +36,15 @@ export const savePublicImage = ({
 export const deletePublicImage = async ({ filename }: { filename: string }) => {
   const targetFileName = filename.split("/").pop();
   if (targetFileName) {
-    const targetPath = join(
-      __dirname,
-      "../..",
-      "public/images",
-      targetFileName,
-    );
+    const targetPath = resolveFilePath(join(targetFileName, "../public"));
     return promises.rm(targetPath);
   }
 
-  return Promise.reject("no file found");
+  return Promise.reject(`File: ${filename} not found`);
 };
 
 // resolve file path from the src folder
+// Will check if it starts with the src folder
 export const resolveFilePath = (filePath: string) => {
   const srcRoot = resolve(parse(bun.main).dir);
   const root = join(srcRoot, "..");
