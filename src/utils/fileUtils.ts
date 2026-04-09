@@ -36,7 +36,9 @@ export const savePublicImage = ({
 export const deletePublicImage = async ({ filename }: { filename: string }) => {
   const targetFileName = filename.split("/").pop();
   if (targetFileName) {
-    const targetPath = resolveFilePath(join(targetFileName, "../public"));
+    const targetPath = resolveFilePath(
+      join("../public/images", targetFileName),
+    );
     return promises.rm(targetPath);
   }
 
