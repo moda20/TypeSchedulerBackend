@@ -119,7 +119,7 @@ export const updateNotificationServiceController = async (
     Object.fromEntries(formData.entries()),
   );
 
-  if (!inputValues.id) {
+  if (inputValues.id === undefined) {
     throw new Error("service id is required");
   }
   const updateObject = {} as any;
