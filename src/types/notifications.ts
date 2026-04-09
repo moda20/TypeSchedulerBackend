@@ -145,7 +145,7 @@ export interface JobEventHandlerConfig {
 
 export const notificationCreationSchema = z.object({
   image: z.file().optional(),
-  imageName: z.string().default(uuidv4()),
+  imageName: z.string().default(() => `${uuidv4()}.jpg`),
   name: z.string({ error: "Service name is required" }),
   description: z.string().optional().default(""),
   entryPoint: z.string({ error: "Entry point is required" }),
@@ -165,7 +165,10 @@ export const notificationUpdateSchema = notificationCreationSchema.extend({
     .refine((n) => Number.isFinite(n), {
       message: "service id must be valid numbers",
     }),
-  imageName: z.string().optional(),
+  imageName: z
+    .string()
+    .optional()
+    .default(() => `${uuidv4()}.jpg`),
 });
 
 // TODO : see is a specific validation for notif_type relation to regex and duration threshold is needed
