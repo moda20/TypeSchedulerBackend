@@ -5,6 +5,7 @@ import { openapi } from "@elysiajs/openapi";
 import { staticPlugin } from "@elysiajs/static";
 
 import { apiRoutes } from "@api/index";
+import { statusController } from "@api/system/status.controller";
 import { auth } from "@auth/auth.controller";
 import { jwtAccessSetup, jwtRefreshSetup } from "@auth/guards/setup.jwt";
 import config from "@config/config";
@@ -50,6 +51,7 @@ if (config.get("swaggerServer")) {
 // Routes
 api.use(auth);
 api.use(apiRoutes);
+api.use(statusController);
 api.get("/", () => "Server is working");
 
 api.use(

@@ -310,7 +310,7 @@ const config = convict({
   version: {
     env: "SYSTEM_VERSION_STRING",
     doc: "system version, set during build",
-    format: String,
+    default: "unknown",
     db_mirror: false,
   },
 });

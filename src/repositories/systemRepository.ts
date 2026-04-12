@@ -1,6 +1,7 @@
 import config from "@config/config";
 import { basePrisma, prisma } from "@initialization/index";
 import { PrismaClient } from "@prisma/client";
+import dayJs from "@utils/dayJs";
 import { resolveFilePath } from "@utils/fileUtils";
 import logger from "@utils/loggers";
 import mysqldump from "mysqldump";
@@ -111,14 +112,16 @@ export const getSystemInformation = async () => {
   const isGotifyEnabled = !!config.safeGet("notifications.gotify.url", null);
   const isNtfyEnabled = !!config.safeGet("notifications.ntfy.url", null);
   const isSlackEnabled = !!config.safeGet("notifications.slack.url", null);
+  const name = config.get("appName");
   return {
     version: getVersion,
+    name,
     services: {
       gotify: isGotifyEnabled,
       ntfy: isNtfyEnabled,
       slack: isSlackEnabled,
       loki: isLokiEnabled,
     },
-    uptime: process.uptime(),
+    uptime: dayJs.duration(process.uptime() * 1000).format("H[h] M[m] s[s]"),
   };
 };
