@@ -29,7 +29,7 @@ RUN bun run build
 
 # copy production dependencies and source code into final image
 FROM base AS release
-ARG VERSION
+ARG SYSTEM_VERSION_STRING
 
 COPY --from=install /temp/prod/node_modules node_modules
 COPY --from=prerelease /usr/src/app/. .
@@ -39,7 +39,7 @@ RUN bun install -g typescript
 RUN bun install bun-types
 RUN bun run build:types
 
-ENV SYSTEM_VERSION_STRING=VERSION
+ENV SYSTEM_VERSION_STRING=$SYSTEM_VERSION_STRING
 
 # run the app
 # USER bun # TODO Investigate usign the same user for docker, in order to not face permissions issues
