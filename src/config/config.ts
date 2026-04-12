@@ -307,6 +307,12 @@ const config = convict({
       db_mirror: false,
     },
   },
+  version: {
+    env: "SYSTEM_VERSION_STRING",
+    doc: "system version, set during build",
+    format: String,
+    db_mirror: false,
+  },
 });
 
 type extendedConvict = typeof config & {

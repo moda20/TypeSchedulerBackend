@@ -104,3 +104,21 @@ export const backupBaseDB = async () => {
     port: config.get("baseDB.port"),
   });
 };
+
+export const getSystemInformation = async () => {
+  const getVersion = config.get("version");
+  const isLokiEnabled = !!config.safeGet("grafana.lokiUrl", null);
+  const isGotifyEnabled = !!config.safeGet("notifications.gotify.url", null);
+  const isNtfyEnabled = !!config.safeGet("notifications.ntfy.url", null);
+  const isSlackEnabled = !!config.safeGet("notifications.slack.url", null);
+  return {
+    version: getVersion,
+    services: {
+      gotify: isGotifyEnabled,
+      ntfy: isNtfyEnabled,
+      slack: isSlackEnabled,
+      loki: isLokiEnabled,
+    },
+    uptime: process.uptime(),
+  };
+};
