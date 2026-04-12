@@ -122,6 +122,6 @@ export const getSystemInformation = async () => {
       slack: isSlackEnabled,
       loki: isLokiEnabled,
     },
-    uptime: dayJs.duration(process.uptime() * 1000).format("H[h] M[m] s[s]"),
+    uptime: dayJs.duration(process.uptime() * 1000).format("H[h] m[m] s[s]"),
   };
 };
