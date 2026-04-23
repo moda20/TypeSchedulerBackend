@@ -124,6 +124,6 @@ export const getSystemInformation = async () => {
     },
     uptime: dayJs
       .duration(process.uptime() * 1000)
-      .format("YYYY-MM-DD | H[h] m[m] s[s]"),
+      .format("Y-MM-DD | H[h] m[m] s[s]"),
   };
 };
