@@ -21,18 +21,17 @@ import {
   InitializeServiceConfig,
   safeUpdateServiceConfig,
   testNotificationService,
-  updateNotificationService,
+  updateNotificationServiceController,
   validateInputConfigAgainstSchema,
   verifyIfNotificationServiceCanBeDeleted,
 } from "@repositories/notificationServices";
 import {
   jobEventNotificationConfigAPISchema,
   notificationCreationSchema,
-  notificationUpdateSchema,
 } from "@typesDef/notifications";
 import { createElysia } from "@utils/createElysia";
 import { APIError } from "@utils/ErrorHandler";
-import { deletePublicImage, savePublicImage } from "@utils/fileUtils";
+import { savePublicImage } from "@utils/fileUtils";
 import qs from "qs";
 import { z } from "zod";
 
@@ -184,7 +183,8 @@ export const notificationsController = createElysia({
         `notifications_${name}`,
         true,
       );
-      if (!rawConfig.length) throw new Error(`Service ${name} not found`);
+      if (!rawConfig.length)
+        throw new Error(`Configuration for service ${name} is not found`);
       return ObjectifyFlattenedProperties(
         rawConfig.reduce(
           (p, c) => {
@@ -211,38 +211,7 @@ export const notificationsController = createElysia({
   )
   .put("/updateNotificationService", async ({ request }) => {
     const formData = await request.formData();
-    const inputValues = notificationUpdateSchema.parse(
-      Object.fromEntries(formData.entries()),
-    );
-
-    if (!inputValues.id) {
-      throw new Error("service id is required");
-    }
-    const updateObject = {} as any;
-    updateObject["name"] = inputValues.name;
-    updateObject["id"] = inputValues.id;
-    updateObject["description"] = inputValues.description;
-    updateObject["entryPoint"] = inputValues.entryPoint;
-
-    if (inputValues.image) {
-      updateObject["image"] = await savePublicImage({
-        filename: inputValues.imageName,
-        data: await inputValues.image?.arrayBuffer(),
-        unique: true,
-      });
-      const targetService = await getNotificationService(inputValues.id);
-      if (targetService?.image) {
-        await deletePublicImage({
-          filename: targetService.image,
-        });
-      }
-    }
-
-    return updateNotificationService(updateObject).then((savedData) => {
-      if (inputValues?.jobs?.length) {
-        return attachAServiceToJob(inputValues.jobs, savedData.id);
-      }
-    });
+    return updateNotificationServiceController(formData);
   })
   .delete(
     "/deleteNotificationService",

@@ -12,6 +12,7 @@ import { NewNotificationService } from "@typesDef/models/notificationService";
 import {
   extractedServiceConfiguration,
   JobEventNotificationConfigAPISchemaType,
+  notificationUpdateSchema,
 } from "@typesDef/notifications";
 import { APIError } from "@utils/ErrorHandler";
 import {
@@ -111,6 +112,48 @@ export const updateNotificationService = async ({
   });
 };
 
+export const updateNotificationServiceController = async (
+  formData: FormData,
+) => {
+  const inputValues = notificationUpdateSchema.parse(
+    Object.fromEntries(formData.entries()),
+  );
+
+  if (inputValues.id === undefined) {
+    throw new Error("service id is required");
+  }
+  const updateObject = {} as any;
+  updateObject["name"] = inputValues.name;
+  updateObject["id"] = inputValues.id;
+  updateObject["description"] = inputValues.description;
+  updateObject["entryPoint"] = inputValues.entryPoint;
+
+  if (inputValues.image) {
+    updateObject["image"] = await savePublicImage({
+      filename: inputValues.imageName,
+      data: await inputValues.image?.arrayBuffer(),
+      unique: true,
+    });
+    const targetService = await getNotificationService(inputValues.id);
+    if (targetService?.image) {
+      await deletePublicImage({
+        filename: targetService.image,
+      }).catch((err) => {
+        logger.error(
+          "Error when deleting service image. ignoring check the following error",
+        );
+        logger.error(err);
+      });
+    }
+  }
+
+  return updateNotificationService(updateObject).then((savedData) => {
+    if (inputValues?.jobs?.length) {
+      return attachAServiceToJob(inputValues.jobs, savedData.id);
+    }
+  });
+};
+
 export const testNotificationService = async (id: number) => {
   const targetService = await getNotificationService(Number(id));
   if (!targetService) throw new APIError("Service not found", REPO_NAME);
@@ -153,6 +196,11 @@ export const deleteNotificationService = async (id: number) => {
   if (targetService?.image) {
     await deletePublicImage({
       filename: targetService.image,
+    }).catch((err) => {
+      logger.error(
+        "Error when deleting service image. ignoring check the following error",
+      );
+      logger.error(err);
     });
   }
   return basePrisma.notificationServices.delete({

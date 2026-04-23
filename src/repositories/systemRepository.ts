@@ -1,6 +1,7 @@
 import config from "@config/config";
 import { basePrisma, prisma } from "@initialization/index";
 import { PrismaClient } from "@prisma/client";
+import dayJs from "@utils/dayJs";
 import { resolveFilePath } from "@utils/fileUtils";
 import logger from "@utils/loggers";
 import mysqldump from "mysqldump";
@@ -103,4 +104,26 @@ export const backupBaseDB = async () => {
     database: config.get("baseDB.databaseName"),
     port: config.get("baseDB.port"),
   });
+};
+
+export const getSystemInformation = async () => {
+  const getVersion = config.get("version");
+  const isLokiEnabled = !!config.safeGet("grafana.lokiUrl", null);
+  const isGotifyEnabled = !!config.safeGet("notifications.gotify.url", null);
+  const isNtfyEnabled = !!config.safeGet("notifications.ntfy.url", null);
+  const isSlackEnabled = !!config.safeGet("notifications.slack.url", null);
+  const name = config.get("appName");
+  return {
+    version: getVersion,
+    name,
+    services: {
+      gotify: isGotifyEnabled,
+      ntfy: isNtfyEnabled,
+      slack: isSlackEnabled,
+      loki: isLokiEnabled,
+    },
+    uptime: dayJs
+      .duration(process.uptime() * 1000)
+      .format("Y-MM-DD | H[h] m[m] s[s]"),
+  };
 };

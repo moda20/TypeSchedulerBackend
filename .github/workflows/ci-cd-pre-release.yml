@@ -26,12 +26,22 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Compute version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          GIT_SHA=${{ github.sha }}
+          echo "APP_VERSION=$VERSION-$GIT_SHA" >> $GITHUB_ENV
+
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./DOCKERFILE
           push: true
+          build-args: |
+            SYSTEM_VERSION_STRING=${{ env.APP_VERSION }}
           tags: |
             ghcr.io/${{ github.repository_owner }}/type_scheduler_backend:dev
             ghcr.io/${{ github.repository_owner }}/type_scheduler_backend:${{ github.sha }}

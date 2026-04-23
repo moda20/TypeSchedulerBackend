@@ -2,14 +2,18 @@ import { PromisePool } from "@supercharge/promise-pool";
 import { AuditMetadata } from "@typesDef/models/logs";
 import logger from "@utils/loggers";
 import * as bun from "bun";
-import * as fs from "node:fs";
 import { join } from "path";
 
 export async function parseAuditFile(
   auditFilePath: string,
 ): Promise<AuditMetadata[] | undefined> {
   try {
-    const parsed = JSON.parse(fs.readFileSync(auditFilePath).toString());
+    const auditFile = bun.file(auditFilePath);
+    if (!(await auditFile.exists())) {
+      logger.warn(`Audit file not found: ${auditFilePath}`);
+      return Promise.resolve([]);
+    }
+    const parsed = await auditFile.json();
     return parsed.files.map((f: any) => {
       f.deletionDate = calculateDeletionDate(
         parsed.keep.days,
