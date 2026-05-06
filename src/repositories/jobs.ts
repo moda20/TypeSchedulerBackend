@@ -291,6 +291,8 @@ export const jobActionExecution = async (
           }
           throw new Error("Job not found", { cause: res });
         })
+        .then(() => Promise.resolve(ScheduleJobManager.stopJobById(id)))
+        .then(() => unsubscribeFromAllLogs(id))
         .then(() => {
           return ScheduleJobManager.softDeleteJob(id).then(
             (d: { success: boolean }) => {

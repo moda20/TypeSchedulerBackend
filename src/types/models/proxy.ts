@@ -27,9 +27,9 @@ export interface newProxyConfig {
   proxy_ip: string;
   proxy_port: number;
   protocol: string;
-  username: string;
-  password: string;
-  description: string;
+  username?: string;
+  password?: string;
+  description?: string;
   status: proxy_status;
 }
 export interface proxyUpdateConfig {
