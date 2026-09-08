@@ -11,6 +11,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
     "lint": "eslint --ext .ts src",
+    "build_ui": "cd ./src/UI && vite build",
     "build": "bun build src/index.ts --target=bun --outdir ./build",
     "build:types": "(tsc --project ./tsTypesconfig.json || true) && sed -i 's#src/#@#g' extraTypes/types.d.ts",
     "build:types:osx": "(tsc --project ./tsTypesconfig.json || true) && sed -i '' 's#src/#@#g' extraTypes/types.d.ts"
