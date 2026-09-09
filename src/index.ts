@@ -53,7 +53,7 @@ if (config.get("swaggerServer")) {
 api.use(auth);
 api.use(apiRoutes);
 api.use(statusController);
-api.use(adminServer);
+api.use(adminServer());
 api.get("/", () => "Server is working");
 
 api.use(
@@ -73,9 +73,17 @@ initialize()
       `🦊 Server is running at ${api.server?.hostname}:${process.env.PORT || 8080}`,
     );
   })
-  .catch((err) => {
+  .catch(async (err) => {
     logger.error("Error initializing the server");
     logger.error(err);
+    if (config.get("admin.errorAdminUI") === true) {
+      logger.info("Enabling admin UI after startup crash");
+      const adminOnlyServer = await adminServer();
+      adminOnlyServer.listen({
+        port: config.get("server.port") as number,
+        hostname: config.get("server.ip") as string,
+      });
+    }
     if (api.server) {
       return api.stop();
     }
