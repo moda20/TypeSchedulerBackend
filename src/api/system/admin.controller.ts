@@ -31,10 +31,12 @@ async function adminIndex() {
 
 export const adminServer = async () =>
   new Elysia({ prefix: "/admin" })
-    .onRequest(({ request, server }) => {
-      const ip = server?.requestIP(request)?.address;
-      if (!ip || !TRUSTED.has(ip))
-        return new Response("Forbidden", { status: 403 });
+    .guard({
+      beforeHandle({ request, server }) {
+        const ip = server?.requestIP(request)?.address;
+        if (!ip || !TRUSTED.has(ip))
+          return new Response("Forbidden", { status: 403 });
+      },
     })
     .use(
       await staticPlugin({

@@ -15,3 +15,6 @@ helm-charts
 coverage*
 *.log
 logs/jobs/*
+.omo/**
+.roo/**
+.tmp
