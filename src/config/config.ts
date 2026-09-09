@@ -329,6 +329,22 @@ const config = convict({
     default: "unknown",
     db_mirror: false,
   },
+  admin: {
+    allowedIPs: {
+      doc: "List of IPs allowed to access the admin portal",
+      format: String,
+      default: "127.0.0.1",
+      env: "ADMIN_ALLOW_IPS",
+    },
+    errorAdminUI: {
+      doc: "Enable the admin UI even if the app failed to start correctly",
+      format: Boolean,
+      default: false,
+      env: "ADMIN_ERROR_UI",
+      db_mirror: false,
+      job_hidden: true,
+    },
+  },
 });
 
 type extendedConvict = typeof config & {
