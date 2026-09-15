@@ -160,3 +160,64 @@ export const deleteConfig = async (key: string, userId?: number) => {
       });
   }
 };
+
+export const deleteAdminConfig = async (key: string) => {
+  const existingConfig = await basePrisma.appConfig.findUnique({
+    where: {
+      key: key,
+    },
+  });
+  if (existingConfig) {
+    return basePrisma.appConfig.delete({
+      where: {
+        key: key,
+      },
+    });
+  }
+};
+
+export const saveAdminConfig = async (
+  key: string,
+  value: string,
+  is_encrypted?: boolean,
+) => {
+  const existingConfig = await basePrisma.appConfig.findUnique({
+    where: {
+      key: key,
+    },
+  });
+  if (existingConfig?.is_encrypted !== is_encrypted) {
+    const sysLog = eventLog(LogEventNames.SysLogEvent);
+    const message = `config ${key} has changed encryption status from ${existingConfig?.is_encrypted} to ${is_encrypted}`;
+    sysLog.warn(message, {
+      eventName: "CONFIG_ENCRYPTION_STATUS_CHANGED",
+    });
+    logger.warn(message);
+  }
+  const finalValue = is_encrypted
+    ? encryptionUtils.encryptWithMasterKey(value)
+    : value;
+  if (existingConfig) {
+    return basePrisma.appConfig
+      .update({
+        where: {
+          key: key,
+        },
+        data: {
+          value: finalValue,
+          is_encrypted: is_encrypted ?? existingConfig.is_encrypted,
+        },
+      })
+      .then(() => finalValue);
+  } else {
+    return basePrisma.appConfig
+      .create({
+        data: {
+          key: key,
+          value: finalValue,
+          is_encrypted: is_encrypted ?? false,
+        },
+      })
+      .then(() => finalValue);
+  }
+};

@@ -1,5 +1,4 @@
-# use the official Bun image
-# see all versions at https://hub.docker.com/r/oven/bun/tags
+# syntax=docker/dockerfile:1
 FROM oven/bun:1 AS base
 WORKDIR /usr/src/app
 
@@ -20,12 +19,20 @@ RUN cd /temp/prod && bun install --frozen-lockfile --production
 # then copy all (non-ignored) project files into the image
 FROM base AS prerelease
 COPY --from=install /temp/dev/node_modules node_modules
-COPY . .
+COPY --exclude=src/UI . .
 
 # [optional] tests & build
 ENV NODE_ENV=development
 # RUN bun test // tests are not implemented yet
 RUN bun run build
+
+
+FROM base AS ui
+COPY src/UI/package.json src/UI/bun.lock ./
+RUN bun install --frozen-lockfile
+COPY src/UI/ ./
+RUN bun run build
+
 
 # copy production dependencies and source code into final image
 FROM base AS release
@@ -34,6 +41,8 @@ ARG SYSTEM_VERSION_STRING
 COPY --from=install /temp/prod/node_modules node_modules
 COPY --from=prerelease /usr/src/app/. .
 COPY --from=prerelease /usr/src/app/package.json .
+COPY --from=ui /usr/src/app/dist ./src/UI/dist
+
 RUN apt update
 RUN bun install -g typescript
 RUN bun install bun-types

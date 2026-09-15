@@ -13,9 +13,8 @@ services:
     environment:
       - NODE_ENV=development
       - DB_HOST=host.docker.internal
-      - DB_PORT=3306
-      - DB_USERNAME=root
-      - DB_PASSWORD=
-      - SCHEDULER_DB_NAME=scheduler_db
+      - BASE_DB_HOST=host.docker.internal
+      - ADMIN_ERROR_UI=true
+      - ADMIN_ALLOW_IPS=
     ports:
       - "8080:8080"
