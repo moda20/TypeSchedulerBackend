@@ -4,6 +4,7 @@ import { JobDTO, jobStatus } from "@typesDef/models/job";
 import currentRunsManager from "@utils/CurrentRunsManager";
 import { getCircularReplacer } from "@utils/jobUtils";
 import logger, { eventLog, JobLogger } from "@utils/loggers";
+import { fromEvent, Observable, take, tap } from "rxjs";
 import schedulerManager from "schedule-manager";
 const { ScheduleJobEventBus, ScheduleJobLogEventBus, ScheduleJobManager } =
   schedulerManager;
@@ -76,15 +77,18 @@ export const registerJobStartAndEndActions = (job: JobDTO) => {
   if (currentRunsManager.isInitialized(job)) {
     return; // Already initialized;
   }
-  onJobStarted<JobDTO>(eventTargetId).then(({ job: startedJob, off }) => {
-    currentRunsManager.startJob(startedJob);
-    currentRunsManager.initialized.get(eventTargetId)!.startEventOff = off;
-  });
-  onJobFinished<JobDTO>(eventTargetId).then(({ job: endedJob, off }) => {
+  const startSub = onJobStarted<JobDTO>(eventTargetId).subscribe(
+    (startedJob) => {
+      currentRunsManager.startJob(startedJob);
+    },
+  );
+  const endSub = onJobFinished<JobDTO>(eventTargetId).subscribe((endedJob) => {
     currentRunsManager.endJob(endedJob);
-    currentRunsManager.initialized.get(eventTargetId)!.endEventOff = off;
   });
-  currentRunsManager.initializeJob(eventTargetId);
+  currentRunsManager.initializeJob(eventTargetId, {
+    startEventOff: () => startSub.unsubscribe(),
+    endEventOff: () => endSub.unsubscribe(),
+  });
 };
 
 export const registerSingularJobStartAndEndActions = (job: JobDTO) => {
@@ -100,7 +104,7 @@ export const registerSingularJobStartAndEndActions = (job: JobDTO) => {
     eventName: `scheduleJob:${eventTargetId}`,
   });
   currentRunsManager.startJob(job);
-  onJobFinished<JobDTO>(eventTargetId, true).then(({ job: endedJob }) => {
+  onJobFinished<JobDTO>(eventTargetId, true).subscribe((endedJob) => {
     logger.trace(`Singular job completed ${job.getUniqueSingularId()!}`);
     currentRunsManager.endJob(endedJob);
     currentRunsManager.unInitializeJob(eventTargetId);
@@ -112,48 +116,38 @@ export const registerSingularJobStartAndEndActions = (job: JobDTO) => {
 export const onJobFinished = <T>(
   eventTargetId: string,
   once?: boolean,
-): Promise<{ job: T; off: () => void }> => {
+): Observable<T> => {
   const fullEventId = `completed:${eventTargetId}`;
-  return new Promise<{ job: T; off: () => void }>((res) => {
-    const execFunction = (endedJob: JobDTO) => {
+
+  const returnedObservable = fromEvent(
+    ScheduleJobEventBus,
+    fullEventId,
+    (job) => job as T,
+  ).pipe(
+    tap(() => {
       const logger = eventLog(LogEventNames.JobScheduleEvent);
       logger.debug(`${jobEventLog.JOB_ENDED}: ${eventTargetId}`, {
         eventName: fullEventId,
       });
-      res({
-        job: endedJob as T,
-        off: () => {
-          ScheduleJobEventBus.off(fullEventId, execFunction);
-        },
-      });
-    };
-    if (once) {
-      ScheduleJobEventBus.once(fullEventId, execFunction);
-    } else {
-      ScheduleJobEventBus.on(fullEventId, execFunction);
-    }
-  });
+    }),
+  );
+  if (once) {
+    return returnedObservable.pipe(take(1));
+  }
+  return returnedObservable;
 };
 
-export const onJobStarted = <T>(
-  eventTargetId: string,
-): Promise<{ job: T; off: () => void }> => {
+export const onJobStarted = <T>(eventTargetId: string): Observable<T> => {
   const fullEventId = `scheduleJob:${eventTargetId}`;
-  return new Promise<{ job: T; off: () => void }>((res) => {
-    const execFunction = (endedJob: JobDTO) => {
+
+  return fromEvent(ScheduleJobEventBus, fullEventId, (job) => job as T).pipe(
+    tap(() => {
       const logger = eventLog(LogEventNames.JobScheduleEvent);
       logger.debug(`${jobEventLog.JOB_STARTED}: ${eventTargetId}`, {
         eventName: fullEventId,
       });
-      res({
-        job: endedJob as T,
-        off: () => {
-          ScheduleJobEventBus.off(fullEventId, execFunction);
-        },
-      });
-    };
-    ScheduleJobEventBus.on(fullEventId, execFunction);
-  });
+    }),
+  );
 };
 
 export const unsubscribeFromAllLogs = (id: number) => {
