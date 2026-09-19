@@ -36,6 +36,7 @@ import { JobQueue } from "@utils/queueUtils";
 import dayjs from "dayjs";
 import { readFile } from "fs-extra";
 import { join } from "path";
+import { firstValueFrom } from "rxjs";
 import manager from "schedule-manager";
 const { ScheduleJobManager } = manager;
 
@@ -454,7 +455,7 @@ export const queueJobExecution = async (
       jobActionExecution(jobActions.EXECUTE, Number(e.id), {}).then(
         (registrationData: any) => {
           const eventTargetId = `${e.getName()}_${registrationData.uniqueSingularId!}`;
-          return onJobFinished(eventTargetId);
+          return firstValueFrom(onJobFinished(eventTargetId));
         },
       );
   });
