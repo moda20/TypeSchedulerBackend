@@ -54,9 +54,10 @@ export const getFilteredJobs = async (filters: advancedFilters) => {
     (Object.keys(filters) as Array<keyof advancedFilters>)
       .filter(
         (e: keyof advancedFilters) =>
-          !["sorting", "status", "latestRun"].includes(e) &&
-          typeof filters[e] === "object" &&
-          (filters[e] as any)?.type !== "regex",
+          typeof filters[e] === "boolean" ||
+          (!["sorting", "status", "latestRun"].includes(e) &&
+            typeof filters[e] === "object" &&
+            (filters[e] as any)?.type !== "regex"),
       )
       .map((e) => [e, filters[e]]),
   );
@@ -145,7 +146,7 @@ export const getAllJobs = async ({
       },
     },
   });
-  const mappedJobs = allJobs.map((job) => {
+  let mappedJobs = allJobs.map((job) => {
     const nj = new JobDTOClass(job);
     nj.setInitialized(currentRunsManager.isInitialized(nj));
     nj.setIsCurrentlyRunning(currentRunsManager.isRunning(nj));
@@ -195,6 +196,10 @@ export const getAllJobs = async ({
       return a.status === "STARTED" ? sortOrder : -sortOrder;
     });
   }
+  // TODO explore more uses for duckDb before using it for this cross Db filters
+  if (advancedFilters?.isRunning) {
+    mappedJobs = mappedJobs.filter((e) => e.isCurrentlyRunning);
+  }
   return mappedJobs;
 };
 
@@ -239,7 +244,7 @@ export const refreshJobRegistration = async (id: number | number[]) => {
         .then(() => {
           return unsubscribeFromAllLogs(id);
         })
-        .then((f) => {
+        .then(() => {
           return ScheduleJobManager.getJobById(id);
         })
         .then((jobDetails) => {
