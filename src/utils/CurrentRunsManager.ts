@@ -1,6 +1,7 @@
 import mainSocketService from "@api/websocket/mainSocket.service";
 import { JobInitialization } from "@typesDef/api/jobs";
 import { JobDTO } from "@typesDef/models/job";
+import { toSafeString } from "@utils/convictUtils";
 import logger from "@utils/loggers";
 import { JobQueue } from "@utils/queueUtils";
 import { Database } from "bun:sqlite";
@@ -46,7 +47,7 @@ export default {
         stmt.run(
           job.getUniqueSingularId() ?? job.getId(),
           job.getName(),
-          job.getParam(),
+          toSafeString(job.getParam()),
         );
 
         if (!this.runningJobs.has(job.getName())) {
@@ -58,7 +59,6 @@ export default {
       });
 
       transaction();
-
       mainSocketService.sendJobStartingNotification(
         job,
         this.getRunningJobCount(),
@@ -96,8 +96,8 @@ export default {
   },
 
   isRunning(job: JobDTO) {
-    const stm = this.db.prepare("SELECT * FROM jobs WHERE id = ?");
-    const foundJob = stm.get(job.getUniqueSingularId() ?? job.getId());
+    const stm = this.db.prepare("SELECT * FROM jobs WHERE name = ?");
+    const foundJob = stm.get(job.getName());
     if (foundJob) return true;
     return false;
   },
