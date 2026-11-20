@@ -19,6 +19,8 @@ import {
 } from "@utils/jobUtils";
 import { eventLog } from "@utils/loggers";
 
+import { stringify } from "./serializationUtils";
+
 export const emitJobEvent = async (
   event: string,
   message: string,
@@ -94,4 +96,10 @@ export function getDefaultNotificationService(): new () => DefaultNotificationSe
   }
 }
 
-export { exportCacheFiles, exportResultsToFile, getNextJobExecution, sleep };
+export {
+  exportCacheFiles,
+  exportResultsToFile,
+  getNextJobExecution,
+  sleep,
+  stringify,
+};
