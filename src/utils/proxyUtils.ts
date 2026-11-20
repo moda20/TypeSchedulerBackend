@@ -23,7 +23,7 @@ export const injectProxyIntoInstance = (
   if (isSocksProxy) {
     logger &&
       logger(
-        "!!WARNING!! Using socks proxy will use a custom fetch function. Check here : https://github.com/oven-sh/bun/issues/16812",
+        "!!WARNING!! Using socks proxy will use a custom fetch function, this will override the default adapter. Check here : https://github.com/oven-sh/bun/issues/16812",
       );
     const proxyUrl = `${proxy.protocol}://${proxy.username ? proxy.username + ":" + proxy.password + "@" : ""}${proxy.proxy_ip}:${proxy.proxy_port}`;
     // TODO as of this addition, bun doesn't fully or partially support socks5 proxies,

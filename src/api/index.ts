@@ -15,6 +15,7 @@ import { keysController } from "@auth/keys.controller";
 import { createElysia } from "@utils/createElysia";
 import { APIError } from "@utils/ErrorHandler";
 import logger from "@utils/loggers";
+import { stringify } from "@utils/serializationUtils";
 import { StatusCodes } from "http-status-codes";
 export const apiRoutes = createElysia()
   .error({ APIError })
@@ -23,6 +24,9 @@ export const apiRoutes = createElysia()
     logger.error(
       `error when calling ${path} with code ${code} and error ${error}`,
     );
+    if ("cause" in error) {
+      logger.error(`error cause: ${stringify(error.cause)}`);
+    }
     const statusCode = getErrorCode({ code, error });
     const message = error.toString() ?? "Unknown system error";
 
