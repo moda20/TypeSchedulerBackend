@@ -9,7 +9,7 @@ import { JobDTO, JobLogDTO } from "@typesDef/models/job";
 import type { Notifications } from "@typesDef/notifications";
 import dayjs from "@utils/dayJs";
 import logger from "@utils/loggers";
-import { stringify } from "@utils/serializationUtils";
+import { stringifyLossless } from "@utils/serializationUtils";
 import cronParser from "cron-parser";
 import { readdirSync, statSync } from "fs-extra";
 import path, { join, parse } from "path";
@@ -167,7 +167,7 @@ export const getFromCache = async (fileName: string) => {
  * @returns string
  */
 export const toJSON = (param: any): any => {
-  return JSON.parse(stringify(param) ?? "['Empty param']");
+  return JSON.parse(stringifyLossless(param) ?? "['Empty param']");
 };
 
 /**

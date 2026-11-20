@@ -7,3 +7,8 @@ export const stringify = configure({
   bigint: true,
   deterministic: false,
 });
+
+export const stringifyLossless = configure({
+  bigint: "string",
+  deterministic: false,
+});
